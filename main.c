@@ -5,6 +5,10 @@ int main(){
   printf("Ini tes dari Fawwaz");
   printf("Masukkan angka pertama");
   scanf("%d",x);
-  printf("Angka pertama telah dimasukkan :)");
+  printf("Angka pertama telah dimasukkan :");
+  printf("aku supri");
+  printf("efnwjhosfd");
+
+  printf("tesdulu");
   return 0;
 }

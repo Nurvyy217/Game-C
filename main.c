@@ -7,6 +7,7 @@ int main(){
   scanf("%d",x);
   printf("Angka pertama telah dimasukkan :");
   printf("aku supri");
+  printf("efnwjhosfd");
 
   printf("tesdulu");
   return 0;

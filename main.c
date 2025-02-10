@@ -8,6 +8,7 @@ int main(){
   printf("Angka pertama telah dimasukkan :");
   printf("aku supri");
   printf("efnwjhosfd");
+  printf("kontol hasbi");
 
   printf("tesdulu");
   return 0;

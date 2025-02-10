@@ -6,5 +6,6 @@ int main(){
   printf("Masukkan angka pertama");
   scanf("%d",x);
   printf("Angka pertama telah dimasukkan :)");
+  printf("tesdulu");
   return 0;
 }

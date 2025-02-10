@@ -1,8 +1,8 @@
 #include "raylib.h"
 
 int main() {
-    const int screenWidth = 720;
-    const int screenHeight = 960;
+    const int screenWidth = 800;
+    const int screenHeight = 450;
 
     InitWindow(screenWidth, screenHeight, "Hello Raylib");
 

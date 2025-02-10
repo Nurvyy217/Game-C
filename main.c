@@ -9,7 +9,7 @@ int main() {
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("Hello, Raylib!", 300, 200, 20, BLACK);
+        DrawText("Hello World!", 300, 200, 20, BLACK);
         EndDrawing();
     }
 

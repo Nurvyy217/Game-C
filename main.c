@@ -11,6 +11,7 @@ int main() {
         ClearBackground(RAYWHITE);
         DrawText("Hello, Raylib!", 300, 200, 20, BLACK);
         EndDrawing();
+        printf("tes blaballla");
     }
 
     CloseWindow();

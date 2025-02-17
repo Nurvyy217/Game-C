@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "raylib.h"
 
 int main(){
   int x;
@@ -9,7 +9,4 @@ int main(){
   printf("aku supri");
   printf("efnwjhosfd");
   printf("kontol hasbi");
-
-  printf("tesdulu");
-  return 0;
 }

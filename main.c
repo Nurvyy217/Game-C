@@ -7,8 +7,8 @@
 #include "hasbi.h"
 
 
-const int screenWidth = 600;
-const int screenHeight = 600;
+const int screenWidth = 720;
+const int screenHeight = 960;
 const Vector2 screenSize= {screenWidth, screenHeight};
 #define NEARBLACK CLITERAL(Color){15, 15, 15, 255}
 

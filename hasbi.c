@@ -22,5 +22,5 @@ void AsteroidUpdate(Asteroid* asteroid, float frametime){
 
 void AsteroidDraw(Asteroid asteroid){
     if (!asteroid.active) return;
-    DrawPoly(asteroid.position, 3, 64, asteroid.rotation, LIGHTGRAY);
+    DrawPolyLines(asteroid.position, 3, 64, asteroid.rotation, LIGHTGRAY);
 }

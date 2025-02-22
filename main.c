@@ -1,64 +1,30 @@
-#include <stdlib.h>
-#include <time.h>
-
-#include "raylib.h"
-#include "raymath.h"
-
 #include "hasbi.h"
 
+int main(void) {
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
+    SetTargetFPS(60);
 
-const int screenWidth = 720;
-const int screenHeight = 960;
-const Vector2 screenSize= {screenWidth, screenHeight};
-#define NEARBLACK CLITERAL(Color){15, 15, 15, 255}
-
-#define MAX_ASTEROIDS 64
-static Asteroid _asteroids[MAX_ASTEROIDS] = {0};
-
-void UpdateDrawFrame(void);
-void AddAsteroid(Vector2 position, Vector2 velocity, AsteroidSize size);
-
-int main() {
-    srand(time(0));
-    InitWindow(screenWidth, screenHeight, "Asteroid by Hasbi");
-
+    InitPlayer();
+    InitBullets();
+    
     while (!WindowShouldClose()) {
-        UpdateDrawFrame();
+        if (!isLoadingDone) {
+            loadingAnimation();  // Tampilkan loading lebih dulu
+        } else {
+            UpdatePlayer();
+            if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+            UpdateBullets();
+            
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawGameplay();  // Menampilkan layout + player + bullet
+            EndDrawing();
+        }
     }
 
+    UnloadPlayer();
+    unloadTextures();
+    
     CloseWindow();
     return 0;
 }
-
-void UpdateDrawFrame(void){
-    float frametime = GetFrameTime();
-    for(int i=0; i<MAX_ASTEROIDS; i++){
-        AsteroidUpdate(_asteroids + i, frametime);
-    }
-    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        AddAsteroid(GetMousePosition(), (Vector2){200, 0}, ASTEROID_SMALL);
-    }
-    BeginDrawing();
-    ClearBackground(NEARBLACK);
-    for(int i=0; i<MAX_ASTEROIDS; i++){
-        AsteroidDraw(_asteroids[i]);
-    }
-    EndDrawing();
-}
-
-void AddAsteroid(Vector2 position, Vector2 velocity, AsteroidSize size){
-    bool created=false;
-    Asteroid asteroid = CreateAsteroid(position, velocity, size);
-    for (int i=0; i<MAX_ASTEROIDS;i++){
-        if (_asteroids[i].active){
-            continue;
-        }
-        _asteroids[i]=CreateAsteroid(position, velocity, size);
-        created=true;
-        break;
-    }
-    if(!created){
-        TraceLog(LOG_ERROR, "Failed to create an asteroid because there was no inactive spots in the array");
-    }
-}
-

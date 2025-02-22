@@ -1,27 +1,39 @@
-#ifndef ASTEROID_H
-#define ASTEROID_H
+#ifndef HASBI_H
+#define HASBI_H
 
 #include "raylib.h"
 
-typedef enum AsteroidSize{
-    ASTEROID_SMALL=1,
-    ASTEROID_MEDIUM=2,
-    ASTEROID_LARGE=4,
-}AsteroidSize;
+#define SCREEN_WIDTH 720
+#define SCREEN_HEIGHT 960
+#define GAMEPLAY_WIDTH (SCREEN_WIDTH * 5 / 7)
+#define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 
-#define ASTEROID_ROT_SPEED_MIN 5 
-#define ASTEROID_ROT_SPEED_MAX 240
+extern bool isLoadingDone; 
+void initTextures();
+void unloadTextures();
+void loadingAnimation();
+void DrawLayout();
 
-typedef struct Asteroid{
-    bool active;
+
+#define PLAYER_SPEED 5
+#define BULLET_SPEED 7
+#define MAX_BULLETS 10
+
+typedef struct {
     Vector2 position;
-    Vector2 velocity; 
-    AsteroidSize size;
-    float rotation;
-    float rotationSpeed;
-}Asteroid;
+    Texture2D texture;
+} Player;
 
-Asteroid CreateAsteroid(Vector2 position, Vector2 velocity, AsteroidSize size);
-void AsteroidUpdate(Asteroid* asteroid, float frametime);
-void AsteroidDraw(Asteroid asteroid);
+typedef struct {
+    Vector2 position;
+    bool active;
+} Bullet;
+
+void InitPlayer();
+void InitBullets();
+void UpdatePlayer();
+void ShootBullet();
+void UpdateBullets();
+void DrawGameplay();
+void UnloadPlayer();
 #endif

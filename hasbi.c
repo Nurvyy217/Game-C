@@ -1,26 +1,162 @@
 #include "hasbi.h"
-#include "raymath.h"
 
-Asteroid CreateAsteroid(Vector2 position, Vector2 velocity, AsteroidSize size){
-    return (Asteroid){
-        .active=true,
-        .position=position,
-        .velocity=velocity,
-        .rotation=GetRandomValue(0, 360),
-        .rotationSpeed=GetRandomValue(ASTEROID_ROT_SPEED_MIN, ASTEROID_ROT_SPEED_MAX)
-    };
+void DrawLayout()
+{
+    ClearBackground(RAYWHITE);
+    
+    // Gameplay area (3/4 of screen, left part)
+    DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, LIGHTGRAY);
+    DrawText("Gameplay Area", GAMEPLAY_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, 20, DARKGRAY);
+    
+    // Menu area (1/4 of screen, right part)
+    DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
+    DrawText("Menu Area", GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, 20, RAYWHITE);
+    
+    // Separator line
+    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK);
+    
 }
 
-void AsteroidUpdate(Asteroid* asteroid, float frametime){
-    if (!asteroid->active){
-        return;
+Texture2D logoDeveloper;
+Texture2D gameNamePhoto;
+bool texturesLoaded = false;  // Cek apakah gambar sudah di-load
+bool isLoadingDone = false; 
+
+void initTextures() {
+    if (!texturesLoaded) {  // Load hanya sekali
+        logoDeveloper = LoadTexture("logoDeveloper.png");
+        gameNamePhoto = LoadTexture("gameNamePhoto.png");
+        texturesLoaded = true;
     }
-    asteroid->position = Vector2Add(asteroid->position,
-        Vector2Scale(asteroid->velocity, frametime));
-    asteroid->rotation += asteroid->rotationSpeed * frametime;
 }
 
-void AsteroidDraw(Asteroid asteroid){
-    if (!asteroid.active) return;
-    DrawPolyLines(asteroid.position, 3, 64, asteroid.rotation, LIGHTGRAY);
+void unloadTextures() {
+    if (texturesLoaded) {
+        UnloadTexture(logoDeveloper);
+        UnloadTexture(gameNamePhoto);
+        texturesLoaded = false;
+    }
+}
+
+void loadingAnimation() {
+    static float alpha = 1.0f;
+    static int stage = 0;
+    static float timer = 0.0f;
+
+    initTextures();
+
+    if (isLoadingDone) return;  // Jika sudah selesai, langsung keluar
+
+    timer += GetFrameTime();
+
+    switch (stage) {
+        case 0: // Fade out gambar pertama
+            if (timer > 2.0f) {
+                alpha -= 0.02f;
+                if (alpha <= 0) {
+                    alpha = 0;
+                    stage = 1;
+                    timer = 0;
+                }
+            }
+            break;
+        case 1: // gambar kedua
+                alpha=1.0f;
+                stage = 2;
+                timer = 0;
+            break;
+    
+        case 2: // Fade out gambar kedua, lalu selesai
+            if (timer > 2.0f) {
+                alpha -= 0.02f;
+                if (alpha <= 0) {
+                    alpha = 0;
+                    isLoadingDone = true;  // Menandai bahwa loading selesai
+                    return;
+                }
+            }
+            break;
+    }
+
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    if (stage == 0) {
+        DrawTexture(logoDeveloper, SCREEN_WIDTH / 2 - logoDeveloper.width / 2, SCREEN_HEIGHT / 2 - logoDeveloper.height / 2, Fade(WHITE, alpha));
+    }
+    if (stage >= 1) {
+        DrawTexture(gameNamePhoto, SCREEN_WIDTH / 2 - gameNamePhoto.width / 2, SCREEN_HEIGHT / 2 - gameNamePhoto.height / 2, Fade(WHITE, (stage == 1) ? (1.0f - alpha) : alpha));
+    }
+
+    EndDrawing();
+}
+
+//PESAWAT USER
+Player player;
+Bullet bullets[MAX_BULLETS];
+
+void InitPlayer() {
+    player.position = (Vector2){GAMEPLAY_WIDTH / 2, SCREEN_HEIGHT - 115};
+    player.texture = LoadTexture("userPlane.png");
+}
+
+void InitBullets() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        bullets[i].active = false;
+    }
+}
+
+void UpdatePlayer() {
+    if (IsKeyDown(KEY_A) && player.position.x > 0) 
+    player.position.x -= PLAYER_SPEED;
+    if (IsKeyDown(KEY_D) && player.position.x < GAMEPLAY_WIDTH - (player.texture.width * 0.21)) 
+        player.position.x += PLAYER_SPEED;
+    if (IsKeyDown(KEY_W) && player.position.y > 0) 
+        player.position.y -= PLAYER_SPEED;
+    if (IsKeyDown(KEY_S) && player.position.y < SCREEN_HEIGHT - (player.texture.height * 0.2)) 
+        player.position.y += PLAYER_SPEED;
+
+}
+
+void ShootBullet() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (!bullets[i].active) {
+            bullets[i].position = (Vector2){player.position.x + player.texture.width *0.2 / 2, player.position.y};
+            bullets[i].active = true;
+            break;
+        }
+    }
+}
+
+void UpdateBullets() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            bullets[i].position.y -= BULLET_SPEED;
+            if (bullets[i].position.y < 0) bullets[i].active = false;
+        }
+    }
+}
+
+void DrawPlayer() {
+    float scale = 0.2; // Skala 20% dari ukuran aslinya
+    DrawTextureEx(player.texture, player.position, 0.0f, scale, WHITE);
+    // DrawTexture(player.texture, player.position.x, player.position.y, WHITE);
+}
+
+void DrawBullets() {
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            DrawCircleV(bullets[i].position, 5, RED);
+        }
+    }
+}
+
+void DrawGameplay() {
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+}
+
+void UnloadPlayer() {
+    UnloadTexture(player.texture);
 }

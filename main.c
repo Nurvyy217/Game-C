@@ -2,14 +2,7 @@
 
 int main(){
   int x;
-  printf("Ini tes dari Fawwaz");
-  printf("halo ini nazwa");
-  printf("Masukkan angka pertama");
-  scanf("%d",x);
-  printf("Angka pertama telah dimasukkan :");
-  printf("aku supri");
-  printf("efnwjhosfd");
-
-  printf("tesdulu");
+  printf("Air air apa yang bisa terbang");
+  printf("Aironmen");
   return 0;
 }

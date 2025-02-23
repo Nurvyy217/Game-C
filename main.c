@@ -1,19 +1,30 @@
-#include "raylib.h"
+#include "hasbi.h"
 
-int main() {
-    const int screenWidth = 720;
-    const int screenHeight = 960;
+int main(void) {
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
+    SetTargetFPS(60);
 
-    InitWindow(screenWidth, screenHeight, "Hello Raylib");
-
+    InitPlayer();
+    InitBullets();
+    
     while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Hello, Raylib!", 300, 200, 20, BLACK);
-        EndDrawing();
-        printf("tes blaballla");
+        if (!isLoadingDone) {
+            loadingAnimation();  // Tampilkan loading lebih dulu
+        } else {
+            UpdatePlayer();
+            if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+            UpdateBullets();
+            
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawGameplay();  // Menampilkan layout + player + bullet
+            EndDrawing();
+        }
     }
 
+    UnloadPlayer();
+    unloadTextures();
+    
     CloseWindow();
     return 0;
-
+}

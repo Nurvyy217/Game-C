@@ -1,5 +1,6 @@
 #include "hasbi.h"
 
+//LOADING SCREEN
 void DrawLayout()
 {
     ClearBackground(RAYWHITE);
@@ -91,7 +92,9 @@ void loadingAnimation() {
     EndDrawing();
 }
 
-//PESAWAT USER
+
+
+//USER PLANE
 Player player;
 Bullet bullets[MAX_BULLETS];
 
@@ -107,13 +110,13 @@ void InitBullets() {
 }
 
 void UpdatePlayer() {
-    if (IsKeyDown(KEY_A) && player.position.x > 0) 
+    if (IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT) && player.position.x > 0) 
     player.position.x -= PLAYER_SPEED;
-    if (IsKeyDown(KEY_D) && player.position.x < GAMEPLAY_WIDTH - (player.texture.width * 0.21)) 
+    if (IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT) && player.position.x < GAMEPLAY_WIDTH - (player.texture.width * 0.21)) 
         player.position.x += PLAYER_SPEED;
-    if (IsKeyDown(KEY_W) && player.position.y > 0) 
+    if (IsKeyDown(KEY_W)||IsKeyDown(KEY_UP) && player.position.y > 0) 
         player.position.y -= PLAYER_SPEED;
-    if (IsKeyDown(KEY_S) && player.position.y < SCREEN_HEIGHT - (player.texture.height * 0.2)) 
+    if (IsKeyDown(KEY_S)||IsKeyDown(KEY_DOWN) && player.position.y < SCREEN_HEIGHT - (player.texture.height * 0.2)) 
         player.position.y += PLAYER_SPEED;
 
 }
@@ -160,3 +163,59 @@ void DrawGameplay() {
 void UnloadPlayer() {
     UnloadTexture(player.texture);
 }
+
+
+
+//ASTEROIDS
+Asteroid asteroids[MAX_ASTEROIDS];
+int playerHealth=15;
+
+void InitAsteroids() {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        asteroids[i].position = (Vector2){GetRandomValue(0, GAMEPLAY_WIDTH - 50), GetRandomValue(-300, -50)};
+        asteroids[i].size = GetRandomValue(1, 3);
+        asteroids[i].health = asteroids[i].size;
+        asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(2, 5)};
+        asteroids[i].active = true;
+    }
+}
+
+void UpdateAsteroids() {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        if (asteroids[i].active) {
+            asteroids[i].position.x += asteroids[i].speed.x;
+            asteroids[i].position.y += asteroids[i].speed.y;
+            
+            if (asteroids[i].position.x <= 0 || asteroids[i].position.x >= GAMEPLAY_WIDTH - 50) {
+                asteroids[i].speed.x *= -1;  // Pantulan jika mencapai batas
+            }
+            
+            if (asteroids[i].position.y > SCREEN_HEIGHT) {
+                asteroids[i].position = (Vector2){GetRandomValue(0, GAMEPLAY_WIDTH - 50), GetRandomValue(-300, -50)};
+                asteroids[i].health = asteroids[i].size;
+            }
+        }
+    }
+}
+
+void CheckCollisions() {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        if (asteroids[i].active) {
+            for (int j = 0; j < MAX_BULLETS; j++) {
+                if (bullets[j].active &&
+                    CheckCollisionCircles(asteroids[i].position, asteroids[i].size * 15, bullets[j].position, 5)) {
+                    bullets[j].active = false;
+                    asteroids[i].health--;
+                    if (asteroids[i].health <= 0) {
+                        asteroids[i].active = false;
+                    }
+                }
+                if (CheckCollisionCircles(player.position, 20, asteroids[i].position, asteroids[i].size * 15)) {
+                    playerHealth -= asteroids[i].size;
+                    asteroids[i].active = false;
+                }
+            }
+        }
+    }
+}
+

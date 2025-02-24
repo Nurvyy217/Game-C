@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include <stdlib.h>
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
@@ -6,6 +7,7 @@ int main(void) {
 
     InitPlayer();
     InitBullets();
+    InitAsteroids();
     
     while (!WindowShouldClose()) {
         if (!isLoadingDone) {
@@ -14,11 +16,14 @@ int main(void) {
             UpdatePlayer();
             if (IsKeyPressed(KEY_SPACE)) ShootBullet();
             UpdateBullets();
+            CheckCollisions();
+            GameLoop();
             
             BeginDrawing();
             ClearBackground(BLACK);
-            DrawGameplay();  // Menampilkan layout + player + bullet
+            DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
             EndDrawing();
+        
         }
     }
 

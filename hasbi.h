@@ -1,6 +1,7 @@
 #ifndef HASBI_H
 #define HASBI_H
 
+#include <stdlib.h>
 #include "raylib.h"
 
 
@@ -42,15 +43,19 @@ void UnloadPlayer();
 
 
 //ASTEROIDS
-#define MAX_ASTEROIDS 10
+#define MAX_ASTEROIDS 4
 extern int playerHealth;
 typedef struct {
+    Texture2D texture;
     Vector2 position; //posisi asteroid
     Vector2 speed; //kecepatan asteroid
     int size;  // 1 = small, 2 = medium, 3 = big
     int health; //jumlah hit yang diperlukan untuk menghancurkan asteroid
     bool active; //status asteroid aktif
 } Asteroid;
+void InitAsteroids();
+void CheckCollisions();
+void GameLoop();
 
 
 #endif

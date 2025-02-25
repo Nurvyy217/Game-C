@@ -42,7 +42,7 @@ void Tampil_Nyawa(){
 }
 
 void Tampil_Score(){
-    DrawText(TextFormat("Score: %d", score), score + 560, 575, 30, RAYWHITE);
+    DrawText(TextFormat("Score: %d", score), 560, 575, 30, RAYWHITE);
     ubahScore();
 }
 

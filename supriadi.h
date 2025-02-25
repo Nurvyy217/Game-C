@@ -3,7 +3,7 @@
 
 #include "raylib.h"
 
-#define NYAWA_AWAL 15
+#define NYAWA_AWAL 16
 
 extern Texture2D nyawaIMG;
 extern int score;

@@ -16,7 +16,7 @@ int main(void) {
             
             if (gameover()){
                 UpdatePlayer();
-                if (IsKeyDown(KEY_SPACE)) ShootBullet();
+                if (IsKeyPressed(KEY_SPACE)) ShootBullet();
                 UpdateBullets();
                 
                 BeginDrawing();

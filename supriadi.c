@@ -1,4 +1,5 @@
 #include "supriadi.h"
+#include "hasbi.h"
 
 Texture2D nyawaIMG;
 int score = 0;
@@ -9,16 +10,24 @@ void BuatNyawa() {
 }
 
 void rubahNyawa(){
-    if (IsKeyPressed(KEY_K)) Nyawa--;
-    // if (IsKeyPressed(KEY_ENTER)) score += 10;    
+
+    // kurangi nyawa jika terkena tembakan musuh
+    // kurangi nyawa jika terkena meteor
+    // dan lain lain
+
+    if (IsKeyPressed(KEY_K)) Nyawa--; //hanya sementara   
 }
 
 void Tampil_Nyawa(){
+    int n = 0,m = 0;
     ClearBackground(RAYWHITE);
     for (int i = 0; i < Nyawa; i++) {
-        Vector2 posisi = { 550 + i * (nyawaIMG.width * 0.02f + 10 ), 800 };
+        if (i == 8){
+            n = 20;
+            m = 130;
+        }
+        Vector2 posisi = {GAMEPLAY_WIDTH + 40 - m + i * (nyawaIMG.width * 0.02f), 800 + n};
         DrawTextureEx(nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
-
     }
     DrawText(TextFormat("Score: %d", score), 560, 575, 30, RAYWHITE);
     if (Nyawa == 0) {

@@ -24,8 +24,8 @@ bool isLoadingDone = false;
 
 void initTextures() {
     if (!texturesLoaded) {  // Load hanya sekali
-        logoDeveloper = LoadTexture("logoDeveloper.png");
-        gameNamePhoto = LoadTexture("gameNamePhoto.png");
+        logoDeveloper = LoadTexture("LogoG6.png");
+        gameNamePhoto = LoadTexture("SpaceInviders.png");
         texturesLoaded = true;
     }
 }

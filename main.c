@@ -13,12 +13,15 @@ int main(void) {
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
+
+
         if (!isLoadingDone) {
             // loadingAnimation();  // Tampilkan loading lebih dulu
             isLoadingDone=true;
         } else {
             UpdatePlayer();
-            if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+            // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+            UpdateShooting(deltaTime);
             UpdateBullets();
             UpdateExplosions(deltaTime);
             CheckCollisions();
@@ -31,7 +34,7 @@ int main(void) {
         
         }
     }
-
+    CloseAudioDevice();
     UnloadAssets();
     unloadTextures();
     

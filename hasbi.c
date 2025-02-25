@@ -1,6 +1,8 @@
 #include "hasbi.h"
 #include<stdio.h>
 
+
+
 //LOADING SCREEN
 void DrawLayout()
 {
@@ -99,6 +101,24 @@ void unloadTextures() {
 //USER PLANE
 Player player;
 Bullet bullets[MAX_BULLETS];
+Texture2D bulletTexture;
+Sound shootSound;
+static float shootCooldown = 0.0f;
+static const float SHOOT_INTERVAL = 0.2f;
+
+void UpdateShooting(float deltaTime) {
+    // Kurangi cooldown
+    if (shootCooldown > 0.0f) {
+        shootCooldown -= deltaTime;
+    }
+
+    // Cek apakah SPACE ditekan + cooldown <= 0
+    if (IsKeyDown(KEY_SPACE) && shootCooldown <= 0.0f) {
+        ShootBullet();           // Fungsi menembak
+        shootCooldown = SHOOT_INTERVAL; // Reset cooldown
+    }
+}
+
 
 void InitPlayer() {
     player.position = (Vector2){(GAMEPLAY_WIDTH / 2)-210, SCREEN_HEIGHT - 230};
@@ -106,6 +126,11 @@ void InitPlayer() {
 }
 
 void InitBullets() {
+    if (bulletTexture.id == 0) {
+        printf("ERROR: bullet.png gagal dimuat!\n");
+    } else {
+        printf("bullet.png berhasil dimuat! Ukuran: %d x %d\n", bulletTexture.width, bulletTexture.height);
+    }
     for (int i = 0; i < MAX_BULLETS; i++) {
         bullets[i].active = false;
     }
@@ -118,7 +143,7 @@ void UpdatePlayer() {
         player.position.x += PLAYER_SPEED;
     if ((IsKeyDown(KEY_W)||IsKeyDown(KEY_UP)) && player.position.y > -125) 
         player.position.y -= PLAYER_SPEED;
-    if ((IsKeyDown(KEY_S)||IsKeyDown(KEY_LEFT)) && player.position.y < SCREEN_HEIGHT - (((player.texture.height * 0.6)/2)+15)) 
+    if ((IsKeyDown(KEY_S)||IsKeyDown(KEY_DOWN)) && player.position.y < SCREEN_HEIGHT - (((player.texture.height * 0.6)/2)+15)) 
         player.position.y += PLAYER_SPEED;
 
 }
@@ -126,7 +151,8 @@ void UpdatePlayer() {
 void ShootBullet() {
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!bullets[i].active) {
-            bullets[i].position = (Vector2){player.position.x + player.texture.width *0.6 / 2, (player.position.y + player.texture.width*0.6/2)-60};
+            bullets[i].position = (Vector2){(player.position.x-25 )+ player.texture.width *0.6 / 2, (player.position.y + player.texture.width*0.6/2)-110};
+            PlaySound(shootSound);
             bullets[i].active = true;
             break;
         }
@@ -151,10 +177,11 @@ void DrawPlayer() {
 void DrawBullets() {
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].active) {
-            DrawCircleV(bullets[i].position, 5, RED);
+            DrawTextureEx(bulletTexture, (Vector2){bullets[i].position.x - 5, bullets[i].position.y - 5}, 0.0f, 1.0f, WHITE);
         }
     }
 }
+
 
 
 
@@ -163,11 +190,6 @@ Explosion explosions[MAX_EXPLOSIONS];
 Texture2D explosionsTexture;
 Sound asteroidDestroyed, userPlaneExplosions;
 
-void LoadAssets() {
-    explosionsTexture = LoadTexture("Explosions.png");
-    asteroidDestroyed= LoadSound("asteroidDestroyed.wav");
-    userPlaneExplosions= LoadSound("userPlaneExplosion.wav");
-}
 
 void CreateExplosion(Vector2 position) {
     for (int i = 0; i < MAX_EXPLOSIONS; i++) {
@@ -338,7 +360,14 @@ void DrawHealth() {
     DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
 }
 
-
+//ASSETS
+void LoadAssets() {
+    shootSound = LoadSound("shoot.wav");
+    bulletTexture = LoadTexture("bullet.png");
+    explosionsTexture = LoadTexture("Explosions.png");
+    asteroidDestroyed= LoadSound("asteroidDestroyed.wav");
+    userPlaneExplosions= LoadSound("userPlaneExplosion.wav");
+}
 
 //GAMEPLAY
 void DrawGameplay() {

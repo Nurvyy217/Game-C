@@ -21,7 +21,8 @@ void DrawLayout();
 //USER PLANE AND BULLET
 #define PLAYER_SPEED 5
 #define BULLET_SPEED 7
-#define MAX_BULLETS 10
+#define MAX_BULLETS 5
+
 
 typedef struct {
     Vector2 position;
@@ -33,6 +34,7 @@ typedef struct {
     bool active;
 } Bullet;
 
+void UpdateShooting(float deltaTime);
 void InitPlayer(); //posisi userplane pertama kali muncul
 void InitBullets(); 
 void UpdatePlayer();

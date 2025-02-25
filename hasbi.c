@@ -32,13 +32,7 @@ void initTextures() {
     }
 }
 
-void unloadTextures() {
-    if (texturesLoaded) {
-        UnloadTexture(logoDeveloper);
-        UnloadTexture(gameNamePhoto);
-        texturesLoaded = false;
-    }
-}
+
 
 void loadingAnimation() {
     static float alpha = 1.0f;
@@ -92,7 +86,13 @@ void loadingAnimation() {
 
     EndDrawing();
 }
-
+void unloadTextures() {
+    if (texturesLoaded) {
+        UnloadTexture(logoDeveloper);
+        UnloadTexture(gameNamePhoto);
+        texturesLoaded = false;
+    }
+}
 
 
 
@@ -101,7 +101,7 @@ Player player;
 Bullet bullets[MAX_BULLETS];
 
 void InitPlayer() {
-    player.position = (Vector2){GAMEPLAY_WIDTH / 2, SCREEN_HEIGHT - 115};
+    player.position = (Vector2){(GAMEPLAY_WIDTH / 2)-210, SCREEN_HEIGHT - 230};
     player.texture = LoadTexture("userPlane.png");
 }
 
@@ -112,13 +112,13 @@ void InitBullets() {
 }
 
 void UpdatePlayer() {
-    if ((IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT)) && player.position.x > 0) 
+    if ((IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT)) && player.position.x > -170) 
     player.position.x -= PLAYER_SPEED;
-    if ((IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT))&& player.position.x < GAMEPLAY_WIDTH - (player.texture.width * 0.21)) 
+    if ((IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT))&& player.position.x < GAMEPLAY_WIDTH - (((player.texture.width * 0.6)/2)+50)) 
         player.position.x += PLAYER_SPEED;
-    if ((IsKeyDown(KEY_W)||IsKeyDown(KEY_UP)) && player.position.y > 0) 
+    if ((IsKeyDown(KEY_W)||IsKeyDown(KEY_UP)) && player.position.y > -125) 
         player.position.y -= PLAYER_SPEED;
-    if ((IsKeyDown(KEY_S)||IsKeyDown(KEY_LEFT)) && player.position.y < SCREEN_HEIGHT - (player.texture.height * 0.2)) 
+    if ((IsKeyDown(KEY_S)||IsKeyDown(KEY_LEFT)) && player.position.y < SCREEN_HEIGHT - (((player.texture.height * 0.6)/2)+15)) 
         player.position.y += PLAYER_SPEED;
 
 }
@@ -126,7 +126,7 @@ void UpdatePlayer() {
 void ShootBullet() {
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (!bullets[i].active) {
-            bullets[i].position = (Vector2){player.position.x + player.texture.width *0.2 / 2, player.position.y};
+            bullets[i].position = (Vector2){player.position.x + player.texture.width *0.6 / 2, (player.position.y + player.texture.width*0.6/2)-60};
             bullets[i].active = true;
             break;
         }
@@ -143,7 +143,7 @@ void UpdateBullets() {
 }
 
 void DrawPlayer() {
-    float scale = 0.2; // Skala 20% dari ukuran aslinya
+    float scale = 0.6f; // Skala 60% dari ukuran aslinya
     DrawTextureEx(player.texture, player.position, 0.0f, scale, WHITE);
     // DrawTexture(player.texture, player.position.x, player.position.y, WHITE);
 }
@@ -157,9 +157,6 @@ void DrawBullets() {
 }
 
 
-void UnloadPlayer() {
-    UnloadTexture(player.texture);
-}
 
 //EXPLOSIONS
 Explosion explosions[MAX_EXPLOSIONS];
@@ -268,11 +265,12 @@ void UpdateAsteroids() {
 }
 
 void CheckCollisions() {
+Vector2 playerPosition=(Vector2){player.position.x+175, player.position.y+140};
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].active) {
             for (int j = 0; j < MAX_BULLETS; j++) {
                 if (bullets[j].active &&
-                    CheckCollisionCircles(asteroids[i].position, asteroids[i].size * 25, bullets[j].position, 5)) {
+                    CheckCollisionCircles(asteroids[i].position, asteroids[i].size * 25, bullets[j].position, 5)) { //asteroid ditembak
                     bullets[j].active = false;
                     asteroids[i].health--;
                     if (asteroids[i].health <= 0) {
@@ -281,10 +279,10 @@ void CheckCollisions() {
                         asteroids[i].active = false;
                     }
                 }
-                if (CheckCollisionCircles(player.position, 35, asteroids[i].position, asteroids[i].size * 25)) {
+                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25)) { //user menabrak asteroid
                     playerHealth -= asteroids[i].size;
                     PlaySound(userPlaneExplosions);
-                    CreateExplosion(player.position);
+                    CreateExplosion(playerPosition);
                     asteroids[i].active = false;
                 }
             }
@@ -316,7 +314,6 @@ void GameLoop() {
         SpawnAsteroid();
         asteroidSpawnTimer = 0.0f;
     }
-
     UpdateAsteroids();
 }
 
@@ -331,39 +328,15 @@ void DrawAsteroids() {
             }else if(asteroids[i].size==3){
                 scale=asteroids[i].size * 0.03f;
             }
-            
             DrawTextureEx(asteroidTexture, asteroids[i].position, 0.0f, scale, WHITE);
-            // float rotation = 0.0f; // Bisa dibuat berputar kalau mau
-
-            // Jika asteroid bergerak ke kiri, balikkan gambar
-        //     Vector2 drawPosition = {
-        //         asteroids[i].position.x - (asteroidTexture.width * scale / 2),
-        //         asteroids[i].position.y - (asteroidTexture.height * scale / 2)
-        //     };
-
-        //     Vector2 origin = { asteroidTexture.width / 2, asteroidTexture.height / 2 };
-
-        //     DrawTexturePro(
-        //         asteroidTexture,
-        //         (Rectangle){0, 0, (asteroids[i].speed.x >= 0) ? asteroidTexture.width : -asteroidTexture.width, asteroidTexture.height},
-        //         (Rectangle){drawPosition.x, drawPosition.y, asteroidTexture.width * scale, asteroidTexture.height * scale},
-        //         origin,
-        //         rotation,
-        //         WHITE
-        //     );
-        // }
+        }
     }
-}
 }
 
 
 void DrawHealth() {
     DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
 }
-
-
-
-
 
 
 
@@ -375,4 +348,14 @@ void DrawGameplay() {
     DrawAsteroids();
     DrawHealth();
     DrawExplosions(explosionsTexture);
+}
+
+
+ //UNLOAD
+void UnloadAssets(){
+    UnloadTexture(player.texture);
+    UnloadTexture(explosionsTexture);
+    UnloadTexture(asteroidTexture);
+    UnloadSound(asteroidDestroyed);
+    UnloadSound(userPlaneExplosions);
 }

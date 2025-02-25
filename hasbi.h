@@ -39,7 +39,7 @@ void UpdatePlayer();
 void ShootBullet();
 void UpdateBullets();
 void DrawGameplay();
-void UnloadPlayer();
+void UnloadAssets();
 
 
 //ASTEROIDS

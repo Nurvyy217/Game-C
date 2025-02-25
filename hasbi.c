@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include<stdio.h>
 
 //LOADING SCREEN
 void DrawLayout()
@@ -160,6 +161,59 @@ void UnloadPlayer() {
     UnloadTexture(player.texture);
 }
 
+//EXPLOSIONS
+Explosion explosions[MAX_EXPLOSIONS];
+Texture2D explosionsTexture;
+Sound asteroidDestroyed, userPlaneExplosions;
+
+void LoadAssets() {
+    explosionsTexture = LoadTexture("Explosions.png");
+    asteroidDestroyed= LoadSound("asteroidDestroyed.wav");
+    userPlaneExplosions= LoadSound("userPlaneExplosion.wav");
+}
+
+void CreateExplosion(Vector2 position) {
+    for (int i = 0; i < MAX_EXPLOSIONS; i++) {
+        if (!explosions[i].active) {
+            explosions[i].position = position; // Menyesuaikan agar pusat
+            // explosions[i].position.y = position.y + 70;
+            explosions[i].active = true;
+            explosions[i].frame = 0;
+            explosions[i].timer = 0;
+            break;  // Keluar setelah menemukan slot kosong
+        }
+    }
+}
+
+void UpdateExplosions(float deltaTime) {
+    for (int i = 0; i < MAX_EXPLOSIONS; i++) {
+        if (explosions[i].active) {
+            explosions[i].timer += deltaTime;
+            if (explosions[i].timer > 0.1f) { // Ubah frame setiap 0.1 detik
+                explosions[i].frame++;
+                explosions[i].timer = 0;
+            }
+            if (explosions[i].frame >= 5) { // Misal animasi punya 5 frame
+                explosions[i].active = false;
+            }
+        }
+    }
+}
+
+void DrawExplosions(Texture2D explosionTexture) {
+    for (int i = 0; i < MAX_EXPLOSIONS; i++) {
+        if (explosions[i].active) {
+            Rectangle source = { explosions[i].frame * 64, 0, 64, 64 }; // Misal sprite 64x64
+            Rectangle dest = { explosions[i].position.x, explosions[i].position.y, 128, 128 };
+            DrawTexturePro(explosionTexture, source, dest, (Vector2){ 18, 0 }, 0, WHITE);
+        }
+    }
+}
+
+
+
+
+
 
 
 //ASTEROIDS
@@ -186,9 +240,6 @@ void UpdateAsteroids() {
             asteroids[i].position.x += asteroids[i].speed.x;
             asteroids[i].position.y += asteroids[i].speed.y;
             
-            // if (asteroids[i].position.x <= 50 || asteroids[i].position.x >= GAMEPLAY_WIDTH - 50) {
-            //     asteroids[i].speed.x *= -1;  // Pantulan jika mencapai batas
-            // }
             if(asteroids[i].size==1){
                 if (asteroids[i].position.x <= 0 || asteroids[i].position.x >= GAMEPLAY_WIDTH - (asteroidTexture.width*0.05f)) {
                     asteroids[i].speed.x *= -1;  // Pantulan jika mencapai batas
@@ -225,11 +276,15 @@ void CheckCollisions() {
                     bullets[j].active = false;
                     asteroids[i].health--;
                     if (asteroids[i].health <= 0) {
+                        PlaySound(asteroidDestroyed);
+                        CreateExplosion(asteroids[i].position);
                         asteroids[i].active = false;
                     }
                 }
                 if (CheckCollisionCircles(player.position, 35, asteroids[i].position, asteroids[i].size * 25)) {
                     playerHealth -= asteroids[i].size;
+                    PlaySound(userPlaneExplosions);
+                    CreateExplosion(player.position);
                     asteroids[i].active = false;
                 }
             }
@@ -306,6 +361,12 @@ void DrawHealth() {
     DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
 }
 
+
+
+
+
+
+
 //GAMEPLAY
 void DrawGameplay() {
     DrawLayout();
@@ -313,4 +374,5 @@ void DrawGameplay() {
     DrawBullets();
     DrawAsteroids();
     DrawHealth();
+    DrawExplosions(explosionsTexture);
 }

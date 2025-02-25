@@ -57,5 +57,16 @@ void InitAsteroids();
 void CheckCollisions();
 void GameLoop();
 
+//EXPLOSION
+#define MAX_EXPLOSIONS 50
+
+typedef struct Explosion {
+    Vector2 position;
+    bool active;
+    int frame;   // Frame animasi ledakan
+    float timer; // Untuk mengatur kecepatan animasi
+} Explosion;
+void UpdateExplosions(float deltaTime);
+void LoadAssets();
 
 #endif

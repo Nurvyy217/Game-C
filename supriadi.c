@@ -9,7 +9,13 @@ void BuatNyawa() {
     nyawaIMG = LoadTexture("nyawa.png");
 }
 
-void rubahNyawa(){
+
+void ubahScore(){
+
+    if (IsKeyPressed(KEY_P)) score += 10; //hanya sementara   
+}
+
+void ubahNyawa(){
 
     // kurangi nyawa jika terkena tembakan musuh
     // kurangi nyawa jika terkena meteor
@@ -29,10 +35,15 @@ void Tampil_Nyawa(){
         Vector2 posisi = {GAMEPLAY_WIDTH + 40 - m + i * (nyawaIMG.width * 0.02f), 800 + n};
         DrawTextureEx(nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
     }
-    DrawText(TextFormat("Score: %d", score), 560, 575, 30, RAYWHITE);
+    ubahNyawa();
     if (Nyawa == 0) {
         DrawText("GAME OVER", 300, 200, 40, RED);
     }
+}
+
+void Tampil_Score(){
+    DrawText(TextFormat("Score: %d", score), score + 560, 575, 30, RAYWHITE);
+    ubahScore();
 }
 
 bool gameover(){
@@ -40,6 +51,7 @@ bool gameover(){
 }
 
 void restart(){
+    DrawText("Press R to Restart", 300, 300, 20, BLACK);
     if (IsKeyPressed(KEY_R)){
         Nyawa = NYAWA_AWAL;
     }    

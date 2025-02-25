@@ -10,8 +10,9 @@ extern int score;
 extern int NyawaMaks;
 
 void BuatNyawa();
-void rubahNyawa();
+void ubahNyawa();
 void Tampil_Nyawa();
+void Tampil_Score();
 void unloadNyawa();
 bool gameover();
 void restart();

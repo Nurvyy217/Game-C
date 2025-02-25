@@ -23,12 +23,11 @@ int main(void) {
                 ClearBackground(BLACK);
                 DrawGameplay();  // Menampilkan layout + player + bullet
         
-                rubahNyawa();
                 Tampil_Nyawa();
+                Tampil_Score();
                 EndDrawing();
             }
             else{
-                DrawText("Press R to Restart", 300, 300, 20, BLACK);
                 restart();
                 EndDrawing();
             }

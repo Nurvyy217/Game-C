@@ -13,8 +13,6 @@ int main(void) {
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
-
-
         if (!isLoadingDone) {
             // loadingAnimation();  // Tampilkan loading lebih dulu
             isLoadingDone=true;
@@ -26,18 +24,15 @@ int main(void) {
             UpdateExplosions(deltaTime);
             CheckCollisions();
             GameLoop();
-            
             BeginDrawing();
             ClearBackground(BLACK);
             DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
             EndDrawing();
-        
         }
     }
     CloseAudioDevice();
     UnloadAssets();
     unloadTextures();
-    
     CloseWindow();
     return 0;
 }

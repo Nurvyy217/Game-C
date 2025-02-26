@@ -239,6 +239,8 @@ void DrawExplosions(Texture2D explosionTexture) {
 Asteroid asteroids[MAX_ASTEROIDS];
 int playerHealth=15;
 Texture2D asteroidTexture;
+Texture2D hitEffect1;
+Texture2D hitEffect2;
 
 
 void InitAsteroids() {
@@ -249,13 +251,21 @@ void InitAsteroids() {
         asteroids[i].health = asteroids[i].size;
         asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(2, 4)};
         asteroids[i].active = true;
+        asteroids[i].hitEffectTimer = 0;  
+        asteroids[i].hitEffectFrame = 0;
     }
 }
 
 
 void UpdateAsteroids() {
+    float deltaTime = GetFrameTime();
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].active) {
+            if (asteroids[i].hitEffectTimer > 0) {
+                asteroids[i].hitEffectTimer -= deltaTime;
+                if (asteroids[i].hitEffectTimer <= 0) {
+                    asteroids[i].hitEffectTimer = 0;}
+                 } // Hilangkan efek setelah waktu habis
             asteroids[i].position.x += asteroids[i].speed.x;
             asteroids[i].position.y += asteroids[i].speed.y;
             
@@ -295,10 +305,14 @@ Vector2 playerPosition=(Vector2){player.position.x+175, player.position.y+140};
                     CheckCollisionCircles(asteroids[i].position, asteroids[i].size * 25, bullets[j].position, 5)) { //asteroid ditembak
                     bullets[j].active = false;
                     asteroids[i].health--;
+                    asteroids[i].hitEffectTimer = 0.15f;  // Waktu efek aktif
+                    asteroids[i].hitEffectFrame = (asteroids[i].health % 2);
                     if (asteroids[i].health <= 0) {
                         PlaySound(asteroidDestroyed);
                         CreateExplosion(asteroids[i].position);
                         asteroids[i].active = false;
+                        asteroids[i].hitEffectTimer = 0;  
+                        asteroids[i].hitEffectFrame = 0;
                     }
                 }
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25)) { //user menabrak asteroid
@@ -321,6 +335,8 @@ void SpawnAsteroid() {
             asteroids[i].health = asteroids[i].size;
             asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(2, 4)};
             asteroids[i].active = true;
+            asteroids[i].hitEffectTimer = 0;  
+            asteroids[i].hitEffectFrame = 0;
             break;
         }
         
@@ -351,6 +367,15 @@ void DrawAsteroids() {
                 scale=asteroids[i].size * 0.03f;
             }
             DrawTextureEx(asteroidTexture, asteroids[i].position, 0.0f, scale, WHITE);
+            if (asteroids[i].hitEffectTimer > 0) {
+                Texture2D effect = (asteroids[i].hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
+
+                Vector2 effectPosition;
+                effectPosition.x = asteroids[i].position.x - (effect.width / 2) + (asteroids[i].size * 25) -20;
+                effectPosition.y = asteroids[i].position.y - (effect.height / 2) + (asteroids[i].size * 25) +10;
+
+                DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
+            }
         }
     }
 }
@@ -367,6 +392,8 @@ void LoadAssets() {
     explosionsTexture = LoadTexture("Explosions.png");
     asteroidDestroyed= LoadSound("asteroidDestroyed.wav");
     userPlaneExplosions= LoadSound("userPlaneExplosion.wav");
+    hitEffect1 = LoadTexture("efekTembakan1.png");
+    hitEffect2 = LoadTexture("efekTembakan2.png");
 }
 
 //GAMEPLAY
@@ -387,4 +414,7 @@ void UnloadAssets(){
     UnloadTexture(asteroidTexture);
     UnloadSound(asteroidDestroyed);
     UnloadSound(userPlaneExplosions);
+    UnloadSound(shootSound);
+    UnloadTexture(hitEffect1);
+    UnloadTexture(hitEffect2);
 }

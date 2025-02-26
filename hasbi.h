@@ -54,6 +54,8 @@ typedef struct {
     int size;  // 1 = small, 2 = medium, 3 = big
     int health; //jumlah hit yang diperlukan untuk menghancurkan asteroid
     bool active; //status asteroid aktif
+    int hitEffectFrame; // 0 atau 1, untuk efek tembakan
+    float hitEffectTimer; // Timer untuk durasi efek
 } Asteroid;
 void InitAsteroids();
 void CheckCollisions();

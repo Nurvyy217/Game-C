@@ -1,6 +1,49 @@
 #include "hasbi.h"
 #include<stdio.h>
 
+//LOADING SCREEN
+void DrawLayout();
+void initTextures();
+void loadingAnimation();
+void unloadTextures();
+
+//USER PLANE
+void InitPlayer();
+void UpdatePlayer();
+void DrawPlayer();
+
+//BULLETS
+void UpdateShooting(float deltaTime);
+void DrawBullets();
+void UpdateBullets();
+void ShootBullet();
+void InitBullets();
+
+//EXPLOSIONS
+void CreateExplosion(Vector2 position);
+void UpdateExplosions(float deltaTime);
+void DrawExplosions(Texture2D explosionTexture);
+
+//ASTEROIDS
+void InitAsteroids();
+void UpdateAsteroids();
+void CheckCollisions();
+void SpawnAsteroid();
+void GameLoop();
+void DrawAsteroids();
+void DrawHealth();
+
+//ASSSETS
+void LoadAssets();
+
+//GAMEPLAY
+void DrawGameplay();
+
+//UNLOAD
+void UnloadAssets();
+
+
+
 
 
 //LOADING SCREEN
@@ -28,8 +71,8 @@ bool isLoadingDone = false;
 
 void initTextures() {
     if (!texturesLoaded) {  // Load hanya sekali
-        logoDeveloper = LoadTexture("logoDeveloper.png");
-        gameNamePhoto = LoadTexture("gameNamePhoto.png");
+        logoDeveloper = LoadTexture("assets/logoDeveloper.png");
+        gameNamePhoto = LoadTexture("assets/gameNamePhoto.png");
         texturesLoaded = true;
     }
 }
@@ -122,7 +165,7 @@ void UpdateShooting(float deltaTime) {
 
 void InitPlayer() {
     player.position = (Vector2){(GAMEPLAY_WIDTH / 2)-210, SCREEN_HEIGHT - 230};
-    player.texture = LoadTexture("userPlane.png");
+    player.texture = LoadTexture("assets/userPlane.png");
 }
 
 void InitBullets() {
@@ -244,7 +287,7 @@ Texture2D hitEffect2;
 
 
 void InitAsteroids() {
-    asteroidTexture = LoadTexture("Asteroid.png");
+    asteroidTexture = LoadTexture("assets/Asteroid.png");
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
         asteroids[i].size = GetRandomValue(1, 3);
@@ -385,15 +428,21 @@ void DrawHealth() {
     DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
 }
 
+
+//ENEMY
+
+
+
+
 //ASSETS
 void LoadAssets() {
-    shootSound = LoadSound("shoot.wav");
-    bulletTexture = LoadTexture("bullet.png");
-    explosionsTexture = LoadTexture("Explosions.png");
-    asteroidDestroyed= LoadSound("asteroidDestroyed.wav");
-    userPlaneExplosions= LoadSound("userPlaneExplosion.wav");
-    hitEffect1 = LoadTexture("efekTembakan1.png");
-    hitEffect2 = LoadTexture("efekTembakan2.png");
+    shootSound = LoadSound("assets/shoot.wav");
+    bulletTexture = LoadTexture("assets/bullet.png");
+    explosionsTexture = LoadTexture("assets/Explosions.png");
+    asteroidDestroyed= LoadSound("assets/asteroidDestroyed.wav");
+    userPlaneExplosions= LoadSound("assets/userPlaneExplosion.wav");
+    hitEffect1 = LoadTexture("assets/efekTembakan1.png");
+    hitEffect2 = LoadTexture("assets/efekTembakan2.png");
 }
 
 //GAMEPLAY

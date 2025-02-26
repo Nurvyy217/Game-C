@@ -21,5 +21,5 @@ void DrawPositions(){
 }
 
 void BossMov(){
-    Vector2
+    Vector2 
 }

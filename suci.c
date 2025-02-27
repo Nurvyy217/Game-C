@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "suci.h"
 
 void initTextures() {
@@ -89,3 +90,6 @@ int main(void)
     return 0;
 }
 
+=======
+haloooo
+>>>>>>> abe55eca8498b8bcc1bc036c27747a3a194f17cc

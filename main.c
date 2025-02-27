@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #include "hasbi.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,12 +42,4 @@ int main(void) {
     CloseWindow();
     return 0;
 }
-=======
-#include <stdio.h>
 
-int main(){
-    printf("IKAN IKAN apa yang jenisnya laki-laki semua?\n");
-    printf("jawaban : ikan mas");
-}
-
->>>>>>> abe55eca8498b8bcc1bc036c27747a3a194f17cc

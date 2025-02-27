@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-#include "suci.h"
 
-void initTextures() {
-    if (!texturesLoaded) {  // Load hanya sekali
-        logoDeveloper = LoadTexture("LogoG6.png");
-        gameNamePhoto = LoadTexture("SpaceInviders.png");
-        texturesLoaded = true;
-    }
-}
+#include "suci.h"
 
 #include "raylib.h"
 
@@ -90,6 +82,3 @@ int main(void)
     return 0;
 }
 
-=======
-haloooo
->>>>>>> abe55eca8498b8bcc1bc036c27747a3a194f17cc

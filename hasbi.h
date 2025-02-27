@@ -12,7 +12,6 @@
 #define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 
 extern bool isLoadingDone; 
-void initTextures();
 void unloadTextures();
 void loadingAnimation();
 void DrawLayout();

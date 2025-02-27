@@ -58,15 +58,15 @@ void DrawLayout()
     ClearBackground(RAYWHITE);
 
     // Gameplay area (3/4 of screen, left part)
-    DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE);
-    DrawText("Gameplay Area", GAMEPLAY_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, 20, RAYWHITE);
+    DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
+    DrawText("Gameplay Area", GAMEPLAY_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, 20, RAYWHITE);// text, posX, posY, font, color
 
     // Menu area (1/4 of screen, right part)
     DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
     DrawText("Menu Area", GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, 20, RAYWHITE);
 
     // Separator line
-    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK);
+    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); //strat posX, start posY, end posX, end posY
 }
 
 Texture2D logoDeveloper;
@@ -74,7 +74,7 @@ Texture2D gameNamePhoto;
 bool texturesLoaded = false; // Cek apakah gambar sudah di-load
 bool isLoadingDone = false;
 
-void initTextures()
+void initLoadScreen()
 {
     if (!texturesLoaded)
     { // Load hanya sekali
@@ -90,7 +90,7 @@ void loadingAnimation()
     static int section = 0;
     static float timer = 0.0f;
 
-    initTextures();
+    initLoadScreen();
 
     if (isLoadingDone)
         return; // Jika sudah selesai, langsung keluar

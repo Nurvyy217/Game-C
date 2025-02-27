@@ -45,7 +45,7 @@ void UnloadAssets();
 
 
 //ASTEROIDS
-#define MAX_ASTEROIDS 4
+#define MAX_ASTEROIDS 0
 extern int playerHealth;
 typedef struct {
     Texture2D texture;
@@ -59,7 +59,7 @@ typedef struct {
 } Asteroid;
 void InitAsteroids();
 void CheckCollisions();
-void GameLoop();
+void AsteroidLoop();
 
 //EXPLOSION
 #define MAX_EXPLOSIONS 50
@@ -72,5 +72,36 @@ typedef struct Explosion {
 } Explosion;
 void UpdateExplosions(float deltaTime);
 void LoadAssets();
+
+
+//ENEMY
+#define SPEED_ENEMY_BULLETS 2
+#define MAX_ENEMIES 12
+#define MAX_ENEMY_BULLETS 3
+
+
+// Struktur untuk musuh
+typedef struct {
+    Vector2 position;
+    Vector2 speed;
+    bool isActive;
+    bool canShoot;
+    bool hasShot;
+} Enemy;
+
+// Struktur untuk peluru musuh
+typedef struct {
+    Vector2 position;
+    bool isActive;
+    Vector2 speed;
+    int shooterIndex; // Menyimpan indeks musuh yang menembakkan peluru
+} EnemyBullet;
+
+void InitEnemies();
+void UpdateEnemies();
+void UpdateEnemyBullets();
+void CheckEnemyCollisions();
+void EnemiesLoop();
+
 
 #endif

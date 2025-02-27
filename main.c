@@ -9,6 +9,7 @@ int main(void) {
     InitPlayer();
     InitBullets();
     InitAsteroids();
+    InitEnemies();
     LoadAssets();
     
     while (!WindowShouldClose()) {
@@ -23,7 +24,11 @@ int main(void) {
             UpdateBullets();
             UpdateExplosions(deltaTime);
             CheckCollisions();
-            GameLoop();
+            UpdateEnemies();
+            UpdateEnemyBullets();
+            CheckEnemyCollisions();
+            AsteroidLoop();
+            EnemiesLoop();
             BeginDrawing();
             ClearBackground(BLACK);
             DrawGameplay();  // Menampilkan layout + player + bullet + asteroids

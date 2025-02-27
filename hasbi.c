@@ -86,8 +86,8 @@ void initTextures()
 
 void loadingAnimation()
 {
-    static float alpha = 1.0f;
-    static int stage = 0;
+    static float opacity = 1.0f;
+    static int section = 0;
     static float timer = 0.0f;
 
     initTextures();
@@ -97,33 +97,33 @@ void loadingAnimation()
 
     timer += GetFrameTime();
 
-    switch (stage)
+    switch (section)
     {
     case 0: // Fade out gambar pertama
         if (timer > 2.0f)
         {
-            alpha -= 0.02f;
-            if (alpha <= 0)
+            opacity -= 0.02f;
+            if (opacity <= 0)
             {
-                alpha = 0;
-                stage = 1;
+                opacity = 0;
+                section = 1;
                 timer = 0;
             }
         }
         break;
     case 1: // gambar kedua
-        alpha = 1.0f;
-        stage = 2;
+        opacity = 1.0f;
+        section = 2;
         timer = 0;
         break;
 
     case 2: // Fade out gambar kedua, lalu selesai
         if (timer > 2.0f)
         {
-            alpha -= 0.02f;
-            if (alpha <= 0)
+            opacity -= 0.02f;
+            if (opacity <= 0)
             {
-                alpha = 0;
+                opacity = 0;
                 isLoadingDone = true; // Menandai bahwa loading selesai
                 return;
             }
@@ -134,13 +134,13 @@ void loadingAnimation()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    if (stage == 0)
+    if (section == 0)
     {
-        DrawTexture(logoDeveloper, SCREEN_WIDTH / 2 - logoDeveloper.width / 2, SCREEN_HEIGHT / 2 - logoDeveloper.height / 2, Fade(WHITE, alpha));
+        DrawTexture(logoDeveloper, SCREEN_WIDTH / 2 - logoDeveloper.width / 2, SCREEN_HEIGHT / 2 - logoDeveloper.height / 2, Fade(WHITE, opacity));
     }
-    if (stage >= 1)
+    if (section >= 1)
     {
-        DrawTexture(gameNamePhoto, SCREEN_WIDTH / 2 - gameNamePhoto.width / 2, SCREEN_HEIGHT / 2 - gameNamePhoto.height / 2, Fade(WHITE, (stage == 1) ? (1.0f - alpha) : alpha));
+        DrawTexture(gameNamePhoto, SCREEN_WIDTH / 2 - gameNamePhoto.width / 2, SCREEN_HEIGHT / 2 - gameNamePhoto.height / 2, Fade(WHITE, (section == 1) ? (1.0f - opacity) : opacity));
     }
 
     EndDrawing();
@@ -501,7 +501,7 @@ void InitEnemies()
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
-        enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 150), GetRandomValue(-300, -50)};
+        enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 150), GetRandomValue(-400, -100)};
         enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.4};
         enemies[i].isActive = true;
         enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
@@ -545,7 +545,7 @@ void SpawnEnemies()
     {
         if (!enemies[i].isActive)
         {
-            enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-300, -50)};
+            enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-150, -100)};
             enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.4};
             enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
             enemies[i].isActive = true;
@@ -560,7 +560,7 @@ void EnemiesLoop()
     static float enemiesSpawnTimer = 0.0f;
     enemiesSpawnTimer += GetFrameTime();
 
-    if (enemiesSpawnTimer >= 2.0f)
+    if (enemiesSpawnTimer >= 0.5f)
     { // Setiap 2 detik, spawn asteroid baru
         SpawnEnemies();
         enemiesSpawnTimer = 0.0f;
@@ -651,7 +651,7 @@ void CheckEnemyCollisions()
         if (!enemies[i].isActive)
             continue; // Lewati musuh yang sudah mati
 
-        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + 90, enemies[i].position.y + 70};
+        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + 95, enemies[i].position.y + 70};
 
         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
         for (int j = 0; j < MAX_BULLETS; j++)

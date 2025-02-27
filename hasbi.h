@@ -76,7 +76,7 @@ void LoadAssets();
 
 //ENEMY
 #define SPEED_ENEMY_BULLETS 2
-#define MAX_ENEMIES 12
+#define MAX_ENEMIES 8
 #define MAX_ENEMY_BULLETS 3
 
 

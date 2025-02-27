@@ -9,7 +9,6 @@ void BuatNyawa() {
     nyawaIMG = LoadTexture("nyawa.png");
 }
 
-
 void ubahScore(){
 
     if (IsKeyPressed(KEY_P)) score += 10; //hanya sementara   
@@ -54,6 +53,7 @@ void restart(){
     DrawText("Press R to Restart", 300, 300, 20, BLACK);
     if (IsKeyPressed(KEY_R)){
         Nyawa = NYAWA_AWAL;
+        score = 0;
     }    
 }
 

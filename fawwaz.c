@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include "fawwaz.h"
-#include "hasbi.h"
 
 // Menyesuaikan layar dengan laptop user
 Bosses bosses;
@@ -20,6 +19,54 @@ void DrawPositions(){
     DrawText(TextFormat("Mouse X: %.0f, Mouse Y: %.0f", mousePos.x, mousePos.y), 10, 10, 20, DARKGRAY);
 }
 
-void BossMov(){
-    Vector2 
+bool movingRight = true; 
+
+void BossMov() 
+{
+    if (movingRight) 
+    {
+        bosses.position.x += BOSS_SPEED;
+        if (bosses.position.x >= 135) {
+            movingRight = false; 
+        }
+    } else 
+    {
+        bosses.position.x -= BOSS_SPEED;
+        if (bosses.position.x <= 0) { 
+            movingRight = true; 
+        }
+    }
 }
+
+void InitBossShoot()
+{
+    for (int i = 0; i < BOSS_MAX_BULLETS; i++)
+    {
+        bullets[i].active = false;
+    }
+
+}
+
+void BossShoot(Vector2 startPos)
+{
+    for (int i = 0; i < BOSS_MAX_BULLETS; i++)
+    {
+        if(!bullets[i].active)
+        {
+            bullets[i].position = startPos;
+            bullets[i].active = true;
+        }
+    }
+}
+
+void UpdateBullets() {
+    for (int i = 0; i < BOSS_MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            bullets[i].position.y += BOSS_BULLET_SPEED;  // Peluru bergerak ke atas
+            
+            // Jika peluru keluar layar, nonaktifkan
+            if (bullets[i].position.y < 0) {
+                bullets[i].active = false;
+            }
+        }
+    }

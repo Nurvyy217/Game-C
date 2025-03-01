@@ -44,6 +44,7 @@ void InitBossShoot()
     for (int i = 0; i < BOSS_MAX_BULLETS; i++)
     {
         bulletboss[i].active = false;
+        bulletboss[i].texture = LoadTexture("Explosions.png");
     }
 
 }
@@ -63,12 +64,19 @@ void BossShoot(Vector2 startPos)
 void UpdateBulletBoss() {
     for (int i = 0; i < BOSS_MAX_BULLETS; i++) {
         if (bulletboss[i].active) {
-            bulletboss[i].position.y += BOSS_BULLET_SPEED;  // Peluru bergerak ke atas
+            bulletboss[i].position.y += BOSS_BULLET_SPEED; 
             
             // Jika peluru keluar layar, nonaktifkan
             if (bulletboss[i].position.y < 0) {
                 bulletboss[i].active = false;
             }
         }
+    }
+}
+
+void DrawBossShoot(){
+    for (int i; i < BOSS_MAX_BULLETS; i++){
+        float scale = 1.0; // Skala 800% dari ukuran aslinya
+        DrawTextureEx(bulletboss[i].texture, bosses.position, 0.0f, scale, WHITE);
     }
 }

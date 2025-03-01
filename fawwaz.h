@@ -15,6 +15,7 @@ typedef struct {
 typedef struct {
     Vector2 position;
     bool active;
+    Texture2D texture;
 } BulletBoss;
 
 void UpdateBulletBoss();
@@ -24,3 +25,4 @@ void DrawBosses();
 //
 void DrawPositions();
 void BossMov();
+void DrawBossShoot();

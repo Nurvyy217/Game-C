@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "fawwaz.h"
 #include<stdio.h>
 
 
@@ -376,6 +377,7 @@ void DrawGameplay() {
     DrawBullets();
     DrawAsteroids();
     DrawHealth();
+    DrawBosses();
     DrawExplosions(explosionsTexture);
 }
 

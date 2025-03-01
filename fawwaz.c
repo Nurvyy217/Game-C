@@ -3,6 +3,7 @@
 
 // Menyesuaikan layar dengan laptop user
 Bosses bosses;
+BulletBoss bulletboss[BOSS_MAX_BULLETS]; 
 
 void InitBosses() {
     bosses.position = (Vector2){80, 65};
@@ -42,7 +43,7 @@ void InitBossShoot()
 {
     for (int i = 0; i < BOSS_MAX_BULLETS; i++)
     {
-        bullets[i].active = false;
+        bulletboss[i].active = false;
     }
 
 }
@@ -51,22 +52,23 @@ void BossShoot(Vector2 startPos)
 {
     for (int i = 0; i < BOSS_MAX_BULLETS; i++)
     {
-        if(!bullets[i].active)
+        if(!bulletboss[i].active)
         {
-            bullets[i].position = startPos;
-            bullets[i].active = true;
-        }
+            bulletboss[i].position = startPos;
+            bulletboss[i].active = true;
+        
     }
 }
-
-void UpdateBullets() {
+}
+void UpdateBulletBoss() {
     for (int i = 0; i < BOSS_MAX_BULLETS; i++) {
-        if (bullets[i].active) {
-            bullets[i].position.y += BOSS_BULLET_SPEED;  // Peluru bergerak ke atas
+        if (bulletboss[i].active) {
+            bulletboss[i].position.y += BOSS_BULLET_SPEED;  // Peluru bergerak ke atas
             
             // Jika peluru keluar layar, nonaktifkan
-            if (bullets[i].position.y < 0) {
-                bullets[i].active = false;
+            if (bulletboss[i].position.y < 0) {
+                bulletboss[i].active = false;
             }
         }
     }
+}

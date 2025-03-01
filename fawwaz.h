@@ -15,12 +15,9 @@ typedef struct {
 typedef struct {
     Vector2 position;
     bool active;
-} Bullet;
+} BulletBoss;
 
-Bullet bullets[BOSS_MAX_BULLETS]; 
-
-
-
+void UpdateBulletBoss();
 void InitBosses();
 void DrawBosses();
 

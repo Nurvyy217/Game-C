@@ -8,6 +8,7 @@ int main(void) {
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
     InitPlayer();
+    InitBosses();
     InitBullets();
     
     while (!WindowShouldClose()) {
@@ -21,9 +22,10 @@ int main(void) {
             UpdatePlayer();
             // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
             UpdateShooting(deltaTime);
-            UpdateBullets();
+            UpdateBulletBoss();
             UpdateExplosions(deltaTime);
             CheckCollisions();
+            BossMov();
             GameLoop();
             
             BeginDrawing();

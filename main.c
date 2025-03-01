@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "nazwa.h"
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");

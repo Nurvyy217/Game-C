@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include "raylib.h"
 
-
+extern int score;
 //LOADING SCREEN
-#define SCREEN_WIDTH 720
-#define SCREEN_HEIGHT 960
+#define SCREEN_WIDTH 540
+#define SCREEN_HEIGHT 683
 #define GAMEPLAY_WIDTH (SCREEN_WIDTH * 5 / 7)
 #define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 
@@ -102,6 +102,5 @@ void UpdateEnemyBullets();
 void CheckEnemyCollisions();
 void EnemiesLoop();
 
-void level1();
-void drawGameplay();
+void game();
 #endif

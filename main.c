@@ -1,5 +1,4 @@
 #include "hasbi.h"
-#include "nazwa.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -9,13 +8,14 @@ int main(void) {
     InitAudioDevice(); // Inisialisasi perangkat audio
 
     InitPlayer();
+    InitBosses();
     InitBullets();
     InitAsteroids();
     InitEnemies();
     LoadAssets();
     
     while (!WindowShouldClose()) {
-        float deltaTime = GetFrameTime();
+        // float deltaTime = GetFrameTime();
         if (!isLoadingDone) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
@@ -32,11 +32,8 @@ int main(void) {
             // CheckEnemyCollisions();
             // AsteroidLoop();
             // EnemiesLoop();
-            
             level1();
             drawGameplay();
-            bool gameStart = false; //status game
-            mainMenu(&gameStart); 
         }
     }
     CloseAudioDevice();

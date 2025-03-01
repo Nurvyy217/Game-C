@@ -1,7 +1,7 @@
 #include "nazwa.h"
 
 bool soundOn = true;
-
+bool startGame = false;
 void varHeart(Texture2D heartTexture)
 {
     // Koordinat menu
@@ -150,12 +150,13 @@ void varSound(bool *isSoundOn, Texture2D soundOnTexture, Texture2D soundOffTextu
 }
 
 
-void mainMenu()
+void mainMenu(bool *gameStart)
 {
-    // Inisialisasi window
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Menu dengan Gambar Interaktif");
+    // Koordinat menu
+    int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
+    int startY = 20;
 
-    // Load semua tekstur hanya sekali
+    // Load semua tekstur
     Texture2D heartTexture = LoadTexture("asset-menu/1.png");
     Texture2D menuTexture = LoadTexture("asset-menu/6.png");
     Texture2D soundOnTexture = LoadTexture("asset-menu/7.png");
@@ -164,35 +165,29 @@ void mainMenu()
     Texture2D pauseTexture = LoadTexture("asset-menu/9.png");
     Texture2D quitTexture = LoadTexture("asset-menu/10.png");
 
-    bool isSoundOn = true; // Status awal suara menyala
+    bool isSoundOn = true;
 
-    SetTargetFPS(60);
-
-    while (!WindowShouldClose()) { // Loop utama game
+    while (!*gameStart && !WindowShouldClose()) { // Loop menu
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Gambar latar belakang menu
+        // Gambar menu
         DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
-
-        // Koordinat menu
-        int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
-        int startY = 20;
-
-        // Gambar menu interaktif
-        varMenu(menuTexture, &isSoundOn, soundOnTexture, soundOffTexture, restartTexture, pauseTexture, quitTexture);
-
-        // Gambar teks menu
         DrawText("Level 1", menuX - 85, startY + 80, 30, RAYWHITE);
         DrawText("Score : 10000", menuX - 85, startY + 120, 25, RAYWHITE);
-
-        // Tampilkan hati
+        varMenu(menuTexture, &isSoundOn, soundOnTexture, soundOffTexture, restartTexture, pauseTexture, quitTexture);
         varHeart(heartTexture);
+
+        DrawText("Press ENTER to Start", SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT - 100, 25, WHITE);
+        
+        if (IsKeyPressed(KEY_ENTER)) {
+            *gameStart = true;  // Set gameStart = true untuk keluar dari menu
+        }
 
         EndDrawing();
     }
 
-    // Unload semua tekstur sebelum keluar
+    // Unload textures
     UnloadTexture(heartTexture);
     UnloadTexture(menuTexture);
     UnloadTexture(soundOnTexture);
@@ -200,9 +195,8 @@ void mainMenu()
     UnloadTexture(restartTexture);
     UnloadTexture(pauseTexture);
     UnloadTexture(quitTexture);
-
-    CloseWindow();
 }
+
 
 
 

@@ -8,7 +8,7 @@
 #define GAMEPLAY_WIDTH (SCREEN_WIDTH * 5 / 7)
 #define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 
-void mainMenu();
+void mainMenu(bool *gameStart);
 void varSound(bool *isSoundOn, Texture2D soundOnTexture, Texture2D soundOffTexture);
 void varHeart(Texture2D heartTexture);
 void varMenu(Texture2D menuTexture, bool *isSoundOn, Texture2D soundOnTexture, Texture2D soundOffTexture, 
@@ -16,3 +16,5 @@ void varMenu(Texture2D menuTexture, bool *isSoundOn, Texture2D soundOnTexture, T
 void varQuit();
 void varPause();
 void varRestart();
+
+#endif

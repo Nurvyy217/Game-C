@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "nazwa.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -6,6 +7,7 @@ int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
+
     InitPlayer();
     InitBullets();
     InitAsteroids();
@@ -17,6 +19,7 @@ int main(void) {
         if (!isLoadingDone) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
+            
         } else {
             // UpdatePlayer();
             // // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
@@ -29,8 +32,11 @@ int main(void) {
             // CheckEnemyCollisions();
             // AsteroidLoop();
             // EnemiesLoop();
+            
             level1();
             drawGameplay();
+            bool gameStart = false; //status game
+            mainMenu(&gameStart); 
         }
     }
     CloseAudioDevice();

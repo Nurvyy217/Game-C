@@ -1,5 +1,7 @@
 #include "hasbi.h"
 #include <stdio.h>
+#include "fawwaz.h"
+#include<stdio.h>
 
 // LOADING SCREEN
 void DrawLayout();
@@ -51,6 +53,8 @@ void DrawGameplay();
 
 // UNLOAD
 void UnloadAssets();
+
+int score=0;
 
 // LOADING SCREEN
 void DrawLayout()
@@ -491,6 +495,10 @@ void DrawHealth()
 {
     DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
 }
+void DrawScore()
+{
+    DrawText(TextFormat("Score: %d", score), 300, 20, 20, RED);
+}
 
 // ENEMY
 Texture2D enemyTexture, enemyBulletTexture;
@@ -662,6 +670,7 @@ void CheckEnemyCollisions()
                 enemies[i].isActive = false; // Matikan musuh
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(enemiesPosition);
+                score++;
 
                 // Hapus semua peluru yang ditembak musuh ini
                 for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
@@ -702,6 +711,13 @@ void CheckEnemyCollisions()
     }
 }
 
+void DisableLevel1Enemies() {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        enemies[i].isActive = false;  // Nonaktifkan semua musuh level 1
+    }
+}
+
+
 // ASSETS
 void LoadAssets()
 {
@@ -717,13 +733,14 @@ void LoadAssets()
 }
 
 // GAMEPLAY
-void DrawGameplay()
+void DrawLvl1()
 {
     DrawLayout();
     DrawPlayer();
     DrawBullets();
     DrawAsteroids();
     DrawHealth();
+    DrawScore();
     DrawExplosions(explosionsTexture);
     DrawEnemies();
     DrawEnemyBullets();
@@ -742,12 +759,19 @@ void UnloadAssets()
     UnloadTexture(hitEffect2);
 }
 
-void drawGameplay(){
-    BeginDrawing();
-    ClearBackground(BLACK);
-    DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
-    EndDrawing();
+
+
+void DrawLvl2(){
+
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawHealth();
+    DrawScore();
+    DrawBosses();
+    DrawBossShoot();
 }
+
 
 void level1(){
     float deltaTime = GetFrameTime();
@@ -762,4 +786,24 @@ void level1(){
     CheckEnemyCollisions();
     AsteroidLoop();
     EnemiesLoop();
+    DrawLvl1();
+}
+void level2(){
+    float deltaTime = GetFrameTime();
+    DisableLevel1Enemies();
+    BossMov();
+    UpdatePlayer();
+    UpdateBulletBoss();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    DrawLvl2();
+}
+void game(){
+    BeginDrawing();
+    ClearBackground(BLACK);
+    level1();
+    if (score>=20){
+        level2();
+    }
+    EndDrawing();
 }

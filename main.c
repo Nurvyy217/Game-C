@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "fawwaz.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -7,30 +8,19 @@ int main(void) {
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
     InitPlayer();
+    InitBosses();
     InitBullets();
     InitAsteroids();
     InitEnemies();
     LoadAssets();
     
     while (!WindowShouldClose()) {
-        float deltaTime = GetFrameTime();
+        // float deltaTime = GetFrameTime();
         if (!isLoadingDone) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
         } else {
-            // UpdatePlayer();
-            // // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-            // UpdateShooting(deltaTime);
-            // UpdateBullets();
-            // UpdateExplosions(deltaTime);
-            // CheckCollisions();
-            // UpdateEnemies();
-            // UpdateEnemyBullets();
-            // CheckEnemyCollisions();
-            // AsteroidLoop();
-            // EnemiesLoop();
-            level1();
-            drawGameplay();
+            game();
         }
     }
     CloseAudioDevice();

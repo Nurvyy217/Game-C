@@ -18,21 +18,19 @@ int main(void) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
         } else {
-            UpdatePlayer();
-            // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-            UpdateShooting(deltaTime);
-            UpdateBullets();
-            UpdateExplosions(deltaTime);
-            CheckCollisions();
-            UpdateEnemies();
-            UpdateEnemyBullets();
-            CheckEnemyCollisions();
-            AsteroidLoop();
-            EnemiesLoop();
-            BeginDrawing();
-            ClearBackground(BLACK);
-            DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
-            EndDrawing();
+            // UpdatePlayer();
+            // // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+            // UpdateShooting(deltaTime);
+            // UpdateBullets();
+            // UpdateExplosions(deltaTime);
+            // CheckCollisions();
+            // UpdateEnemies();
+            // UpdateEnemyBullets();
+            // CheckEnemyCollisions();
+            // AsteroidLoop();
+            // EnemiesLoop();
+            level1();
+            drawGameplay();
         }
     }
     CloseAudioDevice();

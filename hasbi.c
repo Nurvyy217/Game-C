@@ -741,3 +741,25 @@ void UnloadAssets()
     UnloadTexture(hitEffect1);
     UnloadTexture(hitEffect2);
 }
+
+void drawGameplay(){
+    BeginDrawing();
+    ClearBackground(BLACK);
+    DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
+    EndDrawing();
+}
+
+void level1(){
+    float deltaTime = GetFrameTime();
+    UpdatePlayer();
+    // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    CheckCollisions();
+    UpdateEnemies();
+    UpdateEnemyBullets();
+    CheckEnemyCollisions();
+    AsteroidLoop();
+    EnemiesLoop();
+}

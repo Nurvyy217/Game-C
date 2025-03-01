@@ -102,5 +102,6 @@ void UpdateEnemyBullets();
 void CheckEnemyCollisions();
 void EnemiesLoop();
 
-
+void level1();
+void drawGameplay();
 #endif

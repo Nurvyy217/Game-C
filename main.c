@@ -24,6 +24,7 @@ int main(void) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
         } else {
+            varQuit();
             BeginDrawing();
             ClearBackground(BLACK);
             togglePause(); 
@@ -32,7 +33,7 @@ int main(void) {
             } else {
                 gamePaused();
             }
-            
+
             
             EndDrawing();
         }

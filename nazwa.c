@@ -70,22 +70,17 @@ void varMenu(bool *isSoundOn)
         int popupX = (SCREEN_WIDTH - popupWidth) / 2;
         int popupY = (SCREEN_HEIGHT - popupHeight) / 2;
 
+        // Efek Shadow (kotak lebih besar dengan transparansi)
+        DrawRectangle(popupX - 5, popupY - 5, popupWidth + 10, popupHeight + 10, Fade(BLACK, 0.5f));
+
+        // Kotak utama pop-up
         DrawRectangle(popupX, popupY, popupWidth, popupHeight, DARKGRAY);
+
+        // Border tebal (lapisan ganda untuk efek lebih bold)
+        DrawRectangleLinesEx((Rectangle){popupX - 2, popupY - 2, popupWidth + 4, popupHeight + 4}, 4, WHITE);
+        DrawRectangleLinesEx((Rectangle){popupX - 4, popupY - 4, popupWidth + 8, popupHeight + 8}, 2, BLACK);
+
         DrawText("Popup Menu", popupX + 20, popupY + 20, 25, WHITE);
-
-        // Tombol Close
-        int closeBtnSize = 30;
-        int closeX = popupX + popupWidth - closeBtnSize - 10;
-        int closeY = popupY + 10;
-        
-        DrawRectangle(closeX, closeY, closeBtnSize, closeBtnSize, RED);
-        DrawText("X", closeX + 8, closeY + 5, 20, WHITE);
-
-        if (mousePos.x >= closeX && mousePos.x <= closeX + closeBtnSize &&
-            mousePos.y >= closeY && mousePos.y <= closeY + closeBtnSize &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            showPopup = false;
-        }
 
         // Posisi elemen dalam pop-up
         int iconStartX = popupX + 20; // Posisi kiri dalam pop-up
@@ -105,20 +100,25 @@ void varMenu(bool *isSoundOn)
             *isSoundOn = !(*isSoundOn);
         }
 
+        // Tombol Restart
         DrawTextureEx(restartTexture, (Vector2){iconStartX, iconStartY + iconSpacing}, 0.0f, iconScale, WHITE);
-        DrawText("press R to Restart", iconStartX + textOffsetX, iconStartY + iconSpacing + 20, 23, WHITE);
+        DrawText("Press R to Restart", iconStartX + textOffsetX, iconStartY + iconSpacing + 20, 23, WHITE);
 
+        // Tombol Pause
         DrawTextureEx(pauseTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 2}, 0.0f, iconScale, WHITE);
-        DrawText("press Enter to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
+        DrawText("Press Enter to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
         
+        // Tombol Quit
         DrawTextureEx(quitTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 3}, 0.0f, iconScale, WHITE);
-        DrawText("press Q to Quit", iconStartX + textOffsetX, iconStartY + iconSpacing * 3 + 25, 23, WHITE);
+        DrawText("Press Q to Quit", iconStartX + textOffsetX, iconStartY + iconSpacing * 3 + 25, 23, WHITE);
     }
 }
 
 
 void varQuit(){
-
+    if (IsKeyPressed(KEY_Q)) {  // Tekan Q untuk keluar
+        CloseWindow();  // Tutup jendela Raylib
+    }
 }
 
 bool isPaused = false; 

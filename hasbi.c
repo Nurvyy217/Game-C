@@ -49,8 +49,6 @@ void CheckEnemyCollisions();
 void LoadAssets();
 
 
-// GAMEPLAY
-
 // UNLOAD
 void UnloadAssets();
 

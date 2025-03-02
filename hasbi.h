@@ -4,10 +4,12 @@
 #include <stdlib.h>
 #include "raylib.h"
 
+
 extern int score;
+extern int health;
 //LOADING SCREEN
-#define SCREEN_WIDTH 540
-#define SCREEN_HEIGHT 683
+#define SCREEN_WIDTH 720
+#define SCREEN_HEIGHT 960
 #define GAMEPLAY_WIDTH (SCREEN_WIDTH * 5 / 7)
 #define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 
@@ -74,9 +76,9 @@ void LoadAssets();
 
 
 //ENEMY
-#define SPEED_ENEMY_BULLETS 2
+#define SPEED_ENEMY_BULLETS 3
 #define MAX_ENEMIES 8
-#define MAX_ENEMY_BULLETS 3
+#define MAX_ENEMY_BULLETS 4
 
 
 // Struktur untuk musuh

@@ -1,6 +1,8 @@
 #include "hasbi.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "nazwa.h"
+#include "fawwaz.h"
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
@@ -13,32 +15,25 @@ int main(void) {
     InitAsteroids();
     InitEnemies();
     LoadAssets();
+    loadAssetMenu();
+    
     
     while (!WindowShouldClose()) {
         // float deltaTime = GetFrameTime();
         if (!isLoadingDone) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
-            
         } else {
-            // UpdatePlayer();
-            // // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-            // UpdateShooting(deltaTime);
-            // UpdateBullets();
-            // UpdateExplosions(deltaTime);
-            // CheckCollisions();
-            // UpdateEnemies();
-            // UpdateEnemyBullets();
-            // CheckEnemyCollisions();
-            // AsteroidLoop();
-            // EnemiesLoop();
-            level1();
-            drawGameplay();
+            BeginDrawing();
+            ClearBackground(BLACK);
+            game();
+            EndDrawing();
         }
     }
     CloseAudioDevice();
     UnloadAssets();
     unloadTextures();
+    unloadAssetMenu();
     CloseWindow();
     return 0;
 }

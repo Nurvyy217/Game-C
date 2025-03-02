@@ -1,9 +1,16 @@
 #include "nazwa.h"
+#include "hasbi.h"
 
+Texture2D heartTexture;
+Texture2D menuTexture;
+Texture2D soundOnTexture;
+Texture2D soundOffTexture;
+Texture2D restartTexture;
+Texture2D pauseTexture;
+Texture2D quitTexture;
 bool soundOn = true;
 bool startGame = false;
-void varHeart(Texture2D heartTexture)
-{
+void varHeart(){
     // Koordinat menu
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
     int startY = 40;
@@ -27,8 +34,7 @@ void varHeart(Texture2D heartTexture)
     
 }
 
-void varMenu(Texture2D menuTexture, bool *isSoundOn, Texture2D soundOnTexture, Texture2D soundOffTexture, 
-    Texture2D restartTexture, Texture2D pauseTexture, Texture2D quitTexture)
+void varMenu(bool *isSoundOn)
 {
     static bool showPopup = false; // Status pop-up
 
@@ -118,7 +124,7 @@ void varRestart(){
 }
 
 
-void varSound(bool *isSoundOn, Texture2D soundOnTexture, Texture2D soundOffTexture)
+void varSound(bool *isSoundOn)
 {
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
     int startY = 80;
@@ -155,39 +161,35 @@ void mainMenu(bool *gameStart)
     // Koordinat menu
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
     int startY = 20;
-
-    // Load semua tekstur
-    Texture2D heartTexture = LoadTexture("asset-menu/1.png");
-    Texture2D menuTexture = LoadTexture("asset-menu/6.png");
-    Texture2D soundOnTexture = LoadTexture("asset-menu/7.png");
-    Texture2D soundOffTexture = LoadTexture("asset-menu/5.png");
-    Texture2D restartTexture = LoadTexture("asset-menu/8.png");
-    Texture2D pauseTexture = LoadTexture("asset-menu/9.png");
-    Texture2D quitTexture = LoadTexture("asset-menu/10.png");
-
     bool isSoundOn = true;
-
-    while (!*gameStart && !WindowShouldClose()) { // Loop menu
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        // Gambar menu
+    if(!*gameStart){
         DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
         DrawText("Level 1", menuX - 85, startY + 80, 30, RAYWHITE);
         DrawText("Score : 10000", menuX - 85, startY + 120, 25, RAYWHITE);
-        varMenu(menuTexture, &isSoundOn, soundOnTexture, soundOffTexture, restartTexture, pauseTexture, quitTexture);
+        varMenu(&isSoundOn);
         varHeart(heartTexture);
-
-        DrawText("Press ENTER to Start", SCREEN_WIDTH / 2 - 120, SCREEN_HEIGHT - 100, 25, WHITE);
         
         if (IsKeyPressed(KEY_ENTER)) {
             *gameStart = true;  // Set gameStart = true untuk keluar dari menu
         }
-
-        EndDrawing();
     }
+}
 
-    // Unload textures
+
+
+
+void loadAssetMenu(){
+    heartTexture = LoadTexture("asset-menu/1.png");
+    menuTexture = LoadTexture("asset-menu/6.png");
+    soundOnTexture = LoadTexture("asset-menu/7.png");
+    soundOffTexture = LoadTexture("asset-menu/5.png");
+    restartTexture = LoadTexture("asset-menu/8.png");
+    pauseTexture = LoadTexture("asset-menu/9.png");
+    quitTexture = LoadTexture("asset-menu/10.png");
+}
+    
+
+void unloadAssetMenu(){
     UnloadTexture(heartTexture);
     UnloadTexture(menuTexture);
     UnloadTexture(soundOnTexture);
@@ -196,13 +198,5 @@ void mainMenu(bool *gameStart)
     UnloadTexture(pauseTexture);
     UnloadTexture(quitTexture);
 }
-
-
-
-
-
-
-
-
 
 

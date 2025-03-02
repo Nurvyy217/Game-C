@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "fawwaz.h"
 #include<stdio.h>
+#include "nazwa.h"
 
 // LOADING SCREEN
 void DrawLayout();
@@ -49,7 +50,6 @@ void CheckEnemyCollisions();
 void LoadAssets();
 
 // GAMEPLAY
-void DrawGameplay();
 
 // UNLOAD
 void UnloadAssets();
@@ -59,6 +59,7 @@ int score=0;
 // LOADING SCREEN
 void DrawLayout()
 {
+    bool gameStart=false;
     ClearBackground(RAYWHITE);
 
     // Gameplay area (3/4 of screen, left part)
@@ -66,8 +67,7 @@ void DrawLayout()
     DrawText("Gameplay Area", GAMEPLAY_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, 20, RAYWHITE);// text, posX, posY, font, color
 
     // Menu area (1/4 of screen, right part)
-    DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
-    DrawText("Menu Area", GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, 20, RAYWHITE);
+    mainMenu(&gameStart);
 
     // Separator line
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); //strat posX, start posY, end posX, end posY
@@ -509,8 +509,8 @@ void InitEnemies()
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
-        enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 150), GetRandomValue(-400, -100)};
-        enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.4};
+        enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-400, -150)};
+        enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.8};
         enemies[i].isActive = true;
         enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
         enemies[i].hasShot = false;
@@ -533,7 +533,7 @@ void UpdateEnemies()
 
             if (enemies[i].position.y > SCREEN_HEIGHT)
             {
-                enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-300, -50)};
+                enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
                 enemies[i].hasShot = false; // Reset tembakan jika musuh respawn dari atas
             }
 
@@ -553,8 +553,8 @@ void SpawnEnemies()
     {
         if (!enemies[i].isActive)
         {
-            enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-150, -100)};
-            enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.4};
+            enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
+            enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.8};
             enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
             enemies[i].isActive = true;
             enemies[i].hasShot = false;
@@ -568,7 +568,7 @@ void EnemiesLoop()
     static float enemiesSpawnTimer = 0.0f;
     enemiesSpawnTimer += GetFrameTime();
 
-    if (enemiesSpawnTimer >= 0.5f)
+    if (enemiesSpawnTimer >= 0.4f)
     { // Setiap 2 detik, spawn asteroid baru
         SpawnEnemies();
         enemiesSpawnTimer = 0.0f;
@@ -773,8 +773,7 @@ void DrawLvl2(){
 }
 
 
-void level1(){
-    float deltaTime = GetFrameTime();
+void level1(float deltaTime){
     UpdatePlayer();
     // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
     UpdateShooting(deltaTime);
@@ -788,8 +787,7 @@ void level1(){
     EnemiesLoop();
     DrawLvl1();
 }
-void level2(){
-    float deltaTime = GetFrameTime();
+void level2(float deltaTime){
     DisableLevel1Enemies();
     BossMov();
     UpdatePlayer();
@@ -799,11 +797,10 @@ void level2(){
     DrawLvl2();
 }
 void game(){
-    BeginDrawing();
-    ClearBackground(BLACK);
-    level1();
-    if (score>=20){
-        level2();
+    float deltaTime = GetFrameTime();
+    if (score<50){
+        level1(deltaTime);
+    }else{
+        level2(deltaTime);
     }
-    EndDrawing();
 }

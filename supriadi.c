@@ -1,62 +1,81 @@
 #include "supriadi.h"
 #include "hasbi.h"
+#include "stdlib.h"
+#include <stdio.h>
 
-Texture2D nyawaIMG;
-int score = 0;
-int Nyawa = NYAWA_AWAL;
+infoPlayer InfoPlayer;
+Player pemain;
+PowerUp powerup;
 
-void BuatNyawa() {
-    nyawaIMG = LoadTexture("nyawa.png");
+
+
+void infokanPlayer() {
+    InfoPlayer.nyawa = NYAWA_AWAL;
+    InfoPlayer.score = 0;
+    InfoPlayer.nyawaIMG = LoadTexture("nyawa.png");
 }
 
-void ubahScore(){
-
-    if (IsKeyPressed(KEY_P)) score += 10; //hanya sementara   
+void updateNyawa() {
+    InfoPlayer.nyawa -= 1;
 }
 
-void ubahNyawa(){
-
-    // kurangi nyawa jika terkena tembakan musuh
-    // kurangi nyawa jika terkena meteor
-    // dan lain lain
-
-    if (IsKeyPressed(KEY_K)) Nyawa--; //hanya sementara   
+void updateScore() {
+    InfoPlayer.score += 10;
 }
 
-void Tampil_Nyawa(){
-    int n = 0,m = 0;
+void tampilNyawa() {
     ClearBackground(RAYWHITE);
-    for (int i = 0; i < Nyawa; i++) {
-        if (i == 8){
-            n = 20;
-            m = 130;
-        }
-        Vector2 posisi = {GAMEPLAY_WIDTH + 40 - m + i * (nyawaIMG.width * 0.02f), 800 + n};
-        DrawTextureEx(nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
+    for (int i = 0; i < InfoPlayer.nyawa; i++) {
+        Vector2 posisi = {20 + i * (InfoPlayer.nyawaIMG.width * 0.02f), 20};
+        DrawTextureEx(InfoPlayer.nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
     }
-    ubahNyawa();
-    if (Nyawa == 0) {
-        DrawText("GAME OVER", 300, 200, 40, RED);
-    }
+    DrawText(TextFormat("Nyawa: %d", InfoPlayer.nyawa), 20, 50, 20, RED);
 }
 
 void Tampil_Score(){
-    DrawText(TextFormat("Score: %d", score), 560, 575, 30, RAYWHITE);
-    ubahScore();
+    DrawText(TextFormat("Score: %d", InfoPlayer.score), 560, 575, 30, RAYWHITE);
 }
 
 bool gameover(){
-    return (Nyawa == 0)? false : true;
+    return (InfoPlayer.nyawa == 0)? false : true;
 }
 
 void restart(){
     DrawText("Press R to Restart", 300, 300, 20, BLACK);
     if (IsKeyPressed(KEY_R)){
-        Nyawa = NYAWA_AWAL;
-        score = 0;
+        InfoPlayer.nyawa = NYAWA_AWAL;
+        InfoPlayer.score = 0;
     }    
 }
 
-void unloadNyawa() {
-    UnloadTexture(nyawaIMG);
+void infoPowerUp() {
+    powerup.powerupIMG = LoadTexture("assets/powerup.png");
+    powerup.active = false;
+}
+
+void spawnPowerUp() {
+    if (InfoPlayer.score % 100 == 0 && !powerup.active && InfoPlayer.score > 0) {
+        powerup.active = true;
+        powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
+        powerup.posisi.y = GetRandomValue(20, SCREEN_HEIGHT - 100);
+    }
+}
+
+void tampilPowerUp() {
+    if (powerup.active) {
+        DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.1f, WHITE);
+    }
+}
+
+void checkPowerUpCollision(){
+    Vector2 playerPosition = (Vector2){pemain.position.x + 185, pemain.position.y + 150};
+    if (CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+        powerup.active = false;
+        InfoPlayer.nyawa = InfoPlayer.nyawa + 10;
+    }
+}
+
+void unloadResources() {
+    UnloadTexture(InfoPlayer.nyawaIMG);
+    UnloadTexture(powerup.powerupIMG);
 }

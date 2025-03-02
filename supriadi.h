@@ -4,17 +4,38 @@
 #include "raylib.h"
 
 #define NYAWA_AWAL 16
+#define MAX_POWERUPS 5
 
-extern Texture2D nyawaIMG;
-extern int score;
-extern int NyawaMaks;
+// Struktur untuk menyimpan data pemain
+typedef struct {
+    int nyawa;
+    int score;
+    Texture2D nyawaIMG;
+}infoPlayer;
 
-void BuatNyawa();
-void ubahNyawa();
-void Tampil_Nyawa();
+// Struktur untuk menyimpan data power-up
+typedef struct {
+    Vector2 posisi;
+    Texture2D powerupIMG;
+    bool active;
+} PowerUp;
+
+extern infoPlayer InfoPlayer;
+extern PowerUp powerup;
+
+void tampilNyawa();
+void infokanPlayer();
 void Tampil_Score();
-void unloadNyawa();
 bool gameover();
 void restart();
+void infoPowerUp();
+void spawnPowerUp();
+void tampilPowerUp();
+void unloadResources();
+void updateScore();
+void updateNyawa();
+void checkPowerUpCollision();
+
+
 
 #endif

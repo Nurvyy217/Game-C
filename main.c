@@ -12,7 +12,9 @@ int main(void) {
     InitAsteroids();
     InitEnemies();
     LoadAssets();
-    BuatNyawa();
+    
+    infokanPlayer();
+    infoPowerUp();
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
@@ -20,33 +22,29 @@ int main(void) {
             // loadingAnimation();  // Tampilkan loading lebih dulu
             isLoadingDone=true;
         } else {
-            UpdatePlayer();
-            // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-            UpdateShooting(deltaTime);
-            UpdateBullets();
-            UpdateExplosions(deltaTime);
-            CheckCollisions();
-            UpdateEnemies();
-            UpdateEnemyBullets();
-            CheckEnemyCollisions();
-            AsteroidLoop();
-            EnemiesLoop();
-            BeginDrawing();
-            ClearBackground(BLACK);
-            DrawGameplay();  // Menampilkan layout + player + bullet + asteroids
-            EndDrawing();
             
             if (gameover()){
-                UpdatePlayer();
-                if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-                UpdateBullets();
                 
+                UpdatePlayer();
+                // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
+                UpdateShooting(deltaTime);
+                UpdateBullets();
+                UpdateExplosions(deltaTime);
+                CheckCollisions();
+                UpdateEnemies();
+                UpdateEnemyBullets();
+                CheckEnemyCollisions();
+                AsteroidLoop();
+                EnemiesLoop();
                 BeginDrawing();
                 ClearBackground(BLACK);
-                DrawGameplay();  // Menampilkan layout + player + bullet
-        
-                Tampil_Nyawa();
+                DrawGameplay();
+                  // Menampilkan layout + player + bullet + asteroids
+                tampilNyawa();
                 Tampil_Score();
+                spawnPowerUp();
+                tampilPowerUp();
+                // checkPowerUpCollision();
                 EndDrawing();
             }
             else{
@@ -55,12 +53,13 @@ int main(void) {
             }
         }
     }
+
+    EndDrawing();
     CloseAudioDevice();
     UnloadAssets();
-    UnloadPlayer();
+    // UnloadPlayer();
     unloadTextures();
     CloseWindow();
-    unloadNyawa();
     WindowShouldClose();
 
     return 0;

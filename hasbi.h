@@ -29,6 +29,7 @@ typedef struct {
     Texture2D texture;
 } Player;
 
+
 typedef struct {
     Vector2 position;
     bool active;
@@ -46,7 +47,6 @@ void UnloadAssets();
 
 //ASTEROIDS
 #define MAX_ASTEROIDS 0
-extern int playerHealth;
 typedef struct {
     Texture2D texture;
     Vector2 position; //posisi asteroid

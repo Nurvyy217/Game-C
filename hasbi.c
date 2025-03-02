@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "supriadi.h"
 #include <stdio.h>
 
 // LOADING SCREEN
@@ -31,7 +32,6 @@ void CheckCollisions();
 void SpawnAsteroid();
 void AsteroidLoop();
 void DrawAsteroids();
-void DrawHealth();
 
 // ENEMY
 //  Deklarasi fungsi musuh
@@ -314,7 +314,6 @@ void DrawExplosions(Texture2D explosionTexture)
 
 // ASTEROIDS
 Asteroid asteroids[MAX_ASTEROIDS];
-int playerHealth = 15;
 Texture2D asteroidTexture;
 Texture2D hitEffect1;
 Texture2D hitEffect2;
@@ -412,7 +411,7 @@ void CheckCollisions()
                 }
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
                 { // user menabrak asteroid
-                    playerHealth -= asteroids[i].size;
+                    updateNyawa();
                     PlaySound(userPlaneExplosions);
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
@@ -487,10 +486,7 @@ void DrawAsteroids()
     }
 }
 
-void DrawHealth()
-{
-    DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
-}
+
 
 // ENEMY
 Texture2D enemyTexture, enemyBulletTexture;
@@ -659,7 +655,8 @@ void CheckEnemyCollisions()
             if (bullets[j].active && CheckCollisionCircles(enemiesPosition, 35, bullets[j].position, 5))
             {
                 bullets[j].active = false;
-                enemies[i].isActive = false; // Matikan musuh
+                enemies[i].isActive = false; 
+                updateScore();// Matikan musuh
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(enemiesPosition);
 
@@ -679,23 +676,26 @@ void CheckEnemyCollisions()
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
         {
-            playerHealth -= 1;
+            updateNyawa();
             PlaySound(userPlaneExplosions);
             CreateExplosion(playerPosition);
             enemies[i].isActive = false; // Hancurkan musuh
             break;
         }
+        if (CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+            powerup.active = false;
+            InfoPlayer.nyawa = InfoPlayer.nyawa + 10;
+        }
 
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
         for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
         {
-            if (enemyBullets[k].isActive &&
-                CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+            if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
             {
                 enemyBullets[k].isActive = false;
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(playerPosition);
-                playerHealth -= 1;
+                updateNyawa();
                 break;
             }
         }
@@ -723,7 +723,6 @@ void DrawGameplay()
     DrawPlayer();
     DrawBullets();
     DrawAsteroids();
-    DrawHealth();
     DrawExplosions(explosionsTexture);
     DrawEnemies();
     DrawEnemyBullets();

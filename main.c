@@ -8,7 +8,6 @@ int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
-
     InitPlayer();
     InitBosses();
     InitBullets();

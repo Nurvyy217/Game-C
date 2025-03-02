@@ -3,6 +3,7 @@
 #include "fawwaz.h"
 #include<stdio.h>
 #include "nazwa.h"
+#include "suci.h"
 
 // LOADING SCREEN
 void DrawLayout();
@@ -47,6 +48,7 @@ void CheckEnemyCollisions();
 // ASSSETS
 void LoadAssets();
 
+
 // GAMEPLAY
 
 // UNLOAD
@@ -63,7 +65,12 @@ void DrawLayout()
     ClearBackground(RAYWHITE);
 
     // Gameplay area (3/4 of screen, left part)
-    DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
+    // DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
+    Rectangle source = { 0, 0, background.width, background.height };  // Seluruh gambar
+    Rectangle dest = { 0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT };          // Area gameplay
+    Vector2 origin = { 0, 0 };                                         // Titik acuan (pojok kiri atas)
+    
+    DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
 
     // Menu area (1/4 of screen, right part)
     mainMenu(&gameStart);
@@ -72,20 +79,9 @@ void DrawLayout()
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); //strat posX, start posY, end posX, end posY
 }
 
-Texture2D logoDeveloper;
-Texture2D gameNamePhoto;
-bool texturesLoaded = false; // Cek apakah gambar sudah di-load
+
 bool isLoadingDone = false;
 
-void initLoadScreen()
-{
-    if (!texturesLoaded)
-    { // Load hanya sekali
-        logoDeveloper = LoadTexture("assets/logoDeveloper.png");
-        gameNamePhoto = LoadTexture("assets/gameNamePhoto.png");
-        texturesLoaded = true;
-    }
-}
 
 void loadingAnimation()
 {
@@ -710,6 +706,7 @@ void CheckEnemyCollisions()
 // ASSETS
 void LoadAssets()
 {
+    initBG();
     shootSound = LoadSound("assets/shoot.wav");
     bulletTexture = LoadTexture("assets/bullet.png");
     explosionsTexture = LoadTexture("assets/Explosions.png");

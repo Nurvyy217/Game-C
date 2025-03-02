@@ -33,8 +33,6 @@ int main(void) {
             } else {
                 gamePaused();
             }
-
-            
             EndDrawing();
         }
     }

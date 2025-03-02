@@ -1,6 +1,8 @@
 #include "suci.h"
+#include <stdio.h>
 Texture2D logoDeveloper;
 Texture2D gameNamePhoto;
+Texture2D background;
 bool texturesLoaded = false; // Cek apakah gambar sudah di-load
 
 void initLoadScreen()
@@ -11,5 +13,9 @@ void initLoadScreen()
         gameNamePhoto = LoadTexture("assets/spaceInviders.png");
         texturesLoaded = true;
     }
+}
+
+void initBG(){
+    background= LoadTexture("assets/background.png");
 }
 

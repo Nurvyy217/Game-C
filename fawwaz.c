@@ -7,7 +7,7 @@ BulletBoss bulletboss[BOSS_MAX_BULLETS];
 
 void InitBosses() {
     bosses.position = (Vector2){80, 65};
-    bosses.texture = LoadTexture("bossesTest.png");
+    bosses.texture = LoadTexture("assets/bossesTest.png");
 }
 
 void DrawBosses(){
@@ -27,7 +27,7 @@ void BossMov()
     if (movingRight) 
     {
         bosses.position.x += BOSS_SPEED;
-        if (bosses.position.x >= 135) {
+        if (bosses.position.x >= 260) {
             movingRight = false; 
         }
     } else 

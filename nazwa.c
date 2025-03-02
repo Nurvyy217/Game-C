@@ -10,7 +10,7 @@ Texture2D pauseTexture;
 Texture2D quitTexture;
 bool soundOn = true;
 bool startGame = false;
-void varHeart(){
+void varHeart() {
     // Koordinat menu
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
     int startY = 40;
@@ -18,21 +18,26 @@ void varHeart(){
     // Skala gambar
     float scale = 0.025f;
 
-    // Gambar teks Heart
-    DrawText("Heart", menuX - 85, startY + 140, 25, RAYWHITE);
+    // Gambar teks "Health"
+    DrawText("Health", menuX - 85, startY + 140, 25, RAYWHITE);
 
-    // Cetak 3 gambar hati secara horizontal
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 5; j++) {
-            DrawTextureEx(
-                heartTexture,
-                (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
-                0.0f, scale, WHITE
-            );
+    // Cetak gambar hati dalam 3 baris x 5 kolom
+    int heartsDrawn = 0; // Jumlah hati yang sudah digambar
+
+    for (int i = 0; i < 3; i++) {  // Loop untuk baris (max 3)
+        for (int j = 0; j < 5; j++) {  // Loop untuk kolom (max 5)
+            if (heartsDrawn < playerHealth) { // Hanya gambar sesuai `playerHealth`
+                DrawTextureEx(
+                    heartTexture,
+                    (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
+                    0.0f, scale, WHITE
+                );
+                heartsDrawn++; // Tambah jumlah hati yang digambar
+            }
         }
     }
-    
 }
+
 
 void varMenu(bool *isSoundOn)
 {
@@ -164,8 +169,8 @@ void mainMenu(bool *gameStart)
     bool isSoundOn = true;
     if(!*gameStart){
         DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
-        DrawText("Level 1", menuX - 85, startY + 80, 30, RAYWHITE);
-        DrawText("Score : 10000", menuX - 85, startY + 120, 25, RAYWHITE);
+        DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
+        DrawText(TextFormat("Score: %d", score), menuX - 85, startY + 120, 25, RAYWHITE);
         varMenu(&isSoundOn);
         varHeart(heartTexture);
         

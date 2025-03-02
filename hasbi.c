@@ -6,7 +6,6 @@
 
 // LOADING SCREEN
 void DrawLayout();
-void initTextures();
 void loadingAnimation();
 void unloadTextures();
 
@@ -34,7 +33,6 @@ void CheckCollisions();
 void SpawnAsteroid();
 void AsteroidLoop();
 void DrawAsteroids();
-void DrawHealth();
 
 // ENEMY
 //  Deklarasi fungsi musuh
@@ -55,6 +53,8 @@ void LoadAssets();
 void UnloadAssets();
 
 int score=0;
+int level=0;
+
 
 // LOADING SCREEN
 void DrawLayout()
@@ -64,7 +64,6 @@ void DrawLayout()
 
     // Gameplay area (3/4 of screen, left part)
     DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
-    DrawText("Gameplay Area", GAMEPLAY_WIDTH / 2 - 60, SCREEN_HEIGHT / 2, 20, RAYWHITE);// text, posX, posY, font, color
 
     // Menu area (1/4 of screen, right part)
     mainMenu(&gameStart);
@@ -331,7 +330,7 @@ void InitAsteroids()
         asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
         asteroids[i].size = GetRandomValue(1, 3);
         asteroids[i].health = asteroids[i].size;
-        asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(2, 4)};
+        asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(4, 6)};
         asteroids[i].active = true;
         asteroids[i].hitEffectTimer = 0;
         asteroids[i].hitEffectFrame = 0;
@@ -412,14 +411,17 @@ void CheckCollisions()
                         asteroids[i].active = false;
                         asteroids[i].hitEffectTimer = 0;
                         asteroids[i].hitEffectFrame = 0;
+                        score++;
+                        break;
                     }
                 }
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
                 { // user menabrak asteroid
-                    playerHealth -= asteroids[i].size;
+                    playerHealth -= 1;
                     PlaySound(userPlaneExplosions);
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
+                    break;
                 }
             }
         }
@@ -435,7 +437,7 @@ void SpawnAsteroid()
             asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
             asteroids[i].size = GetRandomValue(1, 3);
             asteroids[i].health = asteroids[i].size;
-            asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(2, 4)};
+            asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(4, 6)};
             asteroids[i].active = true;
             asteroids[i].hitEffectTimer = 0;
             asteroids[i].hitEffectFrame = 0;
@@ -449,7 +451,7 @@ void AsteroidLoop()
     static float asteroidSpawnTimer = 0.0f;
     asteroidSpawnTimer += GetFrameTime();
 
-    if (asteroidSpawnTimer >= 2.0f)
+    if (asteroidSpawnTimer >= 0.2f)
     { // Setiap 2 detik, spawn asteroid baru
         SpawnAsteroid();
         asteroidSpawnTimer = 0.0f;
@@ -491,14 +493,6 @@ void DrawAsteroids()
     }
 }
 
-void DrawHealth()
-{
-    DrawText(TextFormat("Health: %d", playerHealth), 20, 20, 20, RED);
-}
-void DrawScore()
-{
-    DrawText(TextFormat("Score: %d", score), 300, 20, 20, RED);
-}
 
 // ENEMY
 Texture2D enemyTexture, enemyBulletTexture;
@@ -711,11 +705,6 @@ void CheckEnemyCollisions()
     }
 }
 
-void DisableLevel1Enemies() {
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        enemies[i].isActive = false;  // Nonaktifkan semua musuh level 1
-    }
-}
 
 
 // ASSETS
@@ -738,13 +727,86 @@ void DrawLvl1()
     DrawLayout();
     DrawPlayer();
     DrawBullets();
-    DrawAsteroids();
-    DrawHealth();
-    DrawScore();
     DrawExplosions(explosionsTexture);
     DrawEnemies();
     DrawEnemyBullets();
 }
+
+void DrawLvl2(){
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawAsteroids();
+    DrawExplosions(explosionsTexture);
+}
+
+
+void DrawLvl3(){
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawBosses();
+    DrawBossShoot();
+}
+
+
+void level1(float deltaTime){
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    CheckCollisions();
+    UpdateEnemies();
+    UpdateEnemyBullets();
+    CheckEnemyCollisions();
+    EnemiesLoop();
+    DrawLvl1();
+}
+void level2(float deltaTime){
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    CheckCollisions();
+    AsteroidLoop();
+    DrawLvl2();
+}
+void level3(float deltaTime){
+    BossMov();
+    UpdatePlayer();
+    UpdateBulletBoss();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    DrawLvl3();
+}
+void gameOver(){
+    ClearBackground(BLACK); // Hapus semua elemen layar
+    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);// text, posX, posY, font, color
+}
+
+void game(){
+    float deltaTime = GetFrameTime();
+    bool isGameOver;
+    if (playerHealth <= 0) {
+        isGameOver = 1; // Tandai bahwa game sudah berakhir
+    }
+
+    if (!isGameOver) {
+        if (score < 20) {
+            level1(deltaTime);
+            level=1;
+        } else if (score >= 20 && score < 40) {
+            level2(deltaTime);
+            level=2;
+        } else {
+            level3(deltaTime);
+            level=3;
+        }
+    } else {
+        gameOver();
+    }
+}
+
 
 // UNLOAD
 void UnloadAssets()
@@ -757,50 +819,4 @@ void UnloadAssets()
     UnloadSound(shootSound);
     UnloadTexture(hitEffect1);
     UnloadTexture(hitEffect2);
-}
-
-
-
-void DrawLvl2(){
-
-    DrawLayout();
-    DrawPlayer();
-    DrawBullets();
-    DrawHealth();
-    DrawScore();
-    DrawBosses();
-    DrawBossShoot();
-}
-
-
-void level1(float deltaTime){
-    UpdatePlayer();
-    // if (IsKeyPressed(KEY_SPACE)) ShootBullet();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    UpdateExplosions(deltaTime);
-    CheckCollisions();
-    UpdateEnemies();
-    UpdateEnemyBullets();
-    CheckEnemyCollisions();
-    AsteroidLoop();
-    EnemiesLoop();
-    DrawLvl1();
-}
-void level2(float deltaTime){
-    DisableLevel1Enemies();
-    BossMov();
-    UpdatePlayer();
-    UpdateBulletBoss();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    DrawLvl2();
-}
-void game(){
-    float deltaTime = GetFrameTime();
-    if (score<50){
-        level1(deltaTime);
-    }else{
-        level2(deltaTime);
-    }
 }

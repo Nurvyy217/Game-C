@@ -6,7 +6,8 @@
 
 
 extern int score;
-extern int health;
+extern int playerHealth;
+extern int level;
 //LOADING SCREEN
 #define SCREEN_WIDTH 720
 #define SCREEN_HEIGHT 960
@@ -46,7 +47,7 @@ void UnloadAssets();
 
 
 //ASTEROIDS
-#define MAX_ASTEROIDS 0
+#define MAX_ASTEROIDS 8
 extern int playerHealth;
 typedef struct {
     Texture2D texture;
@@ -79,7 +80,6 @@ void LoadAssets();
 #define SPEED_ENEMY_BULLETS 3
 #define MAX_ENEMIES 8
 #define MAX_ENEMY_BULLETS 4
-
 
 // Struktur untuk musuh
 typedef struct {

@@ -8,6 +8,7 @@ Texture2D soundOffTexture;
 Texture2D restartTexture;
 Texture2D pauseTexture;
 Texture2D quitTexture;
+Texture2D gameOverTexture;
 bool soundOn = true;
 bool startGame = false;
 void varHeart() {
@@ -120,8 +121,29 @@ void varQuit(){
 
 }
 
-void varPause(){
+bool isPaused = false; 
 
+void togglePause() {
+    if (IsKeyPressed(KEY_ENTER)) {
+        isPaused = !isPaused;
+    }
+}
+
+bool getPauseState() {
+    return isPaused;
+}
+
+void gamePaused()
+{
+        // int iconStartX = SCREEN_WIDTH + 20; // Posisi kiri dalam pop-up
+        // int iconStartY = SCREEN_HEIGHT + 60; // Posisi awal untuk elemen
+        // int iconSpacing = 70; // Jarak antar elemen
+        float iconScale = 0.5f;
+        int textOffsetX = 80; // Jarak teks dari ikon
+    
+        DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
+        DrawText("Press Enter to start", 235, 530, 23, WHITE);
+        
 }
 
 void varRestart(){
@@ -191,6 +213,7 @@ void loadAssetMenu(){
     restartTexture = LoadTexture("asset-menu/8.png");
     pauseTexture = LoadTexture("asset-menu/9.png");
     quitTexture = LoadTexture("asset-menu/10.png");
+    gameOverTexture = LoadTexture("asset-menu/11.png");
 }
     
 
@@ -202,6 +225,7 @@ void unloadAssetMenu(){
     UnloadTexture(restartTexture);
     UnloadTexture(pauseTexture);
     UnloadTexture(quitTexture);
+    UnloadTexture(gameOverTexture);
 }
 
 

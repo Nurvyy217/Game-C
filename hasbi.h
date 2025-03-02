@@ -29,6 +29,7 @@ typedef struct {
     Texture2D texture;
 } Player;
 
+extern Player player;
 
 typedef struct {
     Vector2 position;

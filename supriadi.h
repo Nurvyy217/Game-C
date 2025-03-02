@@ -20,6 +20,15 @@ typedef struct {
     bool active;
 } PowerUp;
 
+// struktur untuk memunculkan animasi ketika mendapat power up
+typedef struct{
+    Vector2 PosisiSpark;
+    bool aktif;
+    float timer;
+    Texture2D sparkIMG;
+} sparkle;
+
+extern sparkle Sparkles;
 extern infoPlayer InfoPlayer;
 extern PowerUp powerup;
 
@@ -34,7 +43,10 @@ void unloadResources();
 void updateScore();
 void updateNyawa();
 void checkPowerUpCollision();
-
+void inipowerup();
+void UpdateSpark();
+void ShowSpark(Vector2 position);
+void tampilspark();
 
 
 #endif

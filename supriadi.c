@@ -4,8 +4,11 @@
 #include <stdio.h>
 
 infoPlayer InfoPlayer;
-Player pemain;
 PowerUp powerup;
+sparkle Sparkles;
+
+
+bool ambilpowerup;
 
 void infokanPlayer() {
     InfoPlayer.nyawa = NYAWA_AWAL;
@@ -31,7 +34,6 @@ void tampilNyawa() {
             DrawTextureEx(InfoPlayer.nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
             }
         }
-        
     }
     DrawText(TextFormat("Nyawa: %d", InfoPlayer.nyawa), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 770, 25, WHITE);
 
@@ -55,16 +57,28 @@ void gameover(){
     }
 }
 
+void inipowerup(){
+    spawnPowerUp();
+    tampilPowerUp();
+    checkPowerUpCollision();
+}
+
 void infoPowerUp() {
     powerup.powerupIMG = LoadTexture("assets/powerup.png");
     powerup.active = false;
+    Sparkles.sparkIMG = LoadTexture("assets/sparkel1.png");
+    Sparkles.aktif = false;
 }
 
 void spawnPowerUp() {
-    if (InfoPlayer.score % 10 == 0 && !powerup.active && InfoPlayer.score > 0) {
-        powerup.active = true;
-        powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
-        powerup.posisi.y = GetRandomValue(20, SCREEN_HEIGHT - 100);
+    if (InfoPlayer.score % 10 == 0) {
+        if (!powerup.active && InfoPlayer.score > 0 && !ambilpowerup) {
+            powerup.active = true;
+            powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
+            powerup.posisi.y = GetRandomValue(20, SCREEN_HEIGHT - 100);
+        }
+    }else{
+        ambilpowerup = false;
     }
 }
 
@@ -74,15 +88,39 @@ void tampilPowerUp() {
     }
 }
 
-// void checkPowerUpCollision(){
-//     Vector2 playerPosition = (Vector2){pemain.position.x + 185, pemain.position.y + 150};
-//     if (CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
-//         powerup.active = false;
-//         InfoPlayer.nyawa = InfoPlayer.nyawa + 10;
-//     }
-// }
+void ShowSpark(Vector2 position){
+    Sparkles.aktif = true;
+    Sparkles.timer = 0.0f;    
+    Sparkles.PosisiSpark = position;
+}
+
+void UpdateSpark() {
+    if (Sparkles.aktif) {
+        Sparkles.timer += GetFrameTime();
+        if (Sparkles.timer >= 1.0f) {
+            Sparkles.aktif = false;
+        }
+    }
+}
+
+void tampilspark() {
+    if (Sparkles.aktif) {
+        DrawTextureEx(Sparkles.sparkIMG, Sparkles.PosisiSpark, 0.0f, 1.0f, WHITE);
+    }
+}
+
+void checkPowerUpCollision(){
+    Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+    if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+        InfoPlayer.nyawa = InfoPlayer.nyawa + 3;
+        powerup.active = false;
+        ambilpowerup = true;
+        ShowSpark(powerup.posisi);
+    }
+}
 
 void unloadResources() {
     UnloadTexture(InfoPlayer.nyawaIMG);
     UnloadTexture(powerup.powerupIMG);
+    UnloadTexture(Sparkles.sparkIMG);
 }

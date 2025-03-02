@@ -728,6 +728,7 @@ void DrawLvl1()
     DrawExplosions(explosionsTexture);
     DrawEnemies();
     DrawEnemyBullets();
+    tampilspark();
 }
 
 void DrawLvl2(){
@@ -736,6 +737,7 @@ void DrawLvl2(){
     DrawBullets();
     DrawAsteroids();
     DrawExplosions(explosionsTexture);
+    tampilspark();
 }
 
 
@@ -759,6 +761,8 @@ void level1(float deltaTime){
     CheckEnemyCollisions();
     EnemiesLoop();
     DrawLvl1();
+    inipowerup();
+    UpdateSpark();
 }
 void level2(float deltaTime){
     UpdatePlayer();
@@ -768,6 +772,8 @@ void level2(float deltaTime){
     CheckCollisions();
     AsteroidLoop();
     DrawLvl2();
+    inipowerup();
+    UpdateSpark();
 }
 void level3(float deltaTime){
     BossMov();
@@ -776,6 +782,8 @@ void level3(float deltaTime){
     UpdateShooting(deltaTime);
     UpdateBullets();
     DrawLvl3();
+    inipowerup();
+    UpdateSpark();
 }
 
 void game(){

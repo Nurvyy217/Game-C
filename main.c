@@ -16,7 +16,6 @@ int main(void) {
     InitEnemies();
     LoadAssets();
     loadAssetMenu();
-    
     infokanPlayer();
     infoPowerUp();
     

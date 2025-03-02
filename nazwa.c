@@ -11,33 +11,33 @@ Texture2D quitTexture;
 Texture2D gameOverTexture;
 bool soundOn = true;
 bool startGame = false;
-void varHeart() {
-    // Koordinat menu
-    int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
-    int startY = 40;
+// void varHeart() {
+//     // Koordinat menu
+//     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
+//     int startY = 40;
     
-    // Skala gambar
-    float scale = 0.025f;
+//     // Skala gambar
+//     float scale = 0.025f;
 
-    // Gambar teks "Health"
-    DrawText("Health", menuX - 85, startY + 140, 25, RAYWHITE);
+//     // Gambar teks "Health"
+//     DrawText("Health", menuX - 85, startY + 140, 25, RAYWHITE);
 
-    // Cetak gambar hati dalam 3 baris x 5 kolom
-    int heartsDrawn = 0; // Jumlah hati yang sudah digambar
+//     // Cetak gambar hati dalam 3 baris x 5 kolom
+//     int heartsDrawn = 0; // Jumlah hati yang sudah digambar
 
-    for (int i = 0; i < 3; i++) {  // Loop untuk baris (max 3)
-        for (int j = 0; j < 5; j++) {  // Loop untuk kolom (max 5)
-            if (heartsDrawn < playerHealth) { // Hanya gambar sesuai `playerHealth`
-                DrawTextureEx(
-                    heartTexture,
-                    (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
-                    0.0f, scale, WHITE
-                );
-                heartsDrawn++; // Tambah jumlah hati yang digambar
-            }
-        }
-    }
-}
+//     for (int i = 0; i < 3; i++) {  // Loop untuk baris (max 3)
+//         for (int j = 0; j < 5; j++) {  // Loop untuk kolom (max 5)
+//             if (heartsDrawn < playerHealth) { // Hanya gambar sesuai `playerHealth`
+//                 DrawTextureEx(
+//                     heartTexture,
+//                     (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
+//                     0.0f, scale, WHITE
+//                 );
+//                 heartsDrawn++; // Tambah jumlah hati yang digambar
+//             }
+//         }
+//     }
+// }
 
 
 void varMenu(bool *isSoundOn)
@@ -192,9 +192,8 @@ void mainMenu(bool *gameStart)
     if(!*gameStart){
         DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
         DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
-        DrawText(TextFormat("Score: %d", score), menuX - 85, startY + 120, 25, RAYWHITE);
         varMenu(&isSoundOn);
-        varHeart(heartTexture);
+        // varHeart(heartTexture);
         
         if (IsKeyPressed(KEY_ENTER)) {
             *gameStart = true;  // Set gameStart = true untuk keluar dari menu
@@ -206,7 +205,6 @@ void mainMenu(bool *gameStart)
 
 
 void loadAssetMenu(){
-    heartTexture = LoadTexture("asset-menu/1.png");
     menuTexture = LoadTexture("asset-menu/6.png");
     soundOnTexture = LoadTexture("asset-menu/7.png");
     soundOffTexture = LoadTexture("asset-menu/5.png");
@@ -218,7 +216,6 @@ void loadAssetMenu(){
     
 
 void unloadAssetMenu(){
-    UnloadTexture(heartTexture);
     UnloadTexture(menuTexture);
     UnloadTexture(soundOnTexture);
     UnloadTexture(soundOffTexture);

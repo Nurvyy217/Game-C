@@ -1,4 +1,5 @@
 #include "hasbi.h"
+#include "supriadi.h"
 #include <stdio.h>
 #include "fawwaz.h"
 #include<stdio.h>
@@ -54,7 +55,6 @@ void LoadAssets();
 // UNLOAD
 void UnloadAssets();
 
-int score=0;
 int level=0;
 
 
@@ -74,6 +74,8 @@ void DrawLayout()
 
     // Menu area (1/4 of screen, right part)
     mainMenu(&gameStart);
+    tampilNyawa();
+    Tampil_Score();
 
     // Separator line
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); //strat posX, start posY, end posX, end posY
@@ -313,7 +315,6 @@ void DrawExplosions(Texture2D explosionTexture)
 
 // ASTEROIDS
 Asteroid asteroids[MAX_ASTEROIDS];
-int playerHealth = 15;
 Texture2D asteroidTexture;
 Texture2D hitEffect1;
 Texture2D hitEffect2;
@@ -407,13 +408,13 @@ void CheckCollisions()
                         asteroids[i].active = false;
                         asteroids[i].hitEffectTimer = 0;
                         asteroids[i].hitEffectFrame = 0;
-                        score++;
+                        updateScore();
                         break;
                     }
                 }
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
                 { // user menabrak asteroid
-                    playerHealth -= 1;
+                    updateNyawa();
                     PlaySound(userPlaneExplosions);
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
@@ -488,6 +489,7 @@ void DrawAsteroids()
         }
     }
 }
+
 
 
 // ENEMY
@@ -657,10 +659,10 @@ void CheckEnemyCollisions()
             if (bullets[j].active && CheckCollisionCircles(enemiesPosition, 35, bullets[j].position, 5))
             {
                 bullets[j].active = false;
-                enemies[i].isActive = false; // Matikan musuh
+                enemies[i].isActive = false; 
+                updateScore();// Matikan musuh
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(enemiesPosition);
-                score++;
 
                 // Hapus semua peluru yang ditembak musuh ini
                 for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
@@ -678,7 +680,7 @@ void CheckEnemyCollisions()
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
         {
-            playerHealth -= 1;
+            updateNyawa();
             PlaySound(userPlaneExplosions);
             CreateExplosion(playerPosition);
             enemies[i].isActive = false; // Hancurkan musuh
@@ -688,13 +690,12 @@ void CheckEnemyCollisions()
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
         for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
         {
-            if (enemyBullets[k].isActive &&
-                CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+            if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
             {
                 enemyBullets[k].isActive = false;
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(playerPosition);
-                playerHealth -= 1;
+                updateNyawa();
                 break;
             }
         }
@@ -776,23 +777,18 @@ void level3(float deltaTime){
     UpdateBullets();
     DrawLvl3();
 }
-void gameOver(){
-    ClearBackground(BLACK); // Hapus semua elemen layar
-    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);// text, posX, posY, font, color
-}
 
 void game(){
     float deltaTime = GetFrameTime();
     bool isGameOver;
-    if (playerHealth <= 0) {
+    if (InfoPlayer.nyawa <= 0) {
         isGameOver = 1; // Tandai bahwa game sudah berakhir
     }
-
     if (!isGameOver) {
-        if (score < 20) {
+        if (InfoPlayer.score < 20) {
             level1(deltaTime);
             level=1;
-        } else if (score >= 20 && score < 40) {
+        } else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40) {
             level2(deltaTime);
             level=2;
         } else {
@@ -800,7 +796,7 @@ void game(){
             level=3;
         }
     } else {
-        gameOver();
+        gameover();
     }
 }
 

@@ -19,13 +19,22 @@ int main(void) {
     
     while (!WindowShouldClose()) {
         // float deltaTime = GetFrameTime();
+
         if (!isLoadingDone) {
             loadingAnimation();  // Tampilkan loading lebih dulu
             // isLoadingDone=true;
         } else {
+            varQuit();
             BeginDrawing();
             ClearBackground(BLACK);
-            game();
+            togglePause(); 
+            if (!getPauseState()) {
+                game();  
+            } else {
+                gamePaused();
+            }
+
+            
             EndDrawing();
         }
     }

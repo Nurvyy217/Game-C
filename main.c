@@ -27,6 +27,7 @@ int main(void) {
             // isLoadingDone=true;
         } else {
             varQuit();
+            varRestart();
             BeginDrawing();
             ClearBackground(BLACK);
             togglePause(); 

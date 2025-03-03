@@ -47,6 +47,7 @@ void inipowerup();
 void UpdateSpark();
 void ShowSpark(Vector2 position);
 void tampilspark();
+void varRestart();
 
 
 #endif

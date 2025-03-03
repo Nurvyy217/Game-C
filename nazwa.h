@@ -9,9 +9,14 @@ void varQuit();
 void togglePause();
 bool getPauseState();
 void gamePaused();
-void varRestart();
 void loadAssetMenu();
 void unloadAssetMenu();
 
+// typedef struct {
+//     int score;
+//     Vector2 playerPos;
+// } GameState;
+
+// void varRestart(GameState *game);
 
 #endif

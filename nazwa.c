@@ -1,5 +1,6 @@
 #include "nazwa.h"
 #include "hasbi.h"
+#include "supriadi.h"
 
 Texture2D heartTexture;
 Texture2D menuTexture;
@@ -11,6 +12,7 @@ Texture2D quitTexture;
 Texture2D gameOverTexture;
 bool soundOn = true;
 bool startGame = false;
+
 // void varHeart() {
 //     // Koordinat menu
 //     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
@@ -147,9 +149,14 @@ void gamePaused()
 }
 
 void varRestart(){
-
+    if (IsKeyPressed(KEY_R)){
+        InfoPlayer.nyawa = NYAWA_AWAL;
+        InfoPlayer.score = 0;
+        InitPlayer();
+        InitEnemies();
+        InitBullets();
+    }
 }
-
 
 void varSound(bool *isSoundOn)
 {

@@ -11,10 +11,10 @@ Texture2D quitTexture;
 Texture2D gameOverTexture;
 bool soundOn = true;
 bool startGame = false;
-void varHeart() {
-    // Koordinat menu
-    int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
-    int startY = 40;
+// void varHeart() {
+//     // Koordinat menu
+//     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
+//     int startY = 40;
     
 //     // Skala gambar
 //     float scale = 0.025f;

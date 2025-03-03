@@ -42,7 +42,6 @@ void InitBullets();
 void UpdatePlayer();
 void ShootBullet();
 void UpdateBullets();
-void DrawGameplay();
 void UnloadAssets();
 
 

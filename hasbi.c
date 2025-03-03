@@ -157,11 +157,12 @@ Player player;
 Bullet bullets[MAX_BULLETS];
 Texture2D bulletTexture;
 Sound shootSound;
-static float shootCooldown = 0.0f;
-static const float SHOOT_INTERVAL = 0.2f;
+
 
 void UpdateShooting(float deltaTime)
 {
+    static float shootCooldown = 0.0f;
+    static const float SHOOT_INTERVAL = 0.2f;
     // Kurangi cooldown
     if (shootCooldown > 0.0f)
     {
@@ -184,14 +185,6 @@ void InitPlayer()
 
 void InitBullets()
 {
-    if (bulletTexture.id == 0)
-    {
-        printf("ERROR: bullet.png gagal dimuat!\n");
-    }
-    else
-    {
-        printf("bullet.png berhasil dimuat! Ukuran: %d x %d\n", bulletTexture.width, bulletTexture.height);
-    }
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         bullets[i].active = false;
@@ -446,7 +439,7 @@ void AsteroidLoop()
     asteroidSpawnTimer += GetFrameTime();
 
     if (asteroidSpawnTimer >= 0.2f)
-    { // Setiap 2 detik, spawn asteroid baru
+    { // Setiap 2 detik, spawn musuh baru
         SpawnAsteroid();
         asteroidSpawnTimer = 0.0f;
     }

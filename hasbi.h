@@ -5,8 +5,6 @@
 #include "raylib.h"
 
 
-extern int score;
-extern int playerHealth;
 extern int level;
 //LOADING SCREEN
 #define SCREEN_WIDTH 720
@@ -31,6 +29,8 @@ typedef struct {
     Texture2D texture;
 } Player;
 
+extern Player player;
+
 typedef struct {
     Vector2 position;
     bool active;
@@ -45,7 +45,7 @@ void UpdateBullets();
 void DrawGameplay();
 void UnloadAssets();
 
-
+void level1(float deltaTime);
 //ASTEROIDS
 #define MAX_ASTEROIDS 8
 extern int playerHealth;
@@ -78,7 +78,7 @@ void LoadAssets();
 
 //ENEMY
 #define SPEED_ENEMY_BULLETS 3
-#define MAX_ENEMIES 8
+#define MAX_ENEMIES 15
 #define MAX_ENEMY_BULLETS 4
 
 // Struktur untuk musuh

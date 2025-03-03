@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "nazwa.h"
 #include "fawwaz.h"
+#include "supriadi.h"
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
@@ -15,7 +16,8 @@ int main(void) {
     InitEnemies();
     LoadAssets();
     loadAssetMenu();
-    
+    infokanPlayer();
+    infoPowerUp();
     
     while (!WindowShouldClose()) {
         // float deltaTime = GetFrameTime();
@@ -33,15 +35,19 @@ int main(void) {
             } else {
                 gamePaused();
             }
-
-            
             EndDrawing();
         }
     }
+
+    EndDrawing();
     CloseAudioDevice();
     UnloadAssets();
+    // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();
+    unloadResources();
     CloseWindow();
+    WindowShouldClose();
+
     return 0;
 }

@@ -46,7 +46,7 @@ void Tampil_Score(){
 void gameover(){
     ClearBackground(BLACK);
     DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, 600, 30, RAYWHITE);
+    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
     if (IsKeyPressed(KEY_R)){
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;

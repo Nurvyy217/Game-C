@@ -4,6 +4,7 @@
 #include "nazwa.h"
 #include "fawwaz.h"
 #include "supriadi.h"
+#include "suci.h"
 
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
@@ -20,26 +21,13 @@ int main(void) {
     infoPowerUp();
     
     while (!WindowShouldClose()) {
-        // float deltaTime = GetFrameTime();
-
         if (!isLoadingDone) {
-            loadingAnimation();  // Tampilkan loading lebih dulu
-            // isLoadingDone=true;
-        } else {
-            varQuit();
-            BeginDrawing();
-            ClearBackground(BLACK);
-            togglePause(); 
-            if (!getPauseState()) {
-                game();  
-            } else {
-                gamePaused();
+            loadingAnimation();}  // Tampilkan loading lebih dulu
+        else {
+                menuSuci();
             }
-            EndDrawing();
-        }
     }
 
-    EndDrawing();
     CloseAudioDevice();
     UnloadAssets();
     // UnloadPlayer();
@@ -51,3 +39,4 @@ int main(void) {
 
     return 0;
 }
+

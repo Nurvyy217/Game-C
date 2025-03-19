@@ -39,11 +39,10 @@ void DrawAsteroids();
 // ENEMY
 //  Deklarasi fungsi musuh
 void InitEnemies();
-void UpdateEnemies();
-void DrawEnemies();
+void DrawEnemies(Texture2D EnemyTexture, float scale);
 void EnemyShoot();
 void UpdateEnemyBullets();
-void DrawEnemyBullets();
+void DrawEnemyBullets(Texture2D EnemyBulletTexture, float scale);
 void CheckEnemyCollisions();
 
 // ASSSETS
@@ -54,6 +53,9 @@ void LoadAssets();
 
 // UNLOAD
 void UnloadAssets();
+
+Texture2D enemylvl1;
+Texture2D enemyBulletlv1;
 
 int level=0;
 
@@ -146,6 +148,7 @@ void loadingAnimation()
 
     EndDrawing();
 }
+
 void unloadTextures()
 {
     if (texturesLoaded)
@@ -493,7 +496,6 @@ void DrawAsteroids()
 
 
 // ENEMY
-Texture2D enemyTexture, enemyBulletTexture;
 Enemy enemies[MAX_ENEMIES];
 EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
 
@@ -509,7 +511,7 @@ void InitEnemies()
     }
 }
 
-void UpdateEnemies()
+void UpdateEnemies(Texture2D EnemyTexture, int xRight, int xLeft)
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
@@ -518,7 +520,7 @@ void UpdateEnemies()
             enemies[i].position.y += enemies[i].speed.y;
             enemies[i].position.x += enemies[i].speed.x;
 
-            if (enemies[i].position.x <= -85 || enemies[i].position.x >= GAMEPLAY_WIDTH - (enemyTexture.width * 2.0f) + 85)
+            if (enemies[i].position.x <= xRight || enemies[i].position.x >= GAMEPLAY_WIDTH - (EnemyTexture.width * 2.0f) + xLeft)
             {
                 enemies[i].speed.x *= -1; // Pantulan jika mencapai batas
             }
@@ -532,7 +534,7 @@ void UpdateEnemies()
             // Jika musuh boleh menembak dan belum menembak sebelumnya, maka tembak
             if (enemies[i].canShoot && !enemies[i].hasShot && GetRandomValue(0, 100) < 2)
             {
-                EnemyShoot();
+                EnemyShoot(EnemyTexture);
             }
         }
     }
@@ -555,7 +557,7 @@ void SpawnEnemies()
     }
 }
 
-void EnemiesLoop()
+void EnemiesLoop(Texture2D EnemyTexture, int xRight, int xLeft)
 {
     static float enemiesSpawnTimer = 0.0f;
     enemiesSpawnTimer += GetFrameTime();
@@ -565,21 +567,21 @@ void EnemiesLoop()
         SpawnEnemies();
         enemiesSpawnTimer = 0.0f;
     }
-    UpdateEnemies();
+    UpdateEnemies(EnemyTexture, xRight, xLeft);
 }
 
-void DrawEnemies()
+void DrawEnemies(Texture2D EnemyTexture, float scale)
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
         if (enemies[i].isActive)
         {
-            DrawTextureEx(enemyTexture, enemies[i].position, 0.0f, 2.0f, WHITE);
+            DrawTextureEx(EnemyTexture, enemies[i].position, 0.0f, scale, WHITE);
         }
     }
 }
 
-void EnemyShoot()
+void EnemyShoot(Texture2D EnemyTexture)
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
@@ -590,8 +592,8 @@ void EnemyShoot()
         {
             if (!enemyBullets[j].isActive)
             {
-                enemyBullets[j].position = (Vector2){(enemies[i].position.x - 30) + enemyTexture.width,
-                                                     (enemies[i].position.y + enemyTexture.width + 20)};
+                enemyBullets[j].position = (Vector2){(enemies[i].position.x - 30) + EnemyTexture.width,
+                                                     (enemies[i].position.y + EnemyTexture.width + 20)};
                 enemyBullets[j].isActive = true;
                 enemyBullets[j].shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
                 if (GetRandomValue(0, 1) == 0)
@@ -610,7 +612,7 @@ void EnemyShoot()
     }
 }
 
-void UpdateEnemyBullets()
+void UpdateEnemyBullets(Texture2D enemyBulletTexture)
 {
     for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
     {
@@ -631,18 +633,18 @@ void UpdateEnemyBullets()
     }
 }
 
-void DrawEnemyBullets()
+void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale)
 {
     for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
     {
         if (enemyBullets[i].isActive)
         {
-            DrawTextureEx(enemyBulletTexture, enemyBullets[i].position, 0.0f, 0.8f, WHITE);
+            DrawTextureEx(enemyBulletTexture, enemyBullets[i].position, 0.0f, scale, WHITE);
         }
     }
 }
 
-void CheckEnemyCollisions()
+void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
 
@@ -651,12 +653,12 @@ void CheckEnemyCollisions()
         if (!enemies[i].isActive)
             continue; // Lewati musuh yang sudah mati
 
-        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + 95, enemies[i].position.y + 70};
+        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + xEnemy, enemies[i].position.y + yEnemy};
 
         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
         for (int j = 0; j < MAX_BULLETS; j++)
         {
-            if (bullets[j].active && CheckCollisionCircles(enemiesPosition, 35, bullets[j].position, 5))
+            if (bullets[j].active && CheckCollisionCircles(enemiesPosition, radiusPlayer, bullets[j].position, radiusBulletEnemy))
             {
                 bullets[j].active = false;
                 enemies[i].isActive = false; 
@@ -702,8 +704,24 @@ void CheckEnemyCollisions()
     }
 }
 
+void ResetEnemies()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        enemies[i].isActive = false;
+    }
+}
+
+void ResetEnemyBullets()
+{
+    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    {
+        enemyBullets[i].isActive = false;
+    }
+}
 
 
+ Texture2D enemyLvl5;
 // ASSETS
 void LoadAssets()
 {
@@ -715,8 +733,9 @@ void LoadAssets()
     userPlaneExplosions = LoadSound("assets/userPlaneExplosion.wav");
     hitEffect1 = LoadTexture("assets/efekTembakan1.png");
     hitEffect2 = LoadTexture("assets/efekTembakan2.png");
-    enemyTexture = LoadTexture("assets/musuh.png");
-    enemyBulletTexture = LoadTexture("assets/enemyBullet.png");
+    enemylvl1 = LoadTexture("assets/musuh.png");
+    enemyBulletlv1 = LoadTexture("assets/enemyBullet.png");
+    enemyLvl5= LoadTexture("assets/enemyLvl5.png");
 }
 
 // GAMEPLAY
@@ -726,8 +745,8 @@ void DrawLvl1()
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawEnemies();
-    DrawEnemyBullets();
+    DrawEnemies(enemylvl1, 2.0f);
+    DrawEnemyBullets(enemyBulletlv1,0.8f);
     tampilspark();
 }
 
@@ -741,7 +760,18 @@ void DrawLvl2(){
 }
 
 
-void DrawLvl3(){
+void DrawLvl5()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(enemyLvl5, 1.2f);
+    DrawEnemyBullets(enemyBulletlv1,0.8f);
+    tampilspark();
+}
+
+void DrawLvl4(){
     DrawLayout();
     DrawPlayer();
     DrawBullets();
@@ -755,11 +785,10 @@ void level1(float deltaTime){
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    CheckCollisions();
-    UpdateEnemies();
-    UpdateEnemyBullets();
-    CheckEnemyCollisions();
-    EnemiesLoop();
+    UpdateEnemies(enemylvl1, -85, 85);
+    UpdateEnemyBullets(enemyBulletlv1);
+    CheckEnemyCollisions(95,70,35,5);
+    EnemiesLoop(enemylvl1, -85, 85);
     DrawLvl1();
     inipowerup();
     UpdateSpark();
@@ -775,33 +804,77 @@ void level2(float deltaTime){
     inipowerup();
     UpdateSpark();
 }
-void level3(float deltaTime){
+void level4(float deltaTime){
     BossMov();
     UpdatePlayer();
     UpdateBulletBoss();
     UpdateShooting(deltaTime);
     UpdateBullets();
-    DrawLvl3();
+    DrawLvl4();
+    inipowerup();
+    UpdateSpark();
+}
+void level5(float deltaTime){
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(enemyLvl5, -35, 125);
+    UpdateEnemyBullets(enemyBulletlv1);
+    CheckEnemyCollisions(60,50,40,10);
+    EnemiesLoop(enemyLvl5, -35, 125);
+    DrawLvl5();
     inipowerup();
     UpdateSpark();
 }
 
-void game(){
+int previousLevel = 0;
+void game() {
     float deltaTime = GetFrameTime();
-    bool isGameOver;
+    bool isGameOver = false; // Pastikan inisialisasi benar
+
     if (InfoPlayer.nyawa <= 0) {
-        isGameOver = 1; // Tandai bahwa game sudah berakhir
+        isGameOver = true;
     }
+
     if (!isGameOver) {
-        if (InfoPlayer.score < 20) {
-            level1(deltaTime);
-            level=1;
-        } else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40) {
-            level2(deltaTime);
-            level=2;
-        } else {
-            level3(deltaTime);
-            level=3;
+        // Tentukan level berdasarkan skor
+        if (InfoPlayer.score < 10) {
+            level = 1;
+        } else if (InfoPlayer.score >= 10 && InfoPlayer.score < 40) {
+            level = 2;
+        } else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60) {
+            level = 3;
+        } else if (InfoPlayer.score >= 60 && InfoPlayer.score < 80) {
+            level = 4;
+        } else if (InfoPlayer.score >= 80 && InfoPlayer.score < 100) {
+            level = 5;
+        }
+
+        // Jika level berubah, reset musuh dan peluru
+        if (level != previousLevel) { 
+            ResetEnemies();
+            ResetEnemyBullets();
+            previousLevel = level; // Simpan level baru sebagai level sebelumnya
+        }
+
+        // Jalankan level yang sesuai
+        switch (level) {
+            case 1:
+                level5(deltaTime);
+                break;
+            case 2:
+                level3(deltaTime);
+                break;
+            case 3:
+                level2(deltaTime);
+                break;
+            case 4:
+                level1(deltaTime);
+                break;
+            case 5:
+                level4(deltaTime);
+                break;
         }
     } else {
         gameover();

@@ -75,7 +75,7 @@ void spawnPowerUp() {
         if (!powerup.active && InfoPlayer.score > 0 && !ambilpowerup) {
             powerup.active = true;
             powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
-            powerup.posisi.y = GetRandomValue(20, SCREEN_HEIGHT - 100);
+            powerup.posisi.y = GetRandomValue(400, SCREEN_HEIGHT - 100);
         }
     }else{
         ambilpowerup = false;

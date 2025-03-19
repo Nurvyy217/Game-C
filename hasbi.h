@@ -35,6 +35,7 @@ typedef struct {
     Vector2 position;
     bool active;
 } Bullet;
+extern Bullet bullet;
 
 void UpdateShooting(float deltaTime);
 void InitPlayer(); //posisi userplane pertama kali muncul
@@ -42,12 +43,11 @@ void InitBullets();
 void UpdatePlayer();
 void ShootBullet();
 void UpdateBullets();
-void DrawGameplay();
 void UnloadAssets();
 
 void level1(float deltaTime);
 //ASTEROIDS
-#define MAX_ASTEROIDS 8
+#define MAX_ASTEROIDS 5
 extern int playerHealth;
 typedef struct {
     Texture2D texture;
@@ -78,7 +78,7 @@ void LoadAssets();
 
 //ENEMY
 #define SPEED_ENEMY_BULLETS 3
-#define MAX_ENEMIES 15
+#define MAX_ENEMIES 5
 #define MAX_ENEMY_BULLETS 4
 
 // Struktur untuk musuh
@@ -99,10 +99,21 @@ typedef struct {
 } EnemyBullet;
 
 void InitEnemies();
-void UpdateEnemies();
-void UpdateEnemyBullets();
-void CheckEnemyCollisions();
-void EnemiesLoop();
+void UpdateEnemies(Texture2D EnemyTexture, int xRight, int xLeft);
+void UpdateEnemyBullets(Texture2D enemyBulletTexture);
+void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale);
+void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy);
+void EnemiesLoop(Texture2D EnemyTexture, int xRight, int xLeft);
+void DrawEnemies(Texture2D EnemyImage, float scale);
+
+
+extern Texture2D explosionsTexture;
+
+void DrawPlayer();
+void DrawBullets();
+void DrawExplosions(Texture2D explosionsTexture);
+
+
 
 void game();
 #endif

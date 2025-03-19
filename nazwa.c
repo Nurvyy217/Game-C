@@ -1,7 +1,9 @@
 #include "nazwa.h"
 #include "hasbi.h"
+#include "supriadi.h"
 
 Texture2D heartTexture;
+Texture2D enemyBulletlv3;
 Texture2D menuTexture;
 Texture2D soundOnTexture;
 Texture2D soundOffTexture;
@@ -9,35 +11,10 @@ Texture2D restartTexture;
 Texture2D pauseTexture;
 Texture2D quitTexture;
 Texture2D gameOverTexture;
+Texture2D ufoTexture;
 bool soundOn = true;
 bool startGame = false;
-// void varHeart() {
-//     // Koordinat menu
-//     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
-//     int startY = 40;
-    
-//     // Skala gambar
-//     float scale = 0.025f;
 
-//     // Gambar teks "Health"
-//     DrawText("Health", menuX - 85, startY + 140, 25, RAYWHITE);
-
-//     // Cetak gambar hati dalam 3 baris x 5 kolom
-//     int heartsDrawn = 0; // Jumlah hati yang sudah digambar
-
-//     for (int i = 0; i < 3; i++) {  // Loop untuk baris (max 3)
-//         for (int j = 0; j < 5; j++) {  // Loop untuk kolom (max 5)
-//             if (heartsDrawn < playerHealth) { // Hanya gambar sesuai `playerHealth`
-//                 DrawTextureEx(
-//                     heartTexture,
-//                     (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
-//                     0.0f, scale, WHITE
-//                 );
-//                 heartsDrawn++; // Tambah jumlah hati yang digambar
-//             }
-//         }
-//     }
-// }
 
 
 void varMenu(bool *isSoundOn)
@@ -135,9 +112,6 @@ bool getPauseState() {
 
 void gamePaused()
 {
-        // int iconStartX = SCREEN_WIDTH + 20; // Posisi kiri dalam pop-up
-        // int iconStartY = SCREEN_HEIGHT + 60; // Posisi awal untuk elemen
-        // int iconSpacing = 70; // Jarak antar elemen
         float iconScale = 0.5f;
         int textOffsetX = 80; // Jarak teks dari ikon
     
@@ -147,9 +121,14 @@ void gamePaused()
 }
 
 void varRestart(){
-
+    if (IsKeyPressed(KEY_R)){
+        InfoPlayer.nyawa = NYAWA_AWAL;
+        InfoPlayer.score = 0;
+        InitPlayer();
+        InitEnemies();
+        InitBullets();
+    }
 }
-
 
 void varSound(bool *isSoundOn)
 {
@@ -190,7 +169,9 @@ void mainMenu(bool *gameStart)
     int startY = 20;
     bool isSoundOn = true;
     if(!*gameStart){
-        DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
+        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKBLUE);
+        DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, BLACK);
+        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, (Color){3, 24, 37, 255});
         DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
         varMenu(&isSoundOn);
         // varHeart(heartTexture);
@@ -201,9 +182,6 @@ void mainMenu(bool *gameStart)
     }
 }
 
-
-
-
 void loadAssetMenu(){
     menuTexture = LoadTexture("asset-menu/6.png");
     soundOnTexture = LoadTexture("asset-menu/7.png");
@@ -212,6 +190,8 @@ void loadAssetMenu(){
     pauseTexture = LoadTexture("asset-menu/9.png");
     quitTexture = LoadTexture("asset-menu/10.png");
     gameOverTexture = LoadTexture("asset-menu/11.png");
+    ufoTexture = LoadTexture("assets/ufo.png");
+    enemyBulletlv3= LoadTexture("assets/laserUfo.png");
 }
     
 
@@ -224,5 +204,32 @@ void unloadAssetMenu(){
     UnloadTexture(quitTexture);
     UnloadTexture(gameOverTexture);
 }
+
+
+void DrawLvl3()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(ufoTexture,1.5f);
+    DrawEnemyBullets(enemyBulletlv3,1.2f);
+    tampilspark();
+}
+
+void level3(float deltaTime){
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(ufoTexture, -30, 100);
+    UpdateEnemyBullets(enemyBulletlv3);
+    CheckEnemyCollisions(65,70,55,10);//x,y,radP,radBE
+    EnemiesLoop(ufoTexture, -30, 100);
+    DrawLvl3();
+    inipowerup();
+    UpdateSpark();
+}
+
 
 

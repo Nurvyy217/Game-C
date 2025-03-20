@@ -14,7 +14,6 @@ int main(void) {
     InitBosses();
     InitBullets();
     InitAsteroids();
-    InitEnemies();
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();

@@ -30,12 +30,12 @@ void tampilNyawa() {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 5; j++){
             if ((i * 5 + j) < InfoPlayer.nyawa) {
-            Vector2 posisi = {531 + j * (InfoPlayer.nyawaIMG.width * 0.02f), 800 + i * (InfoPlayer.nyawaIMG.height * 0.02f)};
+            Vector2 posisi = {531 + j * (InfoPlayer.nyawaIMG.width * 0.02f), 220 + i * (InfoPlayer.nyawaIMG.height * 0.02f)};
             DrawTextureEx(InfoPlayer.nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
             }
         }
     }
-    DrawText(TextFormat("Nyawa: %d", InfoPlayer.nyawa), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 770, 25, WHITE);
+    DrawText(TextFormat("Health: "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 190, 30, WHITE);
 
 }
 
@@ -51,7 +51,6 @@ void gameover(){
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
         InitPlayer();
-        InitEnemies();
         InitBullets();
 
     }
@@ -112,7 +111,7 @@ void tampilspark() {
 void checkPowerUpCollision(){
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
     if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
-        InfoPlayer.nyawa = InfoPlayer.nyawa + 3;
+        InfoPlayer.nyawa = InfoPlayer.nyawa + 1;
         powerup.active = false;
         ambilpowerup = true;
         ShowSpark(powerup.posisi);

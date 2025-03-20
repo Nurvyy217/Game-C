@@ -125,7 +125,6 @@ void varRestart(){
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
         InitPlayer();
-        InitEnemies();
         InitBullets();
     }
 }
@@ -212,8 +211,8 @@ void DrawLvl3()
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawEnemies(ufoTexture,1.5f);
-    DrawEnemyBullets(enemyBulletlv3,1.2f);
+    DrawEnemies(ufoTexture,ufoTexture,1.5f,80,110, &gamestate);
+    DrawEnemyBullets(enemyBulletlv3,1.2f, &gamestate);
     tampilspark();
 }
 
@@ -222,10 +221,10 @@ void level3(float deltaTime){
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    UpdateEnemies(ufoTexture, -30, 100);
-    UpdateEnemyBullets(enemyBulletlv3);
-    CheckEnemyCollisions(65,70,55,10);//x,y,radP,radBE
-    EnemiesLoop(ufoTexture, -30, 100);
+    UpdateEnemies(ufoTexture, -30, 100, 20, 30, 2,&gamestate);
+    UpdateEnemyBullets(enemyBulletlv3, 0,&gamestate);
+    CheckEnemyCollisions(65,70,55,10,&gamestate);//x,y,radP,radBE
+    EnemiesLoop(0, 2, 3, ufoTexture, -30, 100, 20, 30,&gamestate);
     DrawLvl3();
     inipowerup();
     UpdateSpark();

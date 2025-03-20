@@ -77,6 +77,7 @@ void UpdateMenu(Assets *assets, GameScreen *currentScreen) {
     if (IsKeyPressed(KEY_ENTER)) {
         if (menuIndex == MENU_PLAY) {
             *currentScreen = PLAY;
+            StopMusicStream(assets->bgMusic);
         } else if (menuIndex == MENU_SETTINGS) {
             *currentScreen = SETTINGS;
         } else if (menuIndex == MENU_EXIT) {
@@ -125,8 +126,11 @@ void UpdateMenu(Assets *assets, GameScreen *currentScreen) {
     EndDrawing();
 }
 
+
 void UpdatePlayScreen(GameScreen *currentScreen) {
+   
     BeginDrawing();
+    
     ClearBackground(DARKGRAY);
     varQuit();
     togglePause(); 
@@ -162,6 +166,7 @@ void menuSuci(){
         if (currentScreen == MENU) {
             UpdateMenu(&assets, &currentScreen);
         } else if (currentScreen == PLAY) {
+            
             UpdatePlayScreen(&currentScreen);
         } else if (currentScreen == SETTINGS) {
             UpdateSettingsScreen(&currentScreen);

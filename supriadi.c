@@ -6,6 +6,7 @@
 infoPlayer InfoPlayer;
 PowerUp powerup;
 sparkle Sparkles;
+Sound powerupSound;
 
 
 bool ambilpowerup;
@@ -16,8 +17,8 @@ void infokanPlayer() {
     InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
 }
 
-void updateNyawa() {
-    InfoPlayer.nyawa -= 1;
+void updateNyawa(GameState *S) {
+    InfoPlayer.nyawa -= getEnemyDamage(S);
 }
 
 void updateScore() {
@@ -64,6 +65,7 @@ void inipowerup(){
 
 void infoPowerUp() {
     powerup.powerupIMG = LoadTexture("assets/powerup.png");
+    powerupSound = LoadSound("assets/powerup.wav");
     powerup.active = false;
     Sparkles.sparkIMG = LoadTexture("assets/sparkel1.png");
     Sparkles.aktif = false;
@@ -83,7 +85,7 @@ void spawnPowerUp() {
 
 void tampilPowerUp() {
     if (powerup.active) {
-        DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.1f, WHITE);
+        DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.15f, WHITE);
     }
 }
 
@@ -115,6 +117,7 @@ void checkPowerUpCollision(){
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
     if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
         InfoPlayer.nyawa = InfoPlayer.nyawa + 1;
+        PlaySound(powerupSound);
         powerup.active = false;
         ambilpowerup = true;
         ShowSpark(powerup.posisi);

@@ -44,6 +44,7 @@ void CheckEnemyCollisions();
 // ASSSETS
 void LoadAssets();
 // GAMEPLAY
+void initGameState(GameState *S);
 // UNLOAD
 void UnloadAssets();
 
@@ -254,18 +255,6 @@ void DrawBullets()
 }
 
 // SETTER GETTER
-
-void initGameState(GameState *S)
-{
-    maxEnemy(S) = 5;
-    maxEnemyBullet(S) = 5;
-    enemyBulletSpeed(S) = 3;
-    enemyTypeShoot(S)=0;
-    enemySpeed(S)=1;
-    enemyHealth(S)=3;
-    healthBroke(S)=2;
-}
-
 void setMaxEnemy(GameState *S, int value)
 {
     maxEnemy(S) = value;
@@ -293,6 +282,10 @@ void setEnemyHealth(GameState *S, int value)
 void setHealthBroke(GameState *S, int value)
 {
     healthBroke(S) = value;
+}
+void setEnemyDamage(GameState *S, int value)
+{
+    enemyDamage(S) = value;
 }
 
 int getMaxEnemy(GameState *S)
@@ -322,6 +315,10 @@ int getEnemyHealth(GameState *S)
 int getHealthBroke(GameState *S)
 {
     return healthBroke(S);
+}
+int getEnemyDamage(GameState *S)
+{
+    return enemyDamage(S);
 }
 
 // EXPLOSIONS
@@ -391,7 +388,7 @@ void InitAsteroids()
     {
         asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
         asteroids[i].size = GetRandomValue(1, 3);
-        asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(2, 3)};
+        asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
         asteroids[i].active = true;
     }
 }
@@ -437,23 +434,20 @@ void UpdateAsteroids()
     }
 }
 
-void CheckCollisions()
+void CheckCollisions(GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
     for (int i = 0; i < MAX_ASTEROIDS; i++)
     {
         if (asteroids[i].active)
         {
-            for (int j = 0; j < MAX_BULLETS; j++)
-            {
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
                 { // user menabrak asteroid
-                    updateNyawa();
+                    updateNyawa(S);
                     PlaySound(userPlaneExplosions);
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
                     break;
-                }
             }
         }
     }
@@ -467,7 +461,7 @@ void SpawnAsteroid()
         {
             asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
             asteroids[i].size = GetRandomValue(1, 3);
-            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(2, 3)};
+            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
             asteroids[i].active = true;
             break;
         }
@@ -613,7 +607,7 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
     {
         if (!enemies[i].isActive || enemies[i].hasShot)
             continue; // Musuh mati tidak boleh menembak
-        if (getEnemyTypeShoot(S) == 0)
+        if (getEnemyTypeShoot(S) == 0|| getEnemyTypeShoot(S) == 3)
         {
             for (int j = 0; j < getMaxEnemyBullet(S); j++)
             {
@@ -700,7 +694,7 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
 
                     if (delayTimer[i] < 2.0f)
                     {
-                        // ✅ Selama 2 detik pertama, peluru mengikuti musuh
+                        // Selama 2 detik pertama, peluru mengikuti musuh
                         enemyBullets[i].position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
                         enemyBullets[i].position.y = shooterPos.y + enemyBulletTexture.height + 185;
 
@@ -714,10 +708,10 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                         }
                     }
 
-                    // ✅ Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
+                    // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
                     if (delayTimer[i] >= 2.0f)
                     {
-                        if (!enemyBullets[i].hasPlayedDuar) // ✅ Pastikan "duar" hanya dimainkan sekali
+                        if (!enemyBullets[i].hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
                         {
                             PlaySound(duar);
                             enemyBullets[i].hasPlayedDuar = true; // Tandai sudah dimainkan
@@ -801,7 +795,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
         {
-            updateNyawa();
+            updateNyawa(S);
             PlaySound(userPlaneExplosions);
             CreateExplosion(playerPosition);
             enemies[i].isActive = false; // Hancurkan musuh
@@ -816,24 +810,24 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                 enemyBullets[k].isActive = false;
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(playerPosition);
-                updateNyawa();
+                updateNyawa(S);
                 break;
             }
         }
     }
 }
 
-void ResetEnemies(GameState *S)
+void ResetEnemies()
 {
-    for (int i = 0; i < getMaxEnemy(S); i++)
+    for (int i = 0; i < MAX_ENEMIES; i++)
     {
         enemies[i].isActive = false;
     }
 }
 
-void ResetEnemyBullets(GameState *S)
+void ResetEnemyBullets()
 {
-    for (int i = 0; i < getMaxEnemyBullet(S); i++)
+    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
     {
         enemyBullets[i].isActive = false;
     }
@@ -853,7 +847,7 @@ void ResetPlayerBulet()
     }
 }
 
-Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged;
+Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
 Sound typing;
 // ASSETS
 void LoadAssets()
@@ -875,6 +869,7 @@ void LoadAssets()
     enemyLvl6 = LoadTexture("assets/enePurple.png");
     enemyBulletLv3 = LoadTexture("assets/laserUfo.png");
     enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
+    enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
 }
 // UNLOAD
 void UnloadAssets()
@@ -903,20 +898,6 @@ bool isLevelTransition=false;
 char currentText[10];    // Menyimpan teks level
 int letterIndex = 0;     // Indeks huruf yang sudah muncul
 float letterTimer = 0; 
-void DrawLvl1()
-{
-    DrawLayout();
-    DrawPlayer();
-    DrawBullets();
-    DrawExplosions(explosionsTexture);
-    DrawEnemies(enemylvl1, enemylvl1, 2.0f, 120, 150, &gamestate);
-    DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
-    tampilspark();
-}
-void DrawGameplayWithoutEnemies(){
-    DrawLayout();
-    DrawPlayer();
-}
 void DrawLevelTransition(float deltaTime)
 {
     static float letterTimer = 0.0f;
@@ -972,54 +953,45 @@ void DrawLevelTransition(float deltaTime)
     }
 }
 
-void DrawLvl5()
+void GameplayWithoutEnemies(float deltaTime){
+    UpdatePlayer();
+    DrawLayout();
+    DrawPlayer();
+    DrawLevelTransition(deltaTime);
+}
+
+void callAsteroid(GameState *S)
+{
+    DrawAsteroids();
+    CheckCollisions(S);
+    AsteroidLoop();
+}
+
+void initGameState(GameState *S)
+{
+    maxEnemy(S) = 6;
+    maxEnemyBullet(S) = 5;
+    enemyBulletSpeed(S) = 3;
+    enemyTypeShoot(S)=0;
+    enemySpeed(S)=1;
+    enemyHealth(S)=3;
+    healthBroke(S)=2;
+    enemyDamage(S)=1;
+}
+
+void DrawLvl1()
 {
     DrawLayout();
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawEnemies(enemyLvl5, enemyLvl5, 1.2f, 80, 110, &gamestate);
+    DrawEnemies(enemylvl1, enemylvl1, 2.0f, 120, 150, &gamestate);
     DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
 }
-
-void DrawLvl6()
-{
-    DrawLayout();
-    DrawPlayer();
-    DrawBullets();
-    DrawExplosions(explosionsTexture);
-    DrawEnemies(enemyLvl6, enePurpleDamaged, 3.0f, 150, 200, &gamestate);
-    DrawEnemyBullets(enemyBulletLv3, 1.3, &gamestate);
-    tampilspark();
-}
-void level6(float deltaTime)
-{
-    setMaxEnemyBullet(&gamestate, 4);
-    UpdatePlayer();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    UpdateExplosions(deltaTime);
-    UpdateEnemies(enemyLvl6, -90, 10, 150, -5,&gamestate);
-    UpdateEnemyBullets(enemyBulletLv3, &gamestate);
-    CheckEnemyCollisions(100, 140, 40, 10, &gamestate);
-    EnemiesLoop(enemyLvl6, -90, 10, 150, -5, &gamestate);
-    DrawLvl6();
-    inipowerup();
-    UpdateSpark();
-}
-
-void DrawLvl4()
-{
-    DrawLayout();
-    DrawPlayer();
-    DrawBullets();
-    DrawBosses();
-    DrawBossShoot();
-}
-
 void level1(float deltaTime)
 {
+    setEnemyHealth(&gamestate, 1);
     UpdatePlayer();
     UpdateShooting(deltaTime);
     UpdateBullets();
@@ -1032,32 +1004,41 @@ void level1(float deltaTime)
     inipowerup();
     UpdateSpark();
 }
-
-void GameplayWithoutEnemies(float deltaTime){
+void DrawLvl2()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawAsteroids();
+}
+void level2(GameState *S, float deltaTime)
+{
     UpdatePlayer();
-    DrawGameplayWithoutEnemies();
-    DrawLevelTransition(deltaTime);
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    CheckCollisions(S);
+    DrawLvl2();
+    AsteroidLoop();
 }
 
-void level2()
+
+void DrawLvl4()
 {
-    DrawAsteroids();
-    CheckCollisions();
-    AsteroidLoop();
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(enemyLvl5, enemyLvl5Broken, 1.2f, 80, 110, &gamestate);
+    DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
+    tampilspark();
 }
 void level4(float deltaTime)
 {
-    BossMov();
-    UpdatePlayer();
-    UpdateBulletBoss();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    DrawLvl4();
-    inipowerup();
-    UpdateSpark();
-}
-void level5(float deltaTime)
-{
+    setEnemyHealth(&gamestate, 3);
+    setHealthBroke(&gamestate, 1);
+    setEnemyTypeShoot(&gamestate, 1);
     setMaxEnemyBullet(&gamestate, 16);
     UpdatePlayer();
     UpdateShooting(deltaTime);
@@ -1067,10 +1048,63 @@ void level5(float deltaTime)
     UpdateEnemyBullets(enemyBulletlv1, &gamestate);
     CheckEnemyCollisions(60, 50, 40, 10, &gamestate);
     EnemiesLoop(enemyLvl5, -35, 125, 20, 30, &gamestate);
+    DrawLvl4();
+    inipowerup();
+    UpdateSpark();
+}
+
+void DrawLvl5()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(enemyLvl6, enePurpleDamaged, 3.0f, 150, 200, &gamestate);
+    DrawEnemyBullets(enemyBulletLv3, 1.3, &gamestate);
+    tampilspark();
+}
+void level5(float deltaTime)
+{
+    setMaxEnemy(&gamestate, 6);
+    setEnemyDamage(&gamestate, 2);
+    setEnemyTypeShoot(&gamestate, 3);
+    setMaxEnemyBullet(&gamestate, 5);
+    setEnemyHealth(&gamestate, 4);
+    setHealthBroke(&gamestate, 2);
+    setMaxEnemyBullet(&gamestate, 4);
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(enemyLvl6, -90, 10, 150, -5,&gamestate);
+    UpdateEnemyBullets(enemyBulletLv3, &gamestate);
+    CheckEnemyCollisions(100, 140, 40, 10, &gamestate);
+    EnemiesLoop(enemyLvl6, -90, 10, 150, -5, &gamestate);
     DrawLvl5();
     inipowerup();
     UpdateSpark();
 }
+
+void DrawBossLevel()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawBosses();
+    DrawBossShoot();
+}
+void bossLevel(float deltaTime)
+{
+    BossMov();
+    UpdatePlayer();
+    UpdateBulletBoss();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    DrawBossLevel();
+    inipowerup();
+    UpdateSpark();
+}
+
 
 
 
@@ -1081,7 +1115,8 @@ void game()
 {
     initGameState(&gamestate);
     float deltaTime = GetFrameTime();
-    bool isGameOver = false; // Pastikan inisialisasi benar
+    static float levelTimer = 0.0f;
+    bool isGameOver = false; 
 
     if (InfoPlayer.nyawa <= 0)
     {
@@ -1095,11 +1130,11 @@ void game()
         {
             level = 1;
         }
-        else if (InfoPlayer.score >= 20 && InfoPlayer.score < 25)
+        else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
         {
             level = 2;
         }
-        else if (InfoPlayer.score >= 25 && InfoPlayer.score < 40)
+        else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60)
         {
             level = 3;
         }
@@ -1119,8 +1154,8 @@ void game()
         // Jika level berubah, reset musuh dan peluru
         if (level != previousLevel)
         {
-            ResetEnemies(&gamestate);
-            ResetEnemyBullets(&gamestate);
+            ResetEnemies();
+            ResetEnemyBullets();
             ResetExplosions();
             ResetPlayerBulet();
             ResetSpark();
@@ -1140,19 +1175,28 @@ void game()
             {
             case 1:
                 level1(deltaTime);
-                level2();
                 break;
             case 2:
                 level3(deltaTime);
                 break;
             case 3:
-                level4(deltaTime);
+                level2(&gamestate, deltaTime); // Panggil asteroid
+                levelTimer += deltaTime; // Tambahkan waktu saat level 2
+
+                // Jika sudah mencapai 20 detik, naik ke level 3
+                if (levelTimer >= 20.0f)
+                {
+                    InfoPlayer.score=60;
+                }
                 break;
             case 4:
-                level6(deltaTime);
+                level4(deltaTime);
                 break;
             case 5:
                 level5(deltaTime);
+                break;
+            case 6:
+                bossLevel(deltaTime);
                 break;
             }
         }

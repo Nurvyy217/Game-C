@@ -15,7 +15,7 @@
 #define BULLET_SPEED 7
 #define MAX_BULLETS 5
 //ASTEROIDS
-#define MAX_ASTEROIDS 2
+#define MAX_ASTEROIDS 8
 //EXPLOSION
 #define MAX_EXPLOSIONS 50
 //ENEMY
@@ -30,6 +30,7 @@
 #define enemySpeed(S) (S)->enemySpeed
 #define enemyHealth(S) (S)->enemyHealth
 #define healthBroke(S) (S)->healthBroke
+#define enemyDamage(S) (S)->enemyDamage
 
 
 /***************************************** STRUCT ************************************************/
@@ -88,6 +89,7 @@ typedef struct {
     int enemySpeed;
     int enemyHealth;
     int healthBroke;
+    int enemyDamage;
 }GameState;
 
 /***************************************** EXTERN **********************************************/
@@ -144,4 +146,7 @@ void setEnemyTypeShoot(GameState *S, int value);
 void setEnemySpeed(GameState *S, int value);
 void setEnemyHealth(GameState *S, int value);
 void setHealthBroke(GameState *S, int value);
+void setEnemyDamage(GameState *S, int value);
+//GETTER
+int getEnemyDamage(GameState *S);
 #endif

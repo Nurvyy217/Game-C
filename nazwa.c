@@ -180,7 +180,7 @@ void mainMenu(bool *gameStart)
         }
     }
 }
-Texture2D eneBul;
+Texture2D eneBul, ufoBroken;
 void loadAssetMenu(){
     menuTexture = LoadTexture("asset-menu/6.png");
     soundOnTexture = LoadTexture("asset-menu/7.png");
@@ -192,6 +192,7 @@ void loadAssetMenu(){
     ufoTexture = LoadTexture("assets/ufo.png");
     enemyBulletlv3= LoadTexture("assets/laserUfo.png");
     eneBul= LoadTexture("assets/eneBull.png");
+    ufoBroken= LoadTexture("assets/ufoBroken.png");
 }
     
 
@@ -212,7 +213,7 @@ void DrawLvl3()
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawEnemies(ufoTexture,ufoTexture,1.5f,80,110, &gamestate);
+    DrawEnemies(ufoTexture, ufoBroken,1.5f,80,110, &gamestate);
     DrawEnemyBullets(eneBul,1.2f, &gamestate);
     tampilspark();
 }
@@ -220,6 +221,7 @@ void DrawLvl3()
 void level3(float deltaTime){
     setEnemyTypeShoot(&gamestate, 2);
     setMaxEnemyBullet(&gamestate, 9);
+    setHealthBroke(&gamestate, 1);
     UpdatePlayer();
     UpdateShooting(deltaTime);
     UpdateBullets();

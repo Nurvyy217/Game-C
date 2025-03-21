@@ -21,7 +21,7 @@
 //ENEMY
 #define SPEED_ENEMY_BULLETS 3
 #define MAX_ENEMIES 10
-#define MAX_ENEMY_BULLETS 16
+#define MAX_ENEMY_BULLETS 20
 // SETTER GETTER
 #define maxEnemy(S) (S)->maxEnemy
 #define enemyBulletSpeed(S) (S)->enemyBulletSpeed

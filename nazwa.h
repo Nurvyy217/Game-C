@@ -13,7 +13,7 @@ void gamePaused();
 void varRestart();
 void loadAssetMenu();
 void unloadAssetMenu();
-void level3(float deltaTime);
+void level2(float deltaTime);
 
 
 

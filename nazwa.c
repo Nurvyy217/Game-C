@@ -207,7 +207,7 @@ void unloadAssetMenu(){
 }
 
 
-void DrawLvl3()
+void DrawLvl2()
 {
     DrawLayout();
     DrawPlayer();
@@ -218,7 +218,7 @@ void DrawLvl3()
     tampilspark();
 }
 
-void level3(float deltaTime){
+void level2(float deltaTime){
     setEnemyTypeShoot(&gamestate, 2);
     setMaxEnemyBullet(&gamestate, 9);
     setHealthBroke(&gamestate, 1);
@@ -230,7 +230,7 @@ void level3(float deltaTime){
     UpdateEnemyBullets(eneBul,&gamestate);
     CheckEnemyCollisions(65,70,55,10,&gamestate);//x,y,radP,radBE
     EnemiesLoop(ufoTexture, -30, 100, 0, 70,&gamestate);
-    DrawLvl3();
+    DrawLvl2();
     inipowerup();
     UpdateSpark();
 }

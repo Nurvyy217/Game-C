@@ -1004,7 +1004,7 @@ void level1(float deltaTime)
     inipowerup();
     UpdateSpark();
 }
-void DrawLvl2()
+void DrawLvl3()
 {
     DrawLayout();
     DrawPlayer();
@@ -1012,14 +1012,14 @@ void DrawLvl2()
     DrawExplosions(explosionsTexture);
     DrawAsteroids();
 }
-void level2(GameState *S, float deltaTime)
+void level3(GameState *S, float deltaTime)
 {
     UpdatePlayer();
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
     CheckCollisions(S);
-    DrawLvl2();
+    DrawLvl3();
     AsteroidLoop();
 }
 
@@ -1037,9 +1037,10 @@ void DrawLvl4()
 void level4(float deltaTime)
 {
     setEnemyHealth(&gamestate, 3);
+    setMaxEnemy(&gamestate, 7);
     setHealthBroke(&gamestate, 1);
     setEnemyTypeShoot(&gamestate, 1);
-    setMaxEnemyBullet(&gamestate, 16);
+    setMaxEnemyBullet(&gamestate, 20);
     UpdatePlayer();
     UpdateShooting(deltaTime);
     UpdateBullets();
@@ -1177,10 +1178,10 @@ void game()
                 level1(deltaTime);
                 break;
             case 2:
-                level3(deltaTime);
+                level2(deltaTime);
                 break;
             case 3:
-                level2(&gamestate, deltaTime); // Panggil asteroid
+                level3(&gamestate, deltaTime); // Panggil asteroid
                 levelTimer += deltaTime; // Tambahkan waktu saat level 2
 
                 // Jika sudah mencapai 20 detik, naik ke level 3

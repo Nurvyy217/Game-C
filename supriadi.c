@@ -94,7 +94,7 @@ void spawnPowerUp() {
         powerup.active = true;
         powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
         powerup.posisi.y = 0;
-        powerup.type = 0;
+        powerup.type = GetRandomValue(0 , 3);
     }
 
     if (powerup.active) {

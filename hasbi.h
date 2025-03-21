@@ -21,11 +21,15 @@
 //ENEMY
 #define SPEED_ENEMY_BULLETS 3
 #define MAX_ENEMIES 10
-#define MAX_ENEMY_BULLETS 10
+#define MAX_ENEMY_BULLETS 16
 // SETTER GETTER
 #define maxEnemy(S) (S)->maxEnemy
 #define enemyBulletSpeed(S) (S)->enemyBulletSpeed
 #define maxEnemyBullet(S) (S)->maxEnemyBullet
+#define enemyTypeShoot(S) (S)->enemyTypeShoot
+#define enemySpeed(S) (S)->enemySpeed
+#define enemyHealth(S) (S)->enemyHealth
+#define healthBroke(S) (S)->healthBroke
 
 
 /***************************************** STRUCT ************************************************/
@@ -80,6 +84,10 @@ typedef struct {
     int maxEnemy;
     int enemyBulletSpeed;
     int maxEnemyBullet;
+    int enemyTypeShoot;
+    int enemySpeed;
+    int enemyHealth;
+    int healthBroke;
 }GameState;
 
 /***************************************** EXTERN **********************************************/
@@ -120,13 +128,20 @@ void UpdateExplosions(float deltaTime);
 void LoadAssets();
 // ENEMY
 void initGameState(GameState *S);
-void UpdateEnemies(Texture2D EnemyTexture, int xRight, int xLeft, int yPosition, int xPosition, int shootpattern, GameState *S);
-void UpdateEnemyBullets(Texture2D enemyBulletTexture, int type, GameState *S);
+void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
+void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S);
 void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S);
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S);
-void EnemiesLoop(int type, int shootpattern, int eneLife, Texture2D EnemyTexture, int xRight, int xLeft, int yPosition, int xPosition, GameState *S);
+void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void DrawEnemies(Texture2D EnemyImage, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S);
 // GAME
 void game();
-
+// SETTER 
+void setMaxEnemy(GameState *S, int value);
+void setMaxEnemyBullet(GameState *S, int value);
+void setEnemyBulletSpeed(GameState *S, int value);
+void setEnemyTypeShoot(GameState *S, int value);
+void setEnemySpeed(GameState *S, int value);
+void setEnemyHealth(GameState *S, int value);
+void setHealthBroke(GameState *S, int value);
 #endif

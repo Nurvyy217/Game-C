@@ -107,6 +107,9 @@ void tampilspark() {
         DrawTextureEx(Sparkles.sparkIMG, Sparkles.PosisiSpark, 0.0f, 1.0f, WHITE);
     }
 }
+void ResetSpark(){
+    Sparkles.aktif=false;
+}
 
 void checkPowerUpCollision(){
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};

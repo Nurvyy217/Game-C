@@ -180,7 +180,7 @@ void mainMenu(bool *gameStart)
         }
     }
 }
-
+Texture2D eneBul;
 void loadAssetMenu(){
     menuTexture = LoadTexture("asset-menu/6.png");
     soundOnTexture = LoadTexture("asset-menu/7.png");
@@ -191,6 +191,7 @@ void loadAssetMenu(){
     gameOverTexture = LoadTexture("asset-menu/11.png");
     ufoTexture = LoadTexture("assets/ufo.png");
     enemyBulletlv3= LoadTexture("assets/laserUfo.png");
+    eneBul= LoadTexture("assets/eneBull.png");
 }
     
 
@@ -212,19 +213,21 @@ void DrawLvl3()
     DrawBullets();
     DrawExplosions(explosionsTexture);
     DrawEnemies(ufoTexture,ufoTexture,1.5f,80,110, &gamestate);
-    DrawEnemyBullets(enemyBulletlv3,1.2f, &gamestate);
+    DrawEnemyBullets(eneBul,1.2f, &gamestate);
     tampilspark();
 }
 
 void level3(float deltaTime){
+    setEnemyTypeShoot(&gamestate, 2);
+    setMaxEnemyBullet(&gamestate, 9);
     UpdatePlayer();
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    UpdateEnemies(ufoTexture, -30, 100, 20, 30, 2,&gamestate);
-    UpdateEnemyBullets(enemyBulletlv3, 0,&gamestate);
+    UpdateEnemies(ufoTexture, -30, 100, 0, 70, &gamestate);
+    UpdateEnemyBullets(eneBul,&gamestate);
     CheckEnemyCollisions(65,70,55,10,&gamestate);//x,y,radP,radBE
-    EnemiesLoop(0, 2, 3, ufoTexture, -30, 100, 20, 30,&gamestate);
+    EnemiesLoop(ufoTexture, -30, 100, 0, 70,&gamestate);
     DrawLvl3();
     inipowerup();
     UpdateSpark();

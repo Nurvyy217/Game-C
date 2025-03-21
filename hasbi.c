@@ -717,6 +717,7 @@ void LoadAssets()
     hitEffect2 = LoadTexture("assets/efekTembakan2.png");
     enemyTexture = LoadTexture("assets/musuh.png");
     enemyBulletTexture = LoadTexture("assets/enemyBullet.png");
+    
 }
 
 // GAMEPLAY
@@ -786,6 +787,40 @@ void level3(float deltaTime){
     UpdateSpark();
 }
 
+void DrawLvl6()
+{
+    DrawLayout();
+    DrawPlayerLvl6();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawUfo();
+    DrawEnemyBullets();
+    DrawAsteroids();
+    tampilspark();
+}
+
+void level6(float deltaTime) {
+    // 🔹 1. Perbarui semua objek (pergerakan & aksi)
+    UpdatePlayer();         // Update posisi pemain
+    UpdateEnemy();          // Update posisi musuh (UFO)
+    UpdateShooting(deltaTime); // Perbarui status penembakan pemain
+    UpdateEnemyBullets();   // Perbarui peluru musuh
+    UpdateBullets();        // Perbarui peluru pemain
+    UpdateExplosions(deltaTime); // Perbarui efek ledakan
+    UpdateSpark();          // Perbarui efek percikan
+
+    // 🔹 2. Cek tabrakan setelah semua objek diperbarui
+    CheckCollisions();      // Cek tabrakan umum (jika ada)
+    CheckEnemyCollision();  // Cek apakah peluru mengenai musuh
+    EnemiesLooping();       // Jika musuh keluar dari layar, atur ulang
+    AsteroidLoop();         // Jika asteroid keluar dari layar, atur ulang
+    inipowerup();           // Update dan spawn power-up jika diperlukan
+
+    // 🔹 3. Gambar semua objek setelah update selesai
+    DrawLvl6();             // Menggambar level setelah semua pergerakan & tabrakan dicek
+}
+
+
 void game(){
     float deltaTime = GetFrameTime();
     bool isGameOver;
@@ -794,15 +829,15 @@ void game(){
     }
     if (!isGameOver) {
         if (InfoPlayer.score < 20) {
+            level6(deltaTime);
+            level6;
+        } else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40) {
             level1(deltaTime);
             level=1;
-        } else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40) {
-            level2(deltaTime);
-            level=2;
-        } else {
+        } else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60) {
             level3(deltaTime);
             level=3;
-        }
+        } 
     } else {
         gameover();
     }
@@ -820,4 +855,5 @@ void UnloadAssets()
     UnloadSound(shootSound);
     UnloadTexture(hitEffect1);
     UnloadTexture(hitEffect2);
+    
 }

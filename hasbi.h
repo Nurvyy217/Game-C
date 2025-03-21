@@ -36,6 +36,8 @@ typedef struct {
     bool active;
 } Bullet;
 
+// extern Bullet bullet;
+
 void UpdateShooting(float deltaTime);
 void InitPlayer(); //posisi userplane pertama kali muncul
 void InitBullets(); 

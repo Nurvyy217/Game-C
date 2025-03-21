@@ -10,37 +10,238 @@ Texture2D restartTexture;
 Texture2D pauseTexture;
 Texture2D quitTexture;
 Texture2D gameOverTexture;
+Texture2D ufoTexture;
+Texture2D asteroidTextures;
+Enemy enemy[MAX_ENEMIES];
+EnemyBullet enemyBullet[MAX_ENEMY_BULLETS];
+Bullet bullet[MAX_BULLETS];
+// Bullet bullets[MAX_BULLETS];
 bool soundOn = true;
 bool startGame = false;
 
-// void varHeart() {
-//     // Koordinat menu
-//     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
-//     int startY = 40;
-    
-//     // Skala gambar
-//     float scale = 0.025f;
 
-//     // Gambar teks "Health"
-//     DrawText("Health", menuX - 85, startY + 140, 25, RAYWHITE);
+void DrawPlayerLvl6()
+{
+    float scale = 0.6f; // Skala 60% dari ukuran aslinya
+    DrawTextureEx(player.texture, player.position, 0.0f, scale, WHITE);
+}
 
-//     // Cetak gambar hati dalam 3 baris x 5 kolom
-//     int heartsDrawn = 0; // Jumlah hati yang sudah digambar
+void DrawUfo()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (enemy[i].isActive)
+        {
+            DrawTextureEx(ufoTexture, enemy[i].position, 0.0f, 2.0f, WHITE);
+        }
+    }
+}
 
-//     for (int i = 0; i < 3; i++) {  // Loop untuk baris (max 3)
-//         for (int j = 0; j < 5; j++) {  // Loop untuk kolom (max 5)
-//             if (heartsDrawn < playerHealth) { // Hanya gambar sesuai `playerHealth`
-//                 DrawTextureEx(
-//                     heartTexture,
-//                     (Vector2){menuX - 85 + (j * (heartTexture.width * scale + 5)), startY + 170 + (i * (heartTexture.height * scale + 5))},
-//                     0.0f, scale, WHITE
-//                 );
-//                 heartsDrawn++; // Tambah jumlah hati yang digambar
-//             }
-//         }
-//     }
-// }
+void UpdateEnemy()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (enemy[i].isActive)
+        {
+            enemy[i].position.y += enemy[i].speed.y;
+            enemy[i].position.x += enemy[i].speed.x;
 
+            if (enemy[i].position.x <= -85 || enemy[i].position.x >= GAMEPLAY_WIDTH - (ufoTexture.width * 2.0f) + 85)
+            {
+                enemy[i].speed.x *= -1; // Pantulan jika mencapai batas
+            }
+
+            if (enemy[i].position.y > SCREEN_HEIGHT)
+            {
+                enemy[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
+                enemy[i].hasShot = false; // Reset tembakan jika musuh respawn dari atas
+            }
+
+            // Jika musuh boleh menembak dan belum menembak sebelumnya, maka tembak
+            if (enemy[i].canShoot && !enemy[i].hasShot && GetRandomValue(0, 100) < 2)
+            {
+                EnemyShooting();
+            }
+        }
+    }
+}
+
+void SpawnEnemy()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (!enemy[i].isActive)
+        {
+            enemy[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
+            enemy[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.8};
+            enemy[i].canShoot = (GetRandomValue(0, 1) == 1);
+            enemy[i].isActive = true;
+            enemy[i].hasShot = false;
+            break;
+        }
+    }
+}
+
+void EnemiesLooping()
+{
+    static float enemiesSpawnTimer = 0.0f;
+    enemiesSpawnTimer += GetFrameTime();
+
+    if (enemiesSpawnTimer >= 1.5f)
+    { // Setiap 2 detik, spawn asteroid baru
+        SpawnEnemy();
+        enemiesSpawnTimer = 0.0f;
+    }
+    UpdateEnemy();
+}
+
+void EnemyShooting()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (!enemy[i].isActive)
+            continue; // Musuh mati tidak boleh menembak
+
+        for (int j = 0; j < MAX_ENEMY_BULLETS; j++)
+        {
+            if (!enemyBullet[j].isActive)
+            {
+                enemyBullet[j].position = (Vector2){(enemy[i].position.x - 30) + ufoTexture.width,
+                                                     (enemy[i].position.y + ufoTexture.width + 20)};
+                enemyBullet[j].isActive = true;
+                enemyBullet[j].shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
+                if (GetRandomValue(0, 1) == 0)
+                {
+                    enemyBullet[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS}; // Vertikal (ke bawah)
+                }
+                else
+                {
+                    int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1; // Bisa kiri atau kanan
+                    enemyBullet[j].speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
+                }
+                enemy[i].hasShot = true;
+                break;
+            }
+        }
+    }
+}
+
+Explosion explosion[MAX_EXPLOSIONS];
+Texture2D explosionTexture;
+
+void CreateExplosions(Vector2 position)
+{
+    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    {
+        if (!explosion[i].active)
+        {
+            explosion[i].position = position; // Menyesuaikan agar pusat
+            // explosion[i].position.y = position.y + 70;
+            explosion[i].active = true;
+            explosion[i].frame = 0;
+            explosion[i].timer = 0;
+            break; // Keluar setelah menemukan slot kosong
+        }
+    }
+}
+
+void UpdateExplosion(float deltaTime)
+{
+    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    {
+        if (explosion[i].active)
+        {
+            explosion[i].timer += deltaTime;
+            if (explosion[i].timer > 0.1f)
+            { // Ubah frame setiap 0.1 detik
+                explosion[i].frame++;
+                explosion[i].timer = 0;
+            }
+            if (explosion[i].frame >= 5)
+            { // Misal animasi punya 5 frame
+                explosion[i].active = false;
+            }
+        }
+    }
+}
+
+void DrawExplosion(Texture2D explosionTexture)
+{
+    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    {
+        if (explosion[i].active)
+        {
+            Rectangle source = {explosion[i].frame * 64, 0, 64, 64}; // Misal sprite 64x64
+            Rectangle dest = {explosion[i].position.x, explosion[i].position.y, 128, 128};
+            DrawTexturePro(explosionTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
+        }
+    }
+}
+
+
+void CheckEnemyCollision()
+{
+    Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (!enemy[i].isActive)
+            continue; // Lewati musuh yang sudah mati
+
+        Vector2 enemiesPosition = (Vector2){enemy[i].position.x + 95, enemy[i].position.y + 70};
+
+        // **Cek tabrakan dengan peluru pemain (Musuh tertembak)**
+        for (int j = 0; j < MAX_BULLETS; j++)
+        {
+            if (CheckCollisionCircles(enemiesPosition, 40, bullet[j].position, 8))
+            {
+                // printf("Peluru [%d] mengenai musuh [%d]!\n", j, i);
+                CreateExplosions(enemiesPosition);
+                bullet[j].active = false; 
+
+                if (enemy[i].isActive) {
+                    enemy[i].isActive = false; 
+                    updateScore();
+                    CreateExplosions(enemiesPosition);
+                    // printf("Musuh [%d] hancur!\n", i);
+                }
+                updateScore();
+                CreateExplosions(enemiesPosition);
+
+                // Matikan semua peluru yang ditembak oleh musuh ini
+                // for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
+                // {
+                //     if (enemyBullet[k].shooterIndex == i)
+                //     {
+                //         enemyBullet[k].isActive = false;
+                //     }
+                // }
+                break; 
+            }
+        }
+
+        // **Cek tabrakan antara musuh dan pemain (Player menabrak musuh)**
+        if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 40))
+        {
+            updateNyawa();
+            CreateExplosions(playerPosition);
+            enemy[i].isActive = false; // Hancurkan musuh
+            break;
+        }
+
+        // **Cek tabrakan antara peluru musuh dan pemain (Player tertembak)**
+        for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
+        {
+            if (enemyBullet[k].isActive && CheckCollisionCircles(enemyBullet[k].position, 5, playerPosition, 45))
+            {
+                enemyBullet[k].isActive = false;
+                updateNyawa();
+                CreateExplosions(playerPosition);
+                break;
+            }
+        }
+    }
+}
 
 void varMenu(bool *isSoundOn)
 {
@@ -137,9 +338,6 @@ bool getPauseState() {
 
 void gamePaused()
 {
-        // int iconStartX = SCREEN_WIDTH + 20; // Posisi kiri dalam pop-up
-        // int iconStartY = SCREEN_HEIGHT + 60; // Posisi awal untuk elemen
-        // int iconSpacing = 70; // Jarak antar elemen
         float iconScale = 0.5f;
         int textOffsetX = 80; // Jarak teks dari ikon
     
@@ -197,7 +395,9 @@ void mainMenu(bool *gameStart)
     int startY = 20;
     bool isSoundOn = true;
     if(!*gameStart){
-        DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKGRAY);
+        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKBLUE);
+        DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, BLACK);
+        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, (Color){3, 24, 37, 255});
         DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
         varMenu(&isSoundOn);
         // varHeart(heartTexture);
@@ -209,7 +409,72 @@ void mainMenu(bool *gameStart)
 }
 
 
+// void inputName(user *U) {
+    
+//     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Form Input Nama - Raylib");
 
+//     int letterCount = 0; 
+//     bool mouseOnText = false;
+//     bool submitted = false;
+
+//     Rectangle textBox = { SCREEN_WIDTH/2 - 100, 150, 200, 40 };
+    
+//     SetTargetFPS(60);
+
+//     while (!WindowShouldClose()) {
+//         Vector2 mousePoint = GetMousePosition();
+//         mouseOnText = CheckCollisionPointRec(mousePoint, textBox);
+
+//         // Jika Textbox aktif dan pengguna mengetik
+//         if (mouseOnText) {
+//             int key = GetCharPressed();
+//             while (key > 0) {
+//                 if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_CHARS)) {
+//                     U->name[letterCount] = (char)key;
+//                     U->name[letterCount + 1] = '\0'; // Tambahkan null terminator
+//                     letterCount++;
+//                 }
+//                 key = GetCharPressed();
+//             }
+
+//             // Hapus karakter dengan Backspace
+//             if (IsKeyPressed(KEY_BACKSPACE) && letterCount > 0) {
+//                 letterCount--;
+//                 U->name[letterCount] = '\0';
+//             }
+//         }
+
+//         // Cek jika tombol "Submit" ditekan
+//         Rectangle submitButton = { SCREEN_WIDTH/2 - 50, 210, 100, 40 };
+//         if (CheckCollisionPointRec(mousePoint, submitButton) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+//             submitted = true;
+//         }
+
+//         // Gambar UI
+//         BeginDrawing();
+//             ClearBackground(RAYWHITE);
+
+//             DrawText("Masukkan Nama Anda:", SCREEN_WIDTH/2 - 100, 120, 20, DARKGRAY);
+
+//             // Gambar kotak input
+//             DrawRectangleRec(textBox, LIGHTGRAY);
+//             DrawRectangleLinesEx(textBox, 2, mouseOnText ? RED : DARKGRAY);
+//             DrawText(U->name, textBox.x + 5, textBox.y + 10, 20, BLACK);
+
+//             // Gambar tombol submit
+//             DrawRectangleRec(submitButton, BLUE);
+//             DrawText("Submit", submitButton.x + 20, submitButton.y + 10, 20, WHITE);
+
+//             // Jika sudah submit, tampilkan hasilnya
+//             if (submitted) {
+//                 DrawText(TextFormat("Nama Anda: %s", U->name), SCREEN_WIDTH/2 - 100, 270, 20, DARKGREEN);
+//             }
+
+//         EndDrawing();
+//     }
+
+//     CloseWindow();
+// }
 
 void loadAssetMenu(){
     menuTexture = LoadTexture("asset-menu/6.png");
@@ -219,6 +484,9 @@ void loadAssetMenu(){
     pauseTexture = LoadTexture("asset-menu/9.png");
     quitTexture = LoadTexture("asset-menu/10.png");
     gameOverTexture = LoadTexture("asset-menu/11.png");
+    ufoTexture = LoadTexture("assets/ufo.png");
+    asteroidTextures = LoadTexture("assets/Asteroid.png");
+    explosionTexture = LoadTexture("assets/Explosions.png");
 }
     
 
@@ -230,6 +498,9 @@ void unloadAssetMenu(){
     UnloadTexture(pauseTexture);
     UnloadTexture(quitTexture);
     UnloadTexture(gameOverTexture);
+    UnloadTexture(ufoTexture);
+    UnloadTexture(asteroidTextures);
+    UnloadTexture(explosionTexture);
 }
 
 

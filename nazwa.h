@@ -12,18 +12,15 @@ bool getPauseState();
 void gamePaused();
 void loadAssetMenu();
 void unloadAssetMenu();
-void DrawPlayerLvl6();
-void DrawLvl6();
-void level6(float deltaTime);
-void DrawUfo();
-void AsteroidLooping();
-void SpawnAsteroid2();
-void UpdateAsteroids2();
-void CheckEnemyCollision();
-void EnemyShooting();
-void SpawnEnemy();
-void UpdateEnemy();
-void EnemiesLooping();
+void level2(float deltaTime);
+
+
+
+typedef struct {
+    char name[MAX_INPUT_CHARS + 1];
+} user;
+
+void inputName(user *U);
 
 void UpdateExplosion(float deltaTime);
 void DrawExplosion();

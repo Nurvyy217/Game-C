@@ -2,32 +2,30 @@
 #include "supriadi.h"
 #include <stdio.h>
 #include "fawwaz.h"
-#include<stdio.h>
+#include <stdio.h>
 #include "nazwa.h"
 #include "suci.h"
+#include "raylib.h"
+#include <string.h>
 
 // LOADING SCREEN
 void DrawLayout();
 void loadingAnimation();
 void unloadTextures();
-
 // USER PLANE
 void InitPlayer();
 void UpdatePlayer();
 void DrawPlayer();
-
 // BULLETS
 void UpdateShooting(float deltaTime);
 void DrawBullets();
 void UpdateBullets();
 void ShootBullet();
 void InitBullets();
-
 // EXPLOSIONS
 void CreateExplosion(Vector2 position);
 void UpdateExplosions(float deltaTime);
 void DrawExplosions(Texture2D explosionTexture);
-
 // ASTEROIDS
 void InitAsteroids();
 void UpdateAsteroids();
@@ -35,41 +33,39 @@ void CheckCollisions();
 void SpawnAsteroid();
 void AsteroidLoop();
 void DrawAsteroids();
-
 // ENEMY
 //  Deklarasi fungsi musuh
 void InitEnemies();
-void UpdateEnemies();
-void DrawEnemies();
+void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S);
 void EnemyShoot();
 void UpdateEnemyBullets();
-void DrawEnemyBullets();
+void DrawEnemyBullets(Texture2D EnemyBulletTexture, float scale, GameState *S);
 void CheckEnemyCollisions();
-
 // ASSSETS
 void LoadAssets();
-
-
 // GAMEPLAY
-
+void initGameState(GameState *S);
 // UNLOAD
 void UnloadAssets();
 
-int level=0;
+Texture2D enemylvl1;
+Texture2D enemyBulletlv1;
+GameState gamestate;
 
+int level = 0;
 
 // LOADING SCREEN
 void DrawLayout()
 {
-    bool gameStart=false;
+    bool gameStart = false;
     ClearBackground(RAYWHITE);
 
     // Gameplay area (3/4 of screen, left part)
     // DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
-    Rectangle source = { 0, 0, background.width, background.height };  // Seluruh gambar
-    Rectangle dest = { 0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT };          // Area gameplay
-    Vector2 origin = { 0, 0 };                                         // Titik acuan (pojok kiri atas)
-    
+    Rectangle source = {0, 0, background.width, background.height}; // Seluruh gambar
+    Rectangle dest = {0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT};         // Area gameplay
+    Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
+
     DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
 
     // Menu area (1/4 of screen, right part)
@@ -78,12 +74,10 @@ void DrawLayout()
     Tampil_Score();
 
     // Separator line
-    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); //strat posX, start posY, end posX, end posY
+    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); // strat posX, start posY, end posX, end posY
 }
 
-
 bool isLoadingDone = false;
-
 
 void loadingAnimation()
 {
@@ -146,6 +140,7 @@ void loadingAnimation()
 
     EndDrawing();
 }
+
 void unloadTextures()
 {
     if (texturesLoaded)
@@ -259,6 +254,73 @@ void DrawBullets()
     }
 }
 
+// SETTER GETTER
+void setMaxEnemy(GameState *S, int value)
+{
+    maxEnemy(S) = value;
+}
+void setMaxEnemyBullet(GameState *S, int value)
+{
+    maxEnemyBullet(S) = value;
+}
+void setEnemyBulletSpeed(GameState *S, int value)
+{
+    enemyBulletSpeed(S) = value;
+}
+void setEnemyTypeShoot(GameState *S, int value)
+{
+    enemyTypeShoot(S) = value;
+}
+void setEnemySpeed(GameState *S, int value)
+{
+    enemySpeed(S) = value;
+}
+void setEnemyHealth(GameState *S, int value)
+{
+    enemyHealth(S) = value;
+}
+void setHealthBroke(GameState *S, int value)
+{
+    healthBroke(S) = value;
+}
+void setEnemyDamage(GameState *S, int value)
+{
+    enemyDamage(S) = value;
+}
+
+int getMaxEnemy(GameState *S)
+{
+    return maxEnemy(S);
+}
+int getMaxEnemyBullet(GameState *S)
+{
+    return maxEnemyBullet(S);
+}
+int getEnemyBulletSpeed(GameState *S)
+{
+    return enemyBulletSpeed(S);
+}
+int getEnemyTypeShoot(GameState *S)
+{
+    return enemyTypeShoot(S);
+}
+int getEnemySpeed(GameState *S)
+{
+    return enemySpeed(S);
+}
+int getEnemyHealth(GameState *S)
+{
+    return enemyHealth(S);
+}
+int getHealthBroke(GameState *S)
+{
+    return healthBroke(S);
+}
+int getEnemyDamage(GameState *S)
+{
+    return enemyDamage(S);
+}
+
 // EXPLOSIONS
 Explosion explosions[MAX_EXPLOSIONS];
 Texture2D explosionsTexture;
@@ -326,29 +388,17 @@ void InitAsteroids()
     {
         asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
         asteroids[i].size = GetRandomValue(1, 3);
-        asteroids[i].health = asteroids[i].size;
-        asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(4, 6)};
+        asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
         asteroids[i].active = true;
-        asteroids[i].hitEffectTimer = 0;
-        asteroids[i].hitEffectFrame = 0;
     }
 }
 
 void UpdateAsteroids()
 {
-    float deltaTime = GetFrameTime();
     for (int i = 0; i < MAX_ASTEROIDS; i++)
     {
         if (asteroids[i].active)
         {
-            if (asteroids[i].hitEffectTimer > 0)
-            {
-                asteroids[i].hitEffectTimer -= deltaTime;
-                if (asteroids[i].hitEffectTimer <= 0)
-                {
-                    asteroids[i].hitEffectTimer = 0;
-                }
-            } // Hilangkan efek setelah waktu habis
             asteroids[i].position.x += asteroids[i].speed.x;
             asteroids[i].position.y += asteroids[i].speed.y;
 
@@ -379,47 +429,25 @@ void UpdateAsteroids()
             if (asteroids[i].position.y > SCREEN_HEIGHT)
             {
                 asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
-                asteroids[i].health = asteroids[i].size;
             }
         }
     }
 }
 
-void CheckCollisions()
+void CheckCollisions(GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
     for (int i = 0; i < MAX_ASTEROIDS; i++)
     {
         if (asteroids[i].active)
         {
-            for (int j = 0; j < MAX_BULLETS; j++)
-            {
-                if (bullets[j].active &&
-                    CheckCollisionCircles(asteroids[i].position, asteroids[i].size * 25, bullets[j].position, 5))
-                { // asteroid ditembak
-                    bullets[j].active = false;
-                    asteroids[i].health--;
-                    asteroids[i].hitEffectTimer = 0.15f; // Waktu efek aktif
-                    asteroids[i].hitEffectFrame = (asteroids[i].health % 2);
-                    if (asteroids[i].health <= 0)
-                    {
-                        PlaySound(asteroidDestroyed);
-                        CreateExplosion(asteroids[i].position);
-                        asteroids[i].active = false;
-                        asteroids[i].hitEffectTimer = 0;
-                        asteroids[i].hitEffectFrame = 0;
-                        updateScore();
-                        break;
-                    }
-                }
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
                 { // user menabrak asteroid
-                    updateNyawa();
+                    updateNyawa(S);
                     PlaySound(userPlaneExplosions);
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
                     break;
-                }
             }
         }
     }
@@ -433,11 +461,8 @@ void SpawnAsteroid()
         {
             asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
             asteroids[i].size = GetRandomValue(1, 3);
-            asteroids[i].health = asteroids[i].size;
-            asteroids[i].speed = (Vector2){GetRandomValue(-2, 2), GetRandomValue(4, 6)};
+            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
             asteroids[i].active = true;
-            asteroids[i].hitEffectTimer = 0;
-            asteroids[i].hitEffectFrame = 0;
             break;
         }
     }
@@ -476,49 +501,34 @@ void DrawAsteroids()
                 scale = asteroids[i].size * 0.03f;
             }
             DrawTextureEx(asteroidTexture, asteroids[i].position, 0.0f, scale, WHITE);
-            if (asteroids[i].hitEffectTimer > 0)
-            {
-                Texture2D effect = (asteroids[i].hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
-
-                Vector2 effectPosition;
-                effectPosition.x = asteroids[i].position.x - (effect.width / 2) + (asteroids[i].size * 25) - 20;
-                effectPosition.y = asteroids[i].position.y - (effect.height / 2) + (asteroids[i].size * 25) + 10;
-
-                DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
-            }
         }
     }
 }
 
-
-
 // ENEMY
-Texture2D enemyTexture, enemyBulletTexture;
 Enemy enemies[MAX_ENEMIES];
 EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
+Sound nging, duar;
 
-void InitEnemies()
+void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 {
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-400, -150)};
-        enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.8};
-        enemies[i].isActive = true;
-        enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
-        enemies[i].hasShot = false;
-    }
-}
-
-void UpdateEnemies()
-{
-    for (int i = 0; i < MAX_ENEMIES; i++)
+    float deltaTime = GetFrameTime();
+    for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (enemies[i].isActive)
         {
+            if (enemies[i].hitEffectTimer > 0)
+            {
+                enemies[i].hitEffectTimer -= deltaTime;
+                if (enemies[i].hitEffectTimer <= 0)
+                {
+                    enemies[i].hitEffectTimer = 0;
+                }
+            }
             enemies[i].position.y += enemies[i].speed.y;
             enemies[i].position.x += enemies[i].speed.x;
 
-            if (enemies[i].position.x <= -85 || enemies[i].position.x >= GAMEPLAY_WIDTH - (enemyTexture.width * 2.0f) + 85)
+            if (enemies[i].position.x <= xBounceEnemyRight || enemies[i].position.x >= GAMEPLAY_WIDTH - (EnemyTexture.width * 2.0f) + xBounceEnemyLeft)
             {
                 enemies[i].speed.x *= -1; // Pantulan jika mencapai batas
             }
@@ -532,155 +542,260 @@ void UpdateEnemies()
             // Jika musuh boleh menembak dan belum menembak sebelumnya, maka tembak
             if (enemies[i].canShoot && !enemies[i].hasShot && GetRandomValue(0, 100) < 2)
             {
-                EnemyShoot();
+                EnemyShoot(EnemyTexture, yPositionBullet, xPositionBullet, S);
             }
         }
     }
 }
 
-
-void SpawnEnemies()
+void SpawnEnemies(GameState *S)
 {
-    for (int i = 0; i < MAX_ENEMIES; i++)
+    for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (!enemies[i].isActive)
         {
+            enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, getEnemySpeed(S)) * 0.8};
             enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
-            enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, 2) * 0.8};
             enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
+            enemies[i].health = getEnemyHealth(S);
             enemies[i].isActive = true;
             enemies[i].hasShot = false;
+            enemies[i].hitEffectTimer = 0;
+            enemies[i].hitEffectFrame = 0;
             break;
         }
     }
 }
 
-void EnemiesLoop()
+void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 {
     static float enemiesSpawnTimer = 0.0f;
     enemiesSpawnTimer += GetFrameTime();
 
     if (enemiesSpawnTimer >= 0.4f)
     { // Setiap 2 detik, spawn asteroid baru
-        SpawnEnemies();
+        SpawnEnemies(S);
         enemiesSpawnTimer = 0.0f;
     }
-    UpdateEnemies();
+    UpdateEnemies(EnemyTexture, xBounceEnemyRight, xBounceEnemyLeft, yPositionBullet, xPositionBullet, S);
 }
 
-void DrawEnemies()
+void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S)
 {
-    for (int i = 0; i < MAX_ENEMIES; i++)
+    for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (enemies[i].isActive)
         {
-            DrawTextureEx(enemyTexture, enemies[i].position, 0.0f, 2.0f, WHITE);
-        }
-    }
-}
-
-void EnemyShoot()
-{
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        if (!enemies[i].isActive)
-            continue; // Musuh mati tidak boleh menembak
-
-        for (int j = 0; j < MAX_ENEMY_BULLETS; j++)
-        {
-            if (!enemyBullets[j].isActive)
+            Texture2D currentTexture = (enemies[i].health <= getHealthBroke(S)) ? EnemyDamaged : EnemyTexture;
+            DrawTextureEx(currentTexture, enemies[i].position, 0.0f, scale, WHITE);
+            if (enemies[i].hitEffectTimer > 0)
             {
-                enemyBullets[j].position = (Vector2){(enemies[i].position.x - 30) + enemyTexture.width,
-                                                     (enemies[i].position.y + enemyTexture.width + 20)};
-                enemyBullets[j].isActive = true;
-                enemyBullets[j].shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
-                if (GetRandomValue(0, 1) == 0)
-                {
-                    enemyBullets[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS}; // Vertikal (ke bawah)
-                }
-                else
-                {
-                    int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1; // Bisa kiri atau kanan
-                    enemyBullets[j].speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
-                }
-                enemies[i].hasShot = true;
-                break;
+                Texture2D effect = (enemies[i].hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
+
+                Vector2 effectPosition;
+                effectPosition.x = enemies[i].position.x - (effect.width / 2) + xEffect;
+                effectPosition.y = enemies[i].position.y - (effect.height / 2) + yEffect;
+                DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
             }
         }
     }
 }
 
-void UpdateEnemyBullets()
+void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S)
 {
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    for (int i = 0; i < getMaxEnemy(S); i++)
+    {
+        if (!enemies[i].isActive || enemies[i].hasShot)
+            continue; // Musuh mati tidak boleh menembak
+        if (getEnemyTypeShoot(S) == 0|| getEnemyTypeShoot(S) == 3)
+        {
+            for (int j = 0; j < getMaxEnemyBullet(S); j++)
+            {
+                if (!enemyBullets[j].isActive)
+                {
+                    enemyBullets[j].position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width,
+                                                         (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
+                    enemyBullets[j].isActive = true;
+                    enemyBullets[j].shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
+                    if (GetRandomValue(0, 1) == 0)
+                    {
+                        enemyBullets[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS}; // Vertikal (ke bawah)
+                    }
+                    else
+                    {
+                        int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1;                       // Bisa kiri atau kanan
+                        enemyBullets[j].speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
+                    }
+                    enemies[i].hasShot = true;
+                    break;
+                }
+            }
+        }
+        else if (getEnemyTypeShoot(S) == 1)
+        {
+            int bulletsSpawned = 0;
+            for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 4; j++)
+            {
+                if (!enemyBullets[j].isActive)
+                {
+                    float offsetX = (bulletsSpawned % 2 == 0) ? -10 : 10; // Geser kiri & kanan
+                    float offsetY = (bulletsSpawned < 2) ? 0 : -35;       // Peluru belakang lebih mundur sedikit
+                    enemyBullets[j].position = (Vector2){
+                        (enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
+                        (enemies[i].position.y + EnemyTexture.width + yPositionBullet + offsetY)};
+                    enemyBullets[j].isActive = true;
+                    enemyBullets[j].shooterIndex = i;
+                    enemyBullets[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS + 5}; // Lurus ke bawah
+                    bulletsSpawned++;
+                }
+            }
+            enemies[i].hasShot = true;
+        }
+        else if (getEnemyTypeShoot(S) == 2)
+        {
+            int bulletsSpawned = 0;
+            for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 3; j++)
+            {
+                if (!enemyBullets[j].isActive)
+                {
+                    float offsetX = (bulletsSpawned == 0) ? -15 : (bulletsSpawned == 1) ? 0
+                                                                                        : 15;
+                    float speedX = (bulletsSpawned == 0) ? -2.0f : (bulletsSpawned == 1) ? 0
+                                                                                         : 2.0f;
+                    enemyBullets[j].position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
+                                                         (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
+                    enemyBullets[j].isActive = true;
+                    enemyBullets[j].shooterIndex = i;
+                    enemyBullets[j].speed = (Vector2){speedX, 4}; // Kiri, tengah, kanan
+                    bulletsSpawned++;
+                }
+            }
+            enemies[i].hasShot = true;
+        }
+    }
+}
+
+void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
+{
+    int n = getMaxEnemyBullet(S);
+    static float delayTimer[MAX_ENEMY_BULLETS] = {0};
+
+    for (int i = 0; i < getMaxEnemyBullet(S); i++)
     {
         if (enemyBullets[i].isActive)
         {
-            enemyBullets[i].position.x += enemyBullets[i].speed.x;
-            enemyBullets[i].position.y += enemyBullets[i].speed.y;
+            if (getEnemyTypeShoot(S) == 3)
+            {
+                int shooterIdx = enemyBullets[i].shooterIndex; // Ambil index musuh yang menembak
+
+                if (shooterIdx >= 0 && shooterIdx < getMaxEnemy(S))
+                {
+                    Vector2 shooterPos = enemies[shooterIdx].position; // Posisi musuh
+
+                    if (delayTimer[i] < 2.0f)
+                    {
+                        // Selama 2 detik pertama, peluru mengikuti musuh
+                        enemyBullets[i].position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
+                        enemyBullets[i].position.y = shooterPos.y + enemyBulletTexture.height + 185;
+
+                        delayTimer[i] += GetFrameTime();
+
+                        if (delayTimer[i] < 2.0f && !enemyBullets[i].hasPlayedSound)
+                        {
+                            SetSoundVolume(nging, 3.0f);
+                            PlaySound(nging);                      // Suara "nging"
+                            enemyBullets[i].hasPlayedSound = true; // Tandai agar tidak diulang
+                        }
+                    }
+
+                    // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
+                    if (delayTimer[i] >= 2.0f)
+                    {
+                        if (!enemyBullets[i].hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
+                        {
+                            PlaySound(duar);
+                            enemyBullets[i].hasPlayedDuar = true; // Tandai sudah dimainkan
+                        }
+                        enemyBullets[i].speed.y = SPEED_ENEMY_BULLETS * 10.0f;
+                        enemyBullets[i].position.y += enemyBullets[i].speed.y;
+
+                        if (enemyBullets[i].position.y > 960)
+                        {
+                            delayTimer[i] = 0;
+                            enemyBullets[i].hasPlayedSound = false; // Reset untuk peluru berikutnya
+                        }
+                    }
+                }
+            }else{
+                enemyBullets[i].position.x += enemyBullets[i].speed.x;
+                enemyBullets[i].position.y += enemyBullets[i].speed.y;
+            }
             if (enemyBullets[i].position.x <= -15 || enemyBullets[i].position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
             {
-                enemyBullets[i].speed.x *= -1; // Pantulan jika mencapai batas
+                enemyBullets[i].speed.x *= -1;
             }
-            enemyBullets[i].shooterIndex = -1;
+
             if (enemyBullets[i].position.y > 960)
             {
                 enemyBullets[i].isActive = false;
+                enemyBullets[i].hasPlayedSound = false;
+                enemyBullets[i].hasPlayedDuar = false;
+                delayTimer[i] = 0;
+                enemyBullets[i].shooterIndex = -1;
             }
         }
     }
 }
 
-void DrawEnemyBullets()
+void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
 {
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+
+    for (int i = 0; i < getMaxEnemyBullet(S); i++)
     {
         if (enemyBullets[i].isActive)
         {
-            DrawTextureEx(enemyBulletTexture, enemyBullets[i].position, 0.0f, 0.8f, WHITE);
+            DrawTextureEx(enemyBulletTexture, enemyBullets[i].position, 0.0f, scale, WHITE);
         }
     }
 }
 
-void CheckEnemyCollisions()
+void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
 
-    for (int i = 0; i < MAX_ENEMIES; i++)
+    for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (!enemies[i].isActive)
             continue; // Lewati musuh yang sudah mati
 
-        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + 95, enemies[i].position.y + 70};
+        Vector2 enemiesPosition = (Vector2){enemies[i].position.x + xEnemy, enemies[i].position.y + yEnemy};
 
         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
         for (int j = 0; j < MAX_BULLETS; j++)
         {
-            if (bullets[j].active && CheckCollisionCircles(enemiesPosition, 35, bullets[j].position, 5))
+            if (bullets[j].active && CheckCollisionCircles(enemiesPosition, radiusPlayer, bullets[j].position, radiusBulletEnemy))
             {
+                enemies[i].health--;
+                enemies[i].hitEffectTimer = 0.15f; // Waktu efek aktif
+                enemies[i].hitEffectFrame = (enemies[i].health % 2);
                 bullets[j].active = false;
-                enemies[i].isActive = false; 
-                updateScore();// Matikan musuh
-                PlaySound(asteroidDestroyed);
-                CreateExplosion(enemiesPosition);
-
-                // Hapus semua peluru yang ditembak musuh ini
-                for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
+                if (enemies[i].health <= 0)
                 {
-                    if (enemyBullets[k].shooterIndex == i)
-                    {
-                        enemyBullets[k].isActive = false;
-                    }
+                    enemies[i].isActive = false;
+                    enemies[i].hitEffectTimer = 0;
+                    enemies[i].hitEffectFrame = 0;
+                    updateScore(); // Matikan musuh
+                    PlaySound(asteroidDestroyed);
+                    CreateExplosion(enemiesPosition);
+                    break; // Hindari multiple hits dalam satu frame
                 }
-
-                break; // Hindari multiple hits dalam satu frame
             }
         }
 
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
         {
-            updateNyawa();
+            updateNyawa(S);
             PlaySound(userPlaneExplosions);
             CreateExplosion(playerPosition);
             enemies[i].isActive = false; // Hancurkan musuh
@@ -688,172 +803,409 @@ void CheckEnemyCollisions()
         }
 
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
-        for (int k = 0; k < MAX_ENEMY_BULLETS; k++)
+        for (int k = 0; k < getMaxEnemyBullet(S); k++)
         {
             if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
             {
                 enemyBullets[k].isActive = false;
                 PlaySound(asteroidDestroyed);
                 CreateExplosion(playerPosition);
-                updateNyawa();
+                updateNyawa(S);
                 break;
             }
         }
     }
 }
 
+void ResetEnemies()
+{
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        enemies[i].isActive = false;
+    }
+}
 
+void ResetEnemyBullets()
+{
+    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    {
+        enemyBullets[i].isActive = false;
+    }
+}
+void ResetExplosions()
+{
+    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    {
+        explosions[i].active = false;
+    }
+}
+void ResetPlayerBulet()
+{
+    for (int i = 0; i < MAX_BULLETS; i++)
+    {
+        bullets[i].active = false;
+    }
+}
 
+Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
+Sound typing;
 // ASSETS
 void LoadAssets()
 {
     initBG();
+    typing = LoadSound("assets/typing.wav");
     shootSound = LoadSound("assets/shoot.wav");
-    bulletTexture = LoadTexture("assets/bullet.png");
-    explosionsTexture = LoadTexture("assets/Explosions.png");
+    nging = LoadSound("assets/nging.wav");
+    duar = LoadSound("assets/duar.wav");
     asteroidDestroyed = LoadSound("assets/asteroidDestroyed.wav");
     userPlaneExplosions = LoadSound("assets/userPlaneExplosion.wav");
+    bulletTexture = LoadTexture("assets/bullet.png");
+    explosionsTexture = LoadTexture("assets/Explosions.png");
     hitEffect1 = LoadTexture("assets/efekTembakan1.png");
     hitEffect2 = LoadTexture("assets/efekTembakan2.png");
-    enemyTexture = LoadTexture("assets/musuh.png");
-    enemyBulletTexture = LoadTexture("assets/enemyBullet.png");
-    
+    enemylvl1 = LoadTexture("assets/musuh.png");
+    enemyBulletlv1 = LoadTexture("assets/enemyBullet.png");
+    enemyLvl5 = LoadTexture("assets/enemyLvl5.png");
+    enemyLvl6 = LoadTexture("assets/enePurple.png");
+    enemyBulletLv3 = LoadTexture("assets/laserUfo.png");
+    enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
+    enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
+}
+// UNLOAD
+void UnloadAssets()
+{
+    UnloadSound(userPlaneExplosions);
+    UnloadSound(shootSound);
+    UnloadSound(nging);
+    UnloadSound(duar);
+    UnloadSound(asteroidDestroyed);
+    UnloadTexture(explosionsTexture);
+    UnloadTexture(asteroidTexture);
+    UnloadSound(asteroidDestroyed);
+    UnloadTexture(hitEffect1);
+    UnloadTexture(hitEffect2);
+    UnloadTexture(enemylvl1);
+    UnloadTexture(enemyBulletlv1);
+    UnloadTexture(enemyLvl5);
+    UnloadTexture(enemyLvl6);
+    UnloadTexture(enemyBulletLv3);
+    UnloadTexture(enePurpleDamaged);
 }
 
 // GAMEPLAY
+int previousLevel = 0;
+bool isLevelTransition=false;
+char currentText[10];    // Menyimpan teks level
+int letterIndex = 0;     // Indeks huruf yang sudah muncul
+float letterTimer = 0; 
+void DrawLevelTransition(float deltaTime)
+{
+    static float letterTimer = 0.0f;
+    static float removeTimer = 0.0f;
+    static int letterIndex = 0;
+    static bool removing = false; // Menandakan apakah teks sedang menghilang
+
+    const char *levelText = currentText;
+    int textLength = strlen(levelText);
+
+    // Hitung posisi tengah layar
+    int textX = GAMEPLAY_WIDTH / 2 - MeasureText(levelText, 40) / 2;
+    int textY = SCREEN_HEIGHT / 2 - 20;
+
+    // Tambah timer untuk menampilkan huruf
+    letterTimer += deltaTime;
+
+    // Tampilkan huruf satu per satu
+    if (!removing && letterIndex < textLength && letterTimer > 0.2f)
+    {
+        PlaySound(typing);
+        letterIndex++;
+        letterTimer = 0.0f; // Reset timer
+    }
+
+    // Jika semua huruf sudah muncul, tunggu sebelum mulai menghilang
+    if (letterIndex == textLength)
+    {
+        removeTimer += deltaTime;
+        if (removeTimer > 2.0f) // Tahan teks selama 2 detik sebelum mulai menghilang
+        {
+            removing = true;
+            removeTimer = 0.0f;
+        }
+    }
+
+    // Animasi menghilangkan teks satu per satu
+    if (removing && letterIndex > 0 && letterTimer > 0.2f)
+    {
+        PlaySound(typing);
+        letterIndex--;
+        letterTimer = 0.0f;
+    }
+
+    // Gambar teks dengan huruf sesuai indeks yang sudah muncul
+    DrawText(TextSubtext(levelText, 0, letterIndex), textX, textY, 40, WHITE);
+
+    // Jika semua huruf sudah hilang, akhiri animasi
+    if (removing && letterIndex == 0)
+    {
+        isLevelTransition = false;
+        removing = false;
+    }
+}
+
+void GameplayWithoutEnemies(float deltaTime){
+    UpdatePlayer();
+    DrawLayout();
+    DrawPlayer();
+    DrawLevelTransition(deltaTime);
+}
+
+void callAsteroid(GameState *S)
+{
+    DrawAsteroids();
+    CheckCollisions(S);
+    AsteroidLoop();
+}
+
+void initGameState(GameState *S)
+{
+    maxEnemy(S) = 6;
+    maxEnemyBullet(S) = 5;
+    enemyBulletSpeed(S) = 3;
+    enemyTypeShoot(S)=0;
+    enemySpeed(S)=1;
+    enemyHealth(S)=3;
+    healthBroke(S)=2;
+    enemyDamage(S)=1;
+}
+
 void DrawLvl1()
 {
     DrawLayout();
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawEnemies();
-    DrawEnemyBullets();
+    DrawEnemies(enemylvl1, enemylvl1, 2.0f, 120, 150, &gamestate);
+    DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
 }
-
-void DrawLvl2(){
+void level1(float deltaTime)
+{
+    setEnemyHealth(&gamestate, 1);
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(enemylvl1, -85, 85, 20, 30, &gamestate);
+    UpdateEnemyBullets(enemyBulletlv1, &gamestate);
+    CheckEnemyCollisions(95, 70, 35, 5, &gamestate);
+    EnemiesLoop(enemylvl1, -85, 85, 20, 30, &gamestate);
+    DrawLvl1();
+    inipowerup();
+    UpdateSpark();
+}
+void DrawLvl3()
+{
     DrawLayout();
     DrawPlayer();
     DrawBullets();
-    DrawAsteroids();
     DrawExplosions(explosionsTexture);
-    tampilspark();
+    DrawAsteroids();
+}
+void level3(GameState *S, float deltaTime)
+{
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    CheckCollisions(S);
+    DrawLvl3();
+    AsteroidLoop();
 }
 
 
-void DrawLvl3(){
+void DrawLvl4()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(enemyLvl5, enemyLvl5Broken, 1.2f, 80, 110, &gamestate);
+    DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
+    tampilspark();
+}
+void level4(float deltaTime)
+{
+    setEnemyHealth(&gamestate, 3);
+    setMaxEnemy(&gamestate, 7);
+    setHealthBroke(&gamestate, 1);
+    setEnemyTypeShoot(&gamestate, 1);
+    setMaxEnemyBullet(&gamestate, 20);
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(enemyLvl5, -35, 125, 20, 30,&gamestate);
+    UpdateEnemyBullets(enemyBulletlv1, &gamestate);
+    CheckEnemyCollisions(60, 50, 40, 10, &gamestate);
+    EnemiesLoop(enemyLvl5, -35, 125, 20, 30, &gamestate);
+    DrawLvl4();
+    inipowerup();
+    UpdateSpark();
+}
+
+void DrawLvl5()
+{
+    DrawLayout();
+    DrawPlayer();
+    DrawBullets();
+    DrawExplosions(explosionsTexture);
+    DrawEnemies(enemyLvl6, enePurpleDamaged, 3.0f, 150, 200, &gamestate);
+    DrawEnemyBullets(enemyBulletLv3, 1.3, &gamestate);
+    tampilspark();
+}
+void level5(float deltaTime)
+{
+    setMaxEnemy(&gamestate, 6);
+    setEnemyDamage(&gamestate, 2);
+    setEnemyTypeShoot(&gamestate, 3);
+    setMaxEnemyBullet(&gamestate, 5);
+    setEnemyHealth(&gamestate, 4);
+    setHealthBroke(&gamestate, 2);
+    setMaxEnemyBullet(&gamestate, 4);
+    UpdatePlayer();
+    UpdateShooting(deltaTime);
+    UpdateBullets();
+    UpdateExplosions(deltaTime);
+    UpdateEnemies(enemyLvl6, -90, 10, 150, -5,&gamestate);
+    UpdateEnemyBullets(enemyBulletLv3, &gamestate);
+    CheckEnemyCollisions(100, 140, 40, 10, &gamestate);
+    EnemiesLoop(enemyLvl6, -90, 10, 150, -5, &gamestate);
+    DrawLvl5();
+    inipowerup();
+    UpdateSpark();
+}
+
+void DrawBossLevel()
+{
     DrawLayout();
     DrawPlayer();
     DrawBullets();
     DrawBosses();
     DrawBossShoot();
 }
-
-
-void level1(float deltaTime){
-    UpdatePlayer();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    UpdateExplosions(deltaTime);
-    CheckCollisions();
-    UpdateEnemies();
-    UpdateEnemyBullets();
-    CheckEnemyCollisions();
-    EnemiesLoop();
-    DrawLvl1();
-    inipowerup();
-    UpdateSpark();
-}
-void level2(float deltaTime){
-    UpdatePlayer();
-    UpdateShooting(deltaTime);
-    UpdateBullets();
-    UpdateExplosions(deltaTime);
-    CheckCollisions();
-    AsteroidLoop();
-    DrawLvl2();
-    inipowerup();
-    UpdateSpark();
-}
-void level3(float deltaTime){
+void bossLevel(float deltaTime)
+{
     BossMov();
     UpdatePlayer();
     UpdateBulletBoss();
     UpdateShooting(deltaTime);
     UpdateBullets();
-    DrawLvl3();
+    DrawBossLevel();
     inipowerup();
     UpdateSpark();
 }
 
-void DrawLvl6()
+
+
+
+
+
+
+void game()
 {
-    DrawLayout();
-    DrawPlayerLvl6();
-    DrawBullets();
-    DrawExplosions(explosionsTexture);
-    DrawUfo();
-    DrawEnemyBullets();
-    DrawAsteroids();
-    tampilspark();
-}
-
-void level6(float deltaTime) {
-    // 🔹 1. Perbarui semua objek (pergerakan & aksi)
-    UpdatePlayer();         // Update posisi pemain
-    UpdateEnemy();          // Update posisi musuh (UFO)
-    UpdateShooting(deltaTime); // Perbarui status penembakan pemain
-    UpdateEnemyBullets();   // Perbarui peluru musuh
-    UpdateBullets();        // Perbarui peluru pemain
-    UpdateExplosions(deltaTime); // Perbarui efek ledakan
-    UpdateSpark();          // Perbarui efek percikan
-
-    // 🔹 2. Cek tabrakan setelah semua objek diperbarui
-    CheckCollisions();      // Cek tabrakan umum (jika ada)
-    CheckEnemyCollision();  // Cek apakah peluru mengenai musuh
-    EnemiesLooping();       // Jika musuh keluar dari layar, atur ulang
-    AsteroidLoop();         // Jika asteroid keluar dari layar, atur ulang
-    inipowerup();           // Update dan spawn power-up jika diperlukan
-
-    // 🔹 3. Gambar semua objek setelah update selesai
-    DrawLvl6();             // Menggambar level setelah semua pergerakan & tabrakan dicek
-}
-
-
-void game(){
+    initGameState(&gamestate);
     float deltaTime = GetFrameTime();
-    bool isGameOver;
-    if (InfoPlayer.nyawa <= 0) {
-        isGameOver = 1; // Tandai bahwa game sudah berakhir
+    static float levelTimer = 0.0f;
+    bool isGameOver = false; 
+
+    if (InfoPlayer.nyawa <= 0)
+    {
+        isGameOver = true;
     }
-    if (!isGameOver) {
-        if (InfoPlayer.score < 20) {
-            level6(deltaTime);
-            level6;
-        } else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40) {
-            level1(deltaTime);
-            level=1;
-        } else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60) {
-            level3(deltaTime);
-            level=3;
-        } 
-    } else {
+
+    if (!isGameOver)
+    {
+        // Tentukan level berdasarkan skor
+        if (InfoPlayer.score < 20)
+        {
+            level = 1;
+        }
+        else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
+        {
+            level = 2;
+        }
+        else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60)
+        {
+            level = 3;
+        }
+        else if (InfoPlayer.score >= 60 && InfoPlayer.score < 80)
+        {
+            level = 4;
+        }
+        else if (InfoPlayer.score >= 80 && InfoPlayer.score < 100)
+        {
+            level = 5;
+        }
+        else if (InfoPlayer.score >= 100 && InfoPlayer.score < 120)
+        {
+            level = 6;
+        }
+
+        // Jika level berubah, reset musuh dan peluru
+        if (level != previousLevel)
+        {
+            ResetEnemies();
+            ResetEnemyBullets();
+            ResetExplosions();
+            ResetPlayerBulet();
+            ResetSpark();
+            previousLevel = level; // Simpan level baru sebagai level sebelumnya
+            snprintf(currentText, sizeof(currentText), "Level %d", level);
+            letterIndex = 0;
+            letterTimer = 0;
+            isLevelTransition = true;
+        }
+
+        // Jalankan level yang sesuai
+        if (isLevelTransition)
+        {
+            GameplayWithoutEnemies(deltaTime);
+        }else{
+            switch (level)
+            {
+            case 1:
+                level1(deltaTime);
+                break;
+            case 2:
+                level2(deltaTime);
+                break;
+            case 3:
+                level3(&gamestate, deltaTime); // Panggil asteroid
+                levelTimer += deltaTime; // Tambahkan waktu saat level 2
+
+                // Jika sudah mencapai 20 detik, naik ke level 3
+                if (levelTimer >= 20.0f)
+                {
+                    InfoPlayer.score=60;
+                }
+                break;
+            case 4:
+                level4(deltaTime);
+                break;
+            case 5:
+                level5(deltaTime);
+                break;
+            case 6:
+                bossLevel(deltaTime);
+                break;
+            }
+        }
+    }
+    else
+    {
         gameover();
     }
 }
 
 
-// UNLOAD
-void UnloadAssets()
-{
-    UnloadTexture(player.texture);
-    UnloadTexture(explosionsTexture);
-    UnloadTexture(asteroidTexture);
-    UnloadSound(asteroidDestroyed);
-    UnloadSound(userPlaneExplosions);
-    UnloadSound(shootSound);
-    UnloadTexture(hitEffect1);
-    UnloadTexture(hitEffect2);
-    
-}

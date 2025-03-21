@@ -11,16 +11,35 @@ typedef struct {
     int nyawa;
     int score;
     Texture2D nyawaIMG;
+    
+    bool shieldActive;
+    float shieldTimer;
+
+    bool speedActive;
+    float SpeedTimer;
+
+    bool DoubleAttack;
+    float AttackTimer;
+
 }infoPlayer;
 
-// Struktur untuk menyimpan data power-up
+
+typedef enum {
+    POWERUP_LIFE,  
+    POWERUP_FASTFIRE,   
+    // POWERUP_SCORE,   
+    POWERUP_SPEED, 
+    POWERUP_SHIELD,
+} PowerUpType;
+
+
 typedef struct {
     Vector2 posisi;
     Texture2D powerupIMG;
     bool active;
+    PowerUpType type;
 } PowerUp;
 
-// struktur untuk memunculkan animasi ketika mendapat power up
 typedef struct{
     Vector2 PosisiSpark;
     bool aktif;
@@ -31,6 +50,7 @@ typedef struct{
 extern sparkle Sparkles;
 extern infoPlayer InfoPlayer;
 extern PowerUp powerup;
+extern int AddSpeed;
 
 void tampilNyawa();
 void infokanPlayer();
@@ -39,14 +59,15 @@ void gameover();
 void infoPowerUp();
 void spawnPowerUp();
 void tampilPowerUp();
-void unloadResources();
-void updateScore();
-void updateNyawa();
+void updateScore(int berapa);
+void updateNyawa(int tambah, int kurang);
 void checkPowerUpCollision();
 void inipowerup();
 void UpdateSpark();
 void ShowSpark(Vector2 position);
 void tampilspark();
+void updatePowerupTime();
+void powerupAttack();
 
 
 #endif

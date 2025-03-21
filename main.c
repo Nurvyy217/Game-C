@@ -23,8 +23,8 @@ int main(void) {
         // float deltaTime = GetFrameTime();
 
         if (!isLoadingDone) {
-            loadingAnimation();  // Tampilkan loading lebih dulu
-            // isLoadingDone=true;
+            // loadingAnimation();  // Tampilkan loading lebih dulu
+            isLoadingDone=true;
         } else {
             varQuit();
             BeginDrawing();
@@ -45,7 +45,6 @@ int main(void) {
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();
-    unloadResources();
     CloseWindow();
     WindowShouldClose();
 

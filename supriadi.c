@@ -8,20 +8,39 @@ PowerUp powerup;
 sparkle Sparkles;
 
 
-bool ambilpowerup;
+int AddSpeed;
+bool ambilpowerup = false;
 
 void infokanPlayer() {
+    InfoPlayer.shieldActive = false;
     InfoPlayer.nyawa = NYAWA_AWAL;
     InfoPlayer.score = 0;
     InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
 }
 
-void updateNyawa() {
-    InfoPlayer.nyawa -= 1;
+void updateNyawa(int tambah, int kurang) {
+
+    if (InfoPlayer.nyawa < NYAWA_AWAL)
+    {
+        InfoPlayer.nyawa += tambah;
+        if (InfoPlayer.nyawa > NYAWA_AWAL)
+        {
+            InfoPlayer.nyawa = NYAWA_AWAL;
+        }
+        
+    }
+
+    if (InfoPlayer.shieldActive == false)
+    {
+        InfoPlayer.nyawa -= kurang ;    
+    }
 }
 
-void updateScore() {
-    InfoPlayer.score++;
+void updateScore(int berapa) {
+    if (InfoPlayer.score % 10 != 0) {
+        ambilpowerup = false;
+    }
+    InfoPlayer.score += berapa;
 }
 
 void tampilNyawa() {
@@ -52,8 +71,6 @@ void gameover(){
         InfoPlayer.score = 0;
         InitPlayer();
         InitEnemies();
-        InitBullets();
-
     }
 }
 
@@ -61,6 +78,8 @@ void inipowerup(){
     spawnPowerUp();
     tampilPowerUp();
     checkPowerUpCollision();
+    UpdateSpark();
+    updatePowerupTime();
 }
 
 void infoPowerUp() {
@@ -71,22 +90,134 @@ void infoPowerUp() {
 }
 
 void spawnPowerUp() {
-    if (InfoPlayer.score % 10 == 0) {
-        if (!powerup.active && InfoPlayer.score > 0 && !ambilpowerup) {
-            powerup.active = true;
-            powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
-            powerup.posisi.y = GetRandomValue(20, SCREEN_HEIGHT - 100);
+    if (!powerup.active && InfoPlayer.score > 0 && InfoPlayer.score % 10 == 0 && !ambilpowerup) {
+        powerup.active = true;
+        powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
+        powerup.posisi.y = 0;
+        powerup.type = 0;
+    }
+
+    if (powerup.active) {
+        powerup.posisi.y += 3.0f;
+
+        if (powerup.posisi.y > SCREEN_HEIGHT) {
+            powerup.active = false;
+            ambilpowerup = true;
         }
-    }else{
-        ambilpowerup = false;
     }
 }
-
+    
 void tampilPowerUp() {
     if (powerup.active) {
         DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.1f, WHITE);
     }
 }
+
+void checkPowerUpCollision(){
+    Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+    if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+        powerup.active = false;
+        ambilpowerup = true;
+        ShowSpark(powerup.posisi);
+        
+        switch (powerup.type) {
+
+            case POWERUP_LIFE:
+                updateNyawa(3,0);
+                printf("nyawa ");
+            break;
+            
+            case POWERUP_FASTFIRE:
+                printf("FIRE ");
+                InfoPlayer.DoubleAttack = true ;
+                InfoPlayer.AttackTimer = 3.0f  ;
+                printf("%d", InfoPlayer.AttackTimer);
+            break;
+
+            case POWERUP_SPEED:                
+                printf("speed ");
+                InfoPlayer.speedActive = true ;
+                InfoPlayer.SpeedTimer = 5.0f;
+                printf("%d", InfoPlayer.SpeedTimer);
+            break;
+            
+            case POWERUP_SHIELD:
+                printf("shield ");
+                InfoPlayer.shieldActive = true ;
+                InfoPlayer.shieldTimer = 5.0f  ;
+                printf("%d", InfoPlayer.shieldTimer);
+            break;
+        }
+    }
+}
+    
+
+void updatePowerupTime() {
+
+    // Timer Shield
+    if (InfoPlayer.shieldActive) {
+        InfoPlayer.shieldTimer -= GetFrameTime();
+        
+        if (InfoPlayer.shieldTimer <= 0) {
+            InfoPlayer.shieldActive = false;
+            InfoPlayer.shieldTimer = 0;
+            printf("Shield habis!\n");
+        }
+    }
+
+    // Timer MovementSpeed
+    if (InfoPlayer.speedActive) {
+        InfoPlayer.SpeedTimer -= GetFrameTime();
+        
+        if (InfoPlayer.SpeedTimer <= 0) {
+            InfoPlayer.speedActive = false;
+            InfoPlayer.SpeedTimer = 0;
+            printf("speed habis!\n");
+        }
+        AddSpeed = 5;
+    }
+
+    else {
+        AddSpeed = 0;
+    }
+
+    // Timer powerupAttack
+    if (InfoPlayer.DoubleAttack) {
+        InfoPlayer.AttackTimer -= GetFrameTime();
+        
+        if (InfoPlayer.AttackTimer <= 0) {
+            InfoPlayer.DoubleAttack = false;
+            InfoPlayer.AttackTimer = 0;
+            printf("speed habis!\n");
+        }
+    }
+}
+
+void powerupAttack() {
+    int bulletmuncul = 0;
+    
+    for (int i = 0; i < MAX_BULLETS; i++)
+    {
+        if (!bullets[i].active)
+        {
+            if (bulletmuncul == 0) {
+                bullets[i].position = (Vector2){(player.position.x - 50) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+            }
+            else if (bulletmuncul == 1) {
+                bullets[i].position = (Vector2){(player.position.x + 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+            }
+            
+            bullets[i].active = true;
+            bulletmuncul++;
+            
+            if (bulletmuncul >= 2) {
+                break;  
+            }
+            PlaySound(shootSound);
+        }
+    }
+    
+}   
 
 void ShowSpark(Vector2 position){
     Sparkles.aktif = true;
@@ -107,20 +238,4 @@ void tampilspark() {
     if (Sparkles.aktif) {
         DrawTextureEx(Sparkles.sparkIMG, Sparkles.PosisiSpark, 0.0f, 1.0f, WHITE);
     }
-}
-
-void checkPowerUpCollision(){
-    Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
-    if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
-        InfoPlayer.nyawa = InfoPlayer.nyawa + 3;
-        powerup.active = false;
-        ambilpowerup = true;
-        ShowSpark(powerup.posisi);
-    }
-}
-
-void unloadResources() {
-    UnloadTexture(InfoPlayer.nyawaIMG);
-    UnloadTexture(powerup.powerupIMG);
-    UnloadTexture(Sparkles.sparkIMG);
 }

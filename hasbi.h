@@ -33,6 +33,7 @@
 #define enemyDamage(S) (S)->enemyDamage
 
 
+
 /***************************************** STRUCT ************************************************/
 // USER PLANE
 typedef struct {
@@ -102,7 +103,6 @@ extern int level;
 extern bool isLoadingDone; 
 extern int playerHealth;
 extern Texture2D explosionsTexture;
-
 
 /***************************************** MODUL MODUL ****************************************/
 // LAYOUT

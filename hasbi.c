@@ -65,7 +65,7 @@ void DrawLayout()
     Rectangle source = {0, 0, background.width, background.height}; // Seluruh gambar
     Rectangle dest = {0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT};         // Area gameplay
     Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
-
+    
     DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
 
     // Menu area (1/4 of screen, right part)
@@ -141,6 +141,7 @@ void loadingAnimation()
     EndDrawing();
 }
 
+
 void unloadTextures()
 {
     if (texturesLoaded)
@@ -155,25 +156,39 @@ void unloadTextures()
 Player player;
 Bullet bullets[MAX_BULLETS];
 Texture2D bulletTexture;
-Sound shootSound;
+Sound shootSound, userPlaneExplosions, asteroidDestroyed, duar, nging, typing;
 static float shootCooldown = 0.0f;
 static const float SHOOT_INTERVAL = 0.2f;
 
+bool isSoundPlaying = true;
+
 void UpdateShooting(float deltaTime)
 {
-    // Kurangi cooldown
+    // Toggle semua suara saat tombol F ditekan
+    if (IsKeyPressed(KEY_F)) {
+        isSoundPlaying = !isSoundPlaying;
+        
+        SetMasterVolume(isSoundPlaying ? 1.0f : 0.0f);
+    }
+
+    // Reduce cooldown
     if (shootCooldown > 0.0f)
     {
         shootCooldown -= deltaTime;
     }
 
-    // Cek apakah SPACE ditekan + cooldown <= 0
     if (IsKeyDown(KEY_SPACE) && shootCooldown <= 0.0f)
     {
-        ShootBullet();                  // Fungsi menembak
-        shootCooldown = SHOOT_INTERVAL; // Reset cooldown
+        ShootBullet();
+        shootCooldown = SHOOT_INTERVAL;
+
+        // Mainkan suara hanya jika suara aktif
+        PlaySound(shootSound);
     }
 }
+
+
+
 
 void InitPlayer()
 {
@@ -216,7 +231,12 @@ void ShootBullet()
         if (!bullets[i].active)
         {
             bullets[i].position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+
+            // Play the shooting sound if sound is enabled
+            
             PlaySound(shootSound);
+            
+
             bullets[i].active = true;
             break;
         }
@@ -324,7 +344,7 @@ int getEnemyDamage(GameState *S)
 // EXPLOSIONS
 Explosion explosions[MAX_EXPLOSIONS];
 Texture2D explosionsTexture;
-Sound asteroidDestroyed, userPlaneExplosions;
+Sound asteroidDestroyed;
 
 void CreateExplosion(Vector2 position)
 {
@@ -434,8 +454,11 @@ void UpdateAsteroids()
     }
 }
 
+
+
 void CheckCollisions(GameState *S)
 {
+
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
     for (int i = 0; i < MAX_ASTEROIDS; i++)
     {
@@ -445,6 +468,7 @@ void CheckCollisions(GameState *S)
                 { // user menabrak asteroid
                     updateNyawa(S);
                     PlaySound(userPlaneExplosions);
+                    
                     CreateExplosion(playerPosition);
                     asteroids[i].active = false;
                     break;
@@ -703,7 +727,7 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                         if (delayTimer[i] < 2.0f && !enemyBullets[i].hasPlayedSound)
                         {
                             SetSoundVolume(nging, 3.0f);
-                            PlaySound(nging);                      // Suara "nging"
+                            PlaySound(nging);
                             enemyBullets[i].hasPlayedSound = true; // Tandai agar tidak diulang
                         }
                     }
@@ -785,6 +809,8 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     enemies[i].hitEffectTimer = 0;
                     enemies[i].hitEffectFrame = 0;
                     updateScore(); // Matikan musuh
+                    
+
                     PlaySound(asteroidDestroyed);
                     CreateExplosion(enemiesPosition);
                     break; // Hindari multiple hits dalam satu frame
@@ -808,7 +834,9 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
             if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
             {
                 enemyBullets[k].isActive = false;
-                PlaySound(asteroidDestroyed);
+                if (isSoundPlaying) {
+                    PlaySound(userPlaneExplosions);
+                }
                 CreateExplosion(playerPosition);
                 updateNyawa(S);
                 break;

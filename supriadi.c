@@ -6,6 +6,8 @@
 infoPlayer InfoPlayer;
 PowerUp powerup;
 sparkle Sparkles;
+Sound powerupSound;
+Texture2D shield;
 
 
 int AddSpeed;
@@ -18,8 +20,7 @@ void infokanPlayer() {
     InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
 }
 
-void updateNyawa(int tambah, int kurang) {
-
+void updateNyawa(int tambah , GameState *S) {
     if (InfoPlayer.nyawa < NYAWA_AWAL)
     {
         InfoPlayer.nyawa += tambah;
@@ -29,10 +30,9 @@ void updateNyawa(int tambah, int kurang) {
         }
         
     }
-
     if (InfoPlayer.shieldActive == false)
     {
-        InfoPlayer.nyawa -= kurang ;    
+        InfoPlayer.nyawa -= getEnemyDamage(S);
     }
 }
 
@@ -49,12 +49,12 @@ void tampilNyawa() {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 5; j++){
             if ((i * 5 + j) < InfoPlayer.nyawa) {
-            Vector2 posisi = {531 + j * (InfoPlayer.nyawaIMG.width * 0.02f), 800 + i * (InfoPlayer.nyawaIMG.height * 0.02f)};
+            Vector2 posisi = {531 + j * (InfoPlayer.nyawaIMG.width * 0.02f), 220 + i * (InfoPlayer.nyawaIMG.height * 0.02f)};
             DrawTextureEx(InfoPlayer.nyawaIMG, posisi, 0.0f, 0.02f, WHITE);
             }
         }
     }
-    DrawText(TextFormat("Nyawa: %d", InfoPlayer.nyawa), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 770, 25, WHITE);
+    DrawText(TextFormat("Health: "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 190, 30, WHITE);
 
 }
 
@@ -65,12 +65,13 @@ void Tampil_Score(){
 void gameover(){
     ClearBackground(BLACK);
     DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, 600, 30, RAYWHITE);
+    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
     if (IsKeyPressed(KEY_R)){
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
         InitPlayer();
-        InitEnemies();
+        InitBullets();
+
     }
 }
 
@@ -80,10 +81,14 @@ void inipowerup(){
     checkPowerUpCollision();
     UpdateSpark();
     updatePowerupTime();
+    PowerupShield();
+    tampilspark();
 }
 
 void infoPowerUp() {
     powerup.powerupIMG = LoadTexture("assets/powerup.png");
+    shield = LoadTexture("assets/shield.png");
+    powerupSound = LoadSound("assets/powerup.wav");
     powerup.active = false;
     Sparkles.sparkIMG = LoadTexture("assets/sparkel1.png");
     Sparkles.aktif = false;
@@ -94,7 +99,7 @@ void spawnPowerUp() {
         powerup.active = true;
         powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
         powerup.posisi.y = 0;
-        powerup.type = GetRandomValue(0 , 3);
+        powerup.type = GetRandomValue(0, 3);
     }
 
     if (powerup.active) {
@@ -109,43 +114,37 @@ void spawnPowerUp() {
     
 void tampilPowerUp() {
     if (powerup.active) {
-        DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.1f, WHITE);
+        DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.15f, WHITE);
     }
 }
 
 void checkPowerUpCollision(){
+    GameState *S = &gamestate;
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
     if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
         powerup.active = false;
         ambilpowerup = true;
         ShowSpark(powerup.posisi);
-        
+
         switch (powerup.type) {
 
             case POWERUP_LIFE:
-                updateNyawa(3,0);
-                printf("nyawa ");
+                updateNyawa(3, S);
             break;
             
             case POWERUP_FASTFIRE:
-                printf("FIRE ");
                 InfoPlayer.DoubleAttack = true ;
-                InfoPlayer.AttackTimer = 3.0f  ;
-                printf("%d", InfoPlayer.AttackTimer);
+                InfoPlayer.AttackTimer = 5.0f  ;
             break;
 
-            case POWERUP_SPEED:                
-                printf("speed ");
+            case POWERUP_SPEED:
                 InfoPlayer.speedActive = true ;
                 InfoPlayer.SpeedTimer = 5.0f;
-                printf("%d", InfoPlayer.SpeedTimer);
             break;
             
             case POWERUP_SHIELD:
-                printf("shield ");
                 InfoPlayer.shieldActive = true ;
                 InfoPlayer.shieldTimer = 5.0f  ;
-                printf("%d", InfoPlayer.shieldTimer);
             break;
         }
     }
@@ -157,11 +156,10 @@ void updatePowerupTime() {
     // Timer Shield
     if (InfoPlayer.shieldActive) {
         InfoPlayer.shieldTimer -= GetFrameTime();
-        
+
         if (InfoPlayer.shieldTimer <= 0) {
             InfoPlayer.shieldActive = false;
             InfoPlayer.shieldTimer = 0;
-            printf("Shield habis!\n");
         }
     }
 
@@ -172,9 +170,8 @@ void updatePowerupTime() {
         if (InfoPlayer.SpeedTimer <= 0) {
             InfoPlayer.speedActive = false;
             InfoPlayer.SpeedTimer = 0;
-            printf("speed habis!\n");
         }
-        AddSpeed = 5;
+        AddSpeed = 4;
     }
 
     else {
@@ -188,7 +185,6 @@ void updatePowerupTime() {
         if (InfoPlayer.AttackTimer <= 0) {
             InfoPlayer.DoubleAttack = false;
             InfoPlayer.AttackTimer = 0;
-            printf("speed habis!\n");
         }
     }
 }
@@ -219,6 +215,31 @@ void powerupAttack() {
     
 }   
 
+void PowerupShield(){
+    Vector2 playerPosition = (Vector2){player.position.x + 153, player.position.y + 130};
+    if (InfoPlayer.shieldActive)
+    {
+        DrawTextureEx(shield , playerPosition , 0.0f, 0.4f, WHITE);
+    }
+}
+
+void TampilInfoPowerup(){
+    DrawText(TextFormat("POWERUP : "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 350, 15, WHITE);
+
+    if (InfoPlayer.DoubleAttack)
+    {
+        DrawText(TextFormat("DoubleAttack! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+    }
+    if (InfoPlayer.shieldActive)
+    {
+        DrawText(TextFormat("ShieldActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+    }
+    if (InfoPlayer.speedActive)
+    {
+        DrawText(TextFormat("SpeedActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+    }
+}
+
 void ShowSpark(Vector2 position){
     Sparkles.aktif = true;
     Sparkles.timer = 0.0f;    
@@ -228,7 +249,7 @@ void ShowSpark(Vector2 position){
 void UpdateSpark() {
     if (Sparkles.aktif) {
         Sparkles.timer += GetFrameTime();
-        if (Sparkles.timer >= 1.0f) {
+        if (Sparkles.timer >= 2.0f) {
             Sparkles.aktif = false;
         }
     }
@@ -239,3 +260,8 @@ void tampilspark() {
         DrawTextureEx(Sparkles.sparkIMG, Sparkles.PosisiSpark, 0.0f, 1.0f, WHITE);
     }
 }
+
+void ResetSpark(){
+    Sparkles.aktif=false;
+}
+

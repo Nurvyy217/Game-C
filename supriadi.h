@@ -2,6 +2,7 @@
 #define SUPRIADI_H
 
 #include "raylib.h"
+#include "hasbi.h"
 
 #define NYAWA_AWAL 15
 #define MAX_POWERUPS 5
@@ -38,6 +39,7 @@ typedef struct {
     Texture2D powerupIMG;
     bool active;
     PowerUpType type;
+
 } PowerUp;
 
 typedef struct{
@@ -60,7 +62,7 @@ void infoPowerUp();
 void spawnPowerUp();
 void tampilPowerUp();
 void updateScore(int berapa);
-void updateNyawa(int tambah, int kurang);
+void updateNyawa(int tambah , GameState *S);
 void checkPowerUpCollision();
 void inipowerup();
 void UpdateSpark();
@@ -68,6 +70,8 @@ void ShowSpark(Vector2 position);
 void tampilspark();
 void updatePowerupTime();
 void powerupAttack();
-
+void ResetSpark();
+void TampilInfoPowerup();
+void PowerupShield();
 
 #endif

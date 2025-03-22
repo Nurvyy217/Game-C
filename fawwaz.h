@@ -1,5 +1,5 @@
 #include "raylib.h"
-
+#include "hasbi.h"
 #define BOSS_SPEED 2
 #define BOSS_MAX_BULLETS 10
 #define BOSS_BULLET_SPEED 8
@@ -9,21 +9,30 @@
 typedef struct {
     Vector2 position;
     Texture2D texture;
+    int health;
+    bool aktif;
 } Bosses;
 
-// Boss Shoot
 typedef struct {
     Vector2 position;
     bool active;
-    Texture2D texture;
-} BulletBoss;
+    float timer;
+    float cooldown;
+    float animationTimer;
+    int currentFrame; // Untuk menyimpan frame animasi laser
+    float length;
+    Texture2D textures[3];
+} BossLaser;
 
-void InitBossesShoot();
-void UpdateBulletBoss();
+extern Bosses bosses;
+extern BossLaser bossLaser;
+
 void InitBosses();
 void DrawBosses();
 
 //
 void DrawPositions();
 void BossMov();
-void DrawBossShoot();
+void ShootBossLaser();
+void UpdateBossLaser();
+void DrawBossLaser();

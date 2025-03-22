@@ -15,13 +15,13 @@ int main(void) {
     InitBosses();
     InitBullets();
     InitAsteroids();
-    InitEnemies();
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();
     infoPowerUp();
     
     while (!WindowShouldClose()) {
+        isLoadingDone=true;
         if (!isLoadingDone) {
             loadingAnimation();}  // Tampilkan loading lebih dulu
         else {

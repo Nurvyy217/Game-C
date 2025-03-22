@@ -2,6 +2,7 @@
 #define SUPRIADI_H
 
 #include "raylib.h"
+#include "hasbi.h"
 
 #define NYAWA_AWAL 15
 #define MAX_POWERUPS 5
@@ -31,6 +32,7 @@ typedef struct{
 extern sparkle Sparkles;
 extern infoPlayer InfoPlayer;
 extern PowerUp powerup;
+extern int playerInvincible;
 
 void tampilNyawa();
 void infokanPlayer();
@@ -41,12 +43,12 @@ void spawnPowerUp();
 void tampilPowerUp();
 void unloadResources();
 void updateScore();
-void updateNyawa();
+void updateNyawa(GameState *S);
 void checkPowerUpCollision();
 void inipowerup();
 void UpdateSpark();
 void ShowSpark(Vector2 position);
 void tampilspark();
-
+void ResetSpark();
 
 #endif

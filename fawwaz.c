@@ -8,7 +8,7 @@ Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
 Star stars[MAX_STARS];
-
+Texture2D BD1, BD2, BD3;
 
 void InitBosses()
 {
@@ -27,7 +27,9 @@ void InitBosses()
 
     // Load texture dari boss
     bosses.texture = LoadTexture("assets/bossesTest.png");
-    
+    BD1 = LoadTexture("assets/bossesBroken1.png");
+    BD2 = LoadTexture("assets/bossesBroken2.png");
+    BD3 = LoadTexture("assets/bossesBroken3.png");
     
     // Load dua gambar laser
     bossLaser.textures[0] = LoadTexture("assets/laser1.png");
@@ -66,24 +68,19 @@ void DrawStar(){
 
 void DrawBosses()
 {
-    Texture2D BD1 = LoadTexture("assets/bossesBroken1.png");
-    Texture2D BD2 = LoadTexture("assets/bossesBroken2.png");
-    Texture2D BD3 = LoadTexture("assets/bossesBroken3.png");
     if (bosses.aktif)
     {
         float scale = 12.0; // Skala 800% dari ukuran aslinya
         Texture2D currentBossTexture = bosses.texture;
         
-        if (bosses.health <= (bosses.maxHealth * 0.8) && bosses.health > 60)
-        {
+        if (bosses.health <= (bosses.maxHealth * 0.8) && bosses.health > 60) {
+            
             currentBossTexture = BD1;
-        }
-        if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 40)
-        {
+        } 
+        else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 40) {
             currentBossTexture = BD2;
-        }
-        if (bosses.health <= (bosses.maxHealth * 0.4))
-        {
+        } 
+        else if (bosses.health <= (bosses.maxHealth * 0.4)) {
             currentBossTexture = BD3;
         }
 
@@ -213,6 +210,10 @@ void BossMov()
             break;
         }
     }
+}
+
+void tes(){
+    printf("tes");
 }
 
 void CheckBossCollisions(GameState *S) {

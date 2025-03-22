@@ -1,5 +1,6 @@
 #include "supriadi.h"
 #include "hasbi.h"
+#include "suci.h"
 #include "stdlib.h"
 #include <stdio.h>
 
@@ -43,19 +44,36 @@ void Tampil_Score(){
     DrawText(TextFormat("Score: %d", InfoPlayer.score), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 140, 25, RAYWHITE);
 }
 
+void InitGame() {
+    
+    InitWindow(800, 600, "Game Example");  
+    
+}
+void InitAssets(Assets *assets);
 void gameover(){
     ClearBackground(BLACK);
-    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
+    
+    DrawTexture(gameoverImage, 
+        (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - gameoverImage.width / 2, 
+        SCREEN_HEIGHT / 2 - gameoverImage.height / 2, 
+        WHITE);
+    DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
+    DrawText("Press B to Back to Menu", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 180, 650, 30, RAYWHITE);
+    
     if (IsKeyPressed(KEY_R)){
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
+
         InitPlayer();
         InitEnemies();
         InitBullets();
 
+        
+
     }
 }
+
+
 
 void inipowerup(){
     spawnPowerUp();

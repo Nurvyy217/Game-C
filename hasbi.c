@@ -41,6 +41,7 @@ void EnemyShoot();
 void UpdateEnemyBullets();
 void DrawEnemyBullets(Texture2D EnemyBulletTexture, float scale, GameState *S);
 void CheckEnemyCollisions();
+void CheckBossCollisions(GameState *S);
 // ASSSETS
 void LoadAssets();
 // GAMEPLAY
@@ -51,13 +52,14 @@ void UnloadAssets();
 Texture2D enemylvl1;
 Texture2D enemyBulletlv1;
 GameState gamestate;
+bool gameStart = false;
 
 int level = 0;
 
 // LOADING SCREEN
 void DrawLayout()
 {
-    bool gameStart = false;
+    
     ClearBackground(RAYWHITE);
 
     // Gameplay area (3/4 of screen, left part)
@@ -69,9 +71,9 @@ void DrawLayout()
     DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
 
     // Menu area (1/4 of screen, right part)
-    mainMenu(&gameStart);
-    tampilNyawa();
-    Tampil_Score();
+    // mainMenu(&gameStart);
+    // tampilNyawa();
+    // Tampil_Score();
 
     // Separator line
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); // strat posX, start posY, end posX, end posY
@@ -239,7 +241,8 @@ void UpdateBullets()
 void DrawPlayer()
 {
     float scale = 0.6f; // Skala 60% dari ukuran aslinya
-    DrawTextureEx(player.texture, player.position, 0.0f, scale, WHITE);
+    Color playerColor = (playerInvincible > 0) ? (Color){255, 255, 255, 100} : WHITE;
+    DrawTextureEx(player.texture, player.position, 0.0f, scale, playerColor);
     // DrawTexture(player.texture, player.position.x, player.position.y, WHITE);
 }
 
@@ -958,6 +961,7 @@ void GameplayWithoutEnemies(float deltaTime){
     DrawLayout();
     DrawPlayer();
     DrawLevelTransition(deltaTime);
+    mainMenu(&gameStart);
 }
 
 void callAsteroid(GameState *S)
@@ -988,6 +992,7 @@ void DrawLvl1()
     DrawEnemies(enemylvl1, enemylvl1, 2.0f, 120, 150, &gamestate);
     DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
+    mainMenu(&gameStart);
 }
 void level1(float deltaTime)
 {
@@ -1011,6 +1016,7 @@ void DrawLvl3()
     DrawBullets();
     DrawExplosions(explosionsTexture);
     DrawAsteroids();
+    mainMenu(&gameStart);
 }
 void level3(GameState *S, float deltaTime)
 {
@@ -1033,9 +1039,11 @@ void DrawLvl4()
     DrawEnemies(enemyLvl5, enemyLvl5Broken, 1.2f, 80, 110, &gamestate);
     DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
+    mainMenu(&gameStart);
 }
 void level4(float deltaTime)
 {
+    setEnemyDamage(&gamestate, 4);
     setEnemyHealth(&gamestate, 3);
     setMaxEnemy(&gamestate, 7);
     setHealthBroke(&gamestate, 1);
@@ -1063,6 +1071,7 @@ void DrawLvl5()
     DrawEnemies(enemyLvl6, enePurpleDamaged, 3.0f, 150, 200, &gamestate);
     DrawEnemyBullets(enemyBulletLv3, 1.3, &gamestate);
     tampilspark();
+    mainMenu(&gameStart);
 }
 void level5(float deltaTime)
 {
@@ -1092,14 +1101,17 @@ void DrawBossLevel()
     DrawPlayer();
     DrawBullets();
     DrawBosses();
-    DrawBossShoot();
+    DrawBossLaser();
+    mainMenu(&gameStart);
 }
 void bossLevel(float deltaTime)
 {
     BossMov();
+    ShootBossLaser();
+    UpdateBossLaser();
     UpdatePlayer();
-    UpdateBulletBoss();
     UpdateShooting(deltaTime);
+    CheckBossCollisions(&gamestate);
     UpdateBullets();
     DrawBossLevel();
     inipowerup();
@@ -1114,6 +1126,9 @@ void bossLevel(float deltaTime)
 
 void game()
 {
+    if (playerInvincible > 0) {
+        playerInvincible--;
+    }
     initGameState(&gamestate);
     float deltaTime = GetFrameTime();
     static float levelTimer = 0.0f;
@@ -1204,9 +1219,73 @@ void game()
     }
     else
     {
+        levelTimer = 0.0f;
         gameover();
     }
 }
 
+void CheckBossCollisions(GameState *S) {
+    // Player terkena laser boss
+    if (bossLaser.active) {
+        Rectangle laserHitbox = {
+            bossLaser.position.x-330, 
+            bossLaser.position.y, 
+            // bossLaser.textures[bossLaser.currentFrame].width * 1.2f, 
+            5,
+            bossLaser.length
+        };
 
+        Rectangle playerHitbox = {
+            player.position.x-140, 
+            player.position.y-100, 
+            40,
+            30
+        };
+
+        if (CheckCollisionRecs(laserHitbox, playerHitbox)) {
+            updateNyawa(S);
+        }
+    }
+
+    // Player menabrak boss
+    Rectangle bossHitbox = {
+        bosses.position.x, 
+        bosses.position.y, 
+        bosses.texture.width * 12.0f, 
+        bosses.texture.height * 12.0f
+    };
+
+    Rectangle playerHitbox = {
+        player.position.x+50, 
+        player.position.y+50, 
+        30, 
+        30
+    };
+
+    if (CheckCollisionRecs(bossHitbox, playerHitbox)) {
+        updateNyawa(S); 
+    }
+
+    // Peluru player mengenai boss
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            Rectangle bulletHitbox = {
+                bullets[i].position.x, 
+                bullets[i].position.y, 
+                20, 
+                10
+            };
+
+            if (CheckCollisionRecs(bulletHitbox, bossHitbox)) {
+                bosses.health -= 1; // Boss kehilangan 1 HP per tembakan
+                bullets[i].active = false; // Nonaktifkan peluru setelah kena
+                if (bosses.health <= 0){
+                    bosses.aktif = false;
+                    bossLaser.active = false;
+                    bossLaser.cooldown = 10000;
+                } 
+            }
+        }
+    }
+}
 

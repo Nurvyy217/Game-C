@@ -94,7 +94,7 @@ typedef struct {
 
 /***************************************** EXTERN **********************************************/
 // EXTERN
-extern Bullet bullet;
+extern Bullet bullets[MAX_BULLETS];
 extern Player player;
 extern GameState *state;
 extern GameState gamestate;
@@ -149,4 +149,9 @@ void setHealthBroke(GameState *S, int value);
 void setEnemyDamage(GameState *S, int value);
 //GETTER
 int getEnemyDamage(GameState *S);
+
+void ResetPlayerBulet();
+void ResetExplosions();
+void ResetEnemyBullets();
+void ResetEnemies();
 #endif

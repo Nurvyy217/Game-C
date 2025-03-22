@@ -20,6 +20,7 @@ int main(void) {
     infoPowerUp();
     
     while (!WindowShouldClose()) {
+        isLoadingDone=true;
         if (!isLoadingDone) {
             loadingAnimation();}  // Tampilkan loading lebih dulu
         else {

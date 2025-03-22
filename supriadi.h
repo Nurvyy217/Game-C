@@ -32,6 +32,7 @@ typedef struct{
 extern sparkle Sparkles;
 extern infoPlayer InfoPlayer;
 extern PowerUp powerup;
+extern int playerInvincible;
 
 void tampilNyawa();
 void infokanPlayer();

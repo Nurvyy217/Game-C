@@ -2,13 +2,15 @@
 #include "hasbi.h"
 #include "stdlib.h"
 #include <stdio.h>
+#include "fawwaz.h"
+#include "suci.h"
 
 infoPlayer InfoPlayer;
 PowerUp powerup;
 sparkle Sparkles;
 Sound powerupSound;
 
-
+int playerInvincible = 0; // Timer kebal (dalam frame)
 bool ambilpowerup;
 
 void infokanPlayer() {
@@ -18,8 +20,13 @@ void infokanPlayer() {
 }
 
 void updateNyawa(GameState *S) {
-    InfoPlayer.nyawa -= getEnemyDamage(S);
+    if (playerInvincible <= 0) { // Hanya menerima damage jika tidak kebal
+        InfoPlayer.nyawa -= getEnemyDamage(S);
+        // player.position = (Vector2){(GAMEPLAY_WIDTH / 2) - 210, SCREEN_HEIGHT - 230};
+        playerInvincible = 60; // Kebal selama 60 frame (~1 detik jika FPS = 60)
+    }
 }
+
 
 void updateScore() {
     InfoPlayer.score++;
@@ -46,14 +53,18 @@ void Tampil_Score(){
 
 void gameover(){
     ClearBackground(BLACK);
-    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
+    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
+    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
     if (IsKeyPressed(KEY_R)){
+        PlaySound(clickMenu);
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
         InitPlayer();
         InitBullets();
-
+        ResetPlayerBulet();
+        ResetExplosions();
+        ResetEnemyBullets();
+        ResetEnemies();
     }
 }
 
@@ -115,8 +126,10 @@ void ResetSpark(){
 
 void checkPowerUpCollision(){
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
-    if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
-        InfoPlayer.nyawa = InfoPlayer.nyawa + 1;
+    if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30 )){
+        if (InfoPlayer.nyawa<15){
+            InfoPlayer.nyawa = InfoPlayer.nyawa + 1;
+        }
         PlaySound(powerupSound);
         powerup.active = false;
         ambilpowerup = true;

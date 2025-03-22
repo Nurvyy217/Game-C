@@ -18,6 +18,7 @@ typedef struct {
     Texture2D texture;
 } BulletBoss;
 
+void InitBossesShoot();
 void UpdateBulletBoss();
 void InitBosses();
 void DrawBosses();

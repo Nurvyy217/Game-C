@@ -39,12 +39,12 @@ void BossMov()
     }
 }
 
-void InitBossShoot()
+void InitBossesShoot()
 {
     for (int i = 0; i < BOSS_MAX_BULLETS; i++)
     {
         bulletboss[i].active = false;
-        bulletboss[i].texture = LoadTexture("Explosions.png");
+        bulletboss[i].texture = LoadTexture("assets/Explosions.png");
     }
 
 }
@@ -76,7 +76,7 @@ void UpdateBulletBoss() {
 
 void DrawBossShoot(){
     for (int i; i < BOSS_MAX_BULLETS; i++){
-        float scale = 1.0; // Skala 800% dari ukuran aslinya
+        float scale = 8.0; // Skala 800% dari ukuran aslinya
         DrawTextureEx(bulletboss[i].texture, bosses.position, 0.0f, scale, WHITE);
     }
 }

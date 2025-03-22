@@ -11,6 +11,7 @@ int main(void) {
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
     InitPlayer();
+    InitBossesShoot();
     InitBosses();
     InitBullets();
     InitAsteroids();

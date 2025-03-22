@@ -65,6 +65,7 @@ void gameover(){
         ResetExplosions();
         ResetEnemyBullets();
         ResetEnemies();
+        ResetAsteroid();
     }
 }
 

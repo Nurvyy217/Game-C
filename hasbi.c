@@ -827,6 +827,13 @@ void ResetEnemies()
         enemies[i].isActive = false;
     }
 }
+void ResetAsteroid()
+{
+    for (int i = 0; i < MAX_ASTEROIDS; i++)
+    {
+        asteroids[i].active = false;
+    }
+}
 
 void ResetEnemyBullets()
 {
@@ -1106,6 +1113,7 @@ void DrawBossLevel()
 }
 void bossLevel(float deltaTime)
 {
+      
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
@@ -1144,7 +1152,7 @@ void game()
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 20)
         {
-            level = 1;
+            level = 6;
         }
         else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
         {
@@ -1174,6 +1182,7 @@ void game()
             ResetEnemyBullets();
             ResetExplosions();
             ResetPlayerBulet();
+            ResetAsteroid();
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
             snprintf(currentText, sizeof(currentText), "Level %d", level);
@@ -1249,9 +1258,9 @@ void CheckBossCollisions(GameState *S) {
 
     // Player menabrak boss
     Rectangle bossHitbox = {
-        bosses.position.x, 
+        bosses.position.x+50, 
         bosses.position.y, 
-        bosses.texture.width * 12.0f, 
+        bosses.texture.width * 11.0f, 
         bosses.texture.height * 12.0f
     };
 
@@ -1261,6 +1270,7 @@ void CheckBossCollisions(GameState *S) {
         30, 
         30
     };
+
 
     if (CheckCollisionRecs(bossHitbox, playerHitbox)) {
         updateNyawa(S); 

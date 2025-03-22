@@ -17,7 +17,7 @@ void InitBosses()
     bossLaser.cooldown = 3.0f;
     bossLaser.animationTimer = 0.0f;
     bossLaser.currentFrame = 0;
-    bosses.health = 3;
+    bosses.health = 100;
     bossLaser.length = 720;
 
     // Load dua gambar laser

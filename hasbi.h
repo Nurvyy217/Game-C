@@ -154,4 +154,5 @@ void ResetPlayerBulet();
 void ResetExplosions();
 void ResetEnemyBullets();
 void ResetEnemies();
+void ResetAsteroid();
 #endif

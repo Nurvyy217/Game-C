@@ -1,25 +1,34 @@
 #include "raylib.h"
 #include "fawwaz.h"
 #include "hasbi.h"
+#include "supriadi.h"
 
 // Menyesuaikan layar dengan laptop user
 Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
+Star stars[MAX_STARS];
+
 
 void InitBosses()
 {
     bosses.position = (Vector2){70, 300};
     bosses.aktif = true;
-    bosses.texture = LoadTexture("assets/bossesTest.png");
     bossLaser.active = false;
     bossLaser.timer = 0.0f;
     bossLaser.cooldown = 3.0f;
     bossLaser.animationTimer = 0.0f;
     bossLaser.currentFrame = 0;
     bosses.health = 100;
+    bosses.maxHealth = 100;
     bossLaser.length = 720;
+    bosses.hitEffectFrame = 0;
+    bosses.hitEffectTimer = 0;
 
+    // Load texture dari boss
+    bosses.texture = LoadTexture("assets/bossesTest.png");
+    
+    
     // Load dua gambar laser
     bossLaser.textures[0] = LoadTexture("assets/laser1.png");
     bossLaser.textures[1] = LoadTexture("assets/laser2.png");
@@ -27,12 +36,68 @@ void InitBosses()
     laserSound = LoadSound("assets/bossLaser.wav");
 }
 
+void InitStar(){
+    for (int i = 0; i < MAX_STARS; i++)
+    {
+        stars[i].position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
+        stars[i].speed = GetRandomValue(50, 200) / 100.0f;
+        stars[i].size = GetRandomValue(0.1, 2.2);
+    }
+}
+
+void UpdateStar(){
+    for (int i = 0; i < MAX_STARS; i++)
+    {
+        stars[i].position.y += stars[i].speed;
+            if (stars[i].position.y > 960) {
+                stars[i].position.y = 0;
+                stars[i].position.x = GetRandomValue(0, 720);
+                stars[i].size = GetRandomValue(0.1 , 2.2);
+    }
+}
+}
+
+void DrawStar(){
+
+    for (int i = 0; i < MAX_STARS; i++) {
+        DrawCircleV(stars[i].position, stars[i].size ,WHITE);
+    }
+}
+
 void DrawBosses()
 {
+    Texture2D BD1 = LoadTexture("assets/bossesBroken1.png");
+    Texture2D BD2 = LoadTexture("assets/bossesBroken2.png");
+    Texture2D BD3 = LoadTexture("assets/bossesBroken3.png");
     if (bosses.aktif)
     {
         float scale = 12.0; // Skala 800% dari ukuran aslinya
-        DrawTextureEx(bosses.texture, bosses.position, 0.0f, scale, WHITE);
+        Texture2D currentBossTexture = bosses.texture;
+        
+        if (bosses.health <= (bosses.maxHealth * 0.8) && bosses.health > 60)
+        {
+            currentBossTexture = BD1;
+        }
+        if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 40)
+        {
+            currentBossTexture = BD2;
+        }
+        if (bosses.health <= (bosses.maxHealth * 0.4))
+        {
+            currentBossTexture = BD3;
+        }
+
+        DrawTextureEx(currentBossTexture, bosses.position, 0.0f, scale, WHITE);
+        if (bosses.hitEffectTimer > 0)
+            {
+                Texture2D effect = (bosses.hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
+
+                Vector2 effectPosition;
+                effectPosition.x = bosses.position.x - (effect.width / 2) + 160;
+                effectPosition.y = bosses.position.y - (effect.height / 2) + 180;
+                DrawTextureEx(effect, effectPosition, 0.0f , 2.5f, WHITE);
+            }
+            
     }
 }
 
@@ -101,11 +166,20 @@ void BossMov()
     static int state = 0;
     static float lastStateChange = 0.0f;
     const float stateDuration = 1.6f;
+    float deltaTime = GetFrameTime();
     float speed = 130.0f * GetFrameTime(); // Sesuaikan kecepatan dengan frame rate
 
     float currentTime = GetTime();
     if (bosses.aktif)
     {
+        if (bosses.hitEffectTimer > 0)
+            {
+                bosses.hitEffectTimer -= deltaTime;
+                if (bosses.hitEffectTimer <= 0)
+                {
+                    bosses.hitEffectTimer = 0;
+                }
+            }
         // Periksa apakah sudah waktunya pindah state
         if (currentTime - lastStateChange >= stateDuration)
         {
@@ -139,4 +213,86 @@ void BossMov()
             break;
         }
     }
+}
+
+void CheckBossCollisions(GameState *S) {
+    // Player terkena laser boss
+    if (bossLaser.active) {
+        Rectangle laserHitbox = {
+            bossLaser.position.x-330, 
+            bossLaser.position.y, 
+            // bossLaser.textures[bossLaser.currentFrame].width * 1.2f, 
+            5,
+            bossLaser.length
+        };
+
+        Rectangle playerHitbox = {
+            player.position.x-140, 
+            player.position.y-100, 
+            40,
+            30
+        };
+
+        if (CheckCollisionRecs(laserHitbox, playerHitbox)) {
+            updateNyawa(S);
+        }
+    }
+
+    // Player menabrak boss
+    Rectangle bossHitbox = {
+        bosses.position.x+50, 
+        bosses.position.y, 
+        bosses.texture.width * 11.0f, 
+        bosses.texture.height * 12.0f
+    };
+
+    Rectangle playerHitbox = {
+        player.position.x+50, 
+        player.position.y+50, 
+        30, 
+        30
+    };
+
+
+    if (CheckCollisionRecs(bossHitbox, playerHitbox)) {
+        updateNyawa(S); 
+    }
+
+    // Peluru player mengenai boss
+    for (int i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            Rectangle bulletHitbox = {
+                bullets[i].position.x, 
+                bullets[i].position.y, 
+                20, 
+                10
+            };
+
+            if (CheckCollisionRecs(bulletHitbox, bossHitbox)) {
+                bosses.health -= 1; // Boss kehilangan 1 HP per tembakan
+                bullets[i].active = false; // Nonaktifkan peluru setelah kena
+                bosses.hitEffectTimer = 0.15f;
+                bosses.hitEffectFrame = (bosses.health % 2);
+                if (bosses.health <= 0){
+                    bosses.aktif = false;
+                    bossLaser.active = false;
+                    bossLaser.cooldown = 10000;
+                    bosses.hitEffectTimer = 0;
+                    bosses.hitEffectFrame = 0;
+                } 
+            }
+        }
+    }
+}
+
+void BossBar(){
+    float healthBarWidth = 400 * ((float)bosses.health/ bosses.maxHealth);
+    DrawRectangle(200, 50, 400, 20, RED);
+
+    // Gambar health bar berdasarkan sisa HP (hijau)
+    if (bosses.health>0){
+        DrawRectangle(200, 50, healthBarWidth, 20, GREEN);
+    }
+        // Tampilkan teks HP
+    DrawText(TextFormat("Boss HP: %d/%d", bosses.health, bosses.maxHealth), 320, 80, 20, WHITE);
 }

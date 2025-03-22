@@ -60,7 +60,7 @@ int level = 0;
 void DrawLayout()
 {
     
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
 
     // Gameplay area (3/4 of screen, left part)
     // DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
@@ -74,7 +74,7 @@ void DrawLayout()
     // mainMenu(&gameStart);
     // tampilNyawa();
     // Tampil_Score();
-
+    DrawStar();
     // Separator line
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); // strat posX, start posY, end posX, end posY
 }
@@ -1034,6 +1034,7 @@ void level3(GameState *S, float deltaTime)
     CheckCollisions(S);
     DrawLvl3();
     AsteroidLoop();
+    UpdateStar();
 }
 
 
@@ -1122,8 +1123,10 @@ void bossLevel(float deltaTime)
     CheckBossCollisions(&gamestate);
     UpdateBullets();
     DrawBossLevel();
+    BossBar();
     inipowerup();
     UpdateSpark();
+    UpdateStar();
 }
 
 
@@ -1233,69 +1236,5 @@ void game()
     }
 }
 
-void CheckBossCollisions(GameState *S) {
-    // Player terkena laser boss
-    if (bossLaser.active) {
-        Rectangle laserHitbox = {
-            bossLaser.position.x-330, 
-            bossLaser.position.y, 
-            // bossLaser.textures[bossLaser.currentFrame].width * 1.2f, 
-            5,
-            bossLaser.length
-        };
 
-        Rectangle playerHitbox = {
-            player.position.x-140, 
-            player.position.y-100, 
-            40,
-            30
-        };
-
-        if (CheckCollisionRecs(laserHitbox, playerHitbox)) {
-            updateNyawa(S);
-        }
-    }
-
-    // Player menabrak boss
-    Rectangle bossHitbox = {
-        bosses.position.x+50, 
-        bosses.position.y, 
-        bosses.texture.width * 11.0f, 
-        bosses.texture.height * 12.0f
-    };
-
-    Rectangle playerHitbox = {
-        player.position.x+50, 
-        player.position.y+50, 
-        30, 
-        30
-    };
-
-
-    if (CheckCollisionRecs(bossHitbox, playerHitbox)) {
-        updateNyawa(S); 
-    }
-
-    // Peluru player mengenai boss
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (bullets[i].active) {
-            Rectangle bulletHitbox = {
-                bullets[i].position.x, 
-                bullets[i].position.y, 
-                20, 
-                10
-            };
-
-            if (CheckCollisionRecs(bulletHitbox, bossHitbox)) {
-                bosses.health -= 1; // Boss kehilangan 1 HP per tembakan
-                bullets[i].active = false; // Nonaktifkan peluru setelah kena
-                if (bosses.health <= 0){
-                    bosses.aktif = false;
-                    bossLaser.active = false;
-                    bossLaser.cooldown = 10000;
-                } 
-            }
-        }
-    }
-}
 

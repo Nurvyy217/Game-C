@@ -859,6 +859,7 @@ void ResetPlayerBulet()
 
 Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
 Sound typing;
+Music gameplayMusic;
 // ASSETS
 void LoadAssets()
 {
@@ -880,6 +881,7 @@ void LoadAssets()
     enemyBulletLv3 = LoadTexture("assets/laserUfo.png");
     enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
     enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
+    gameplayMusic = LoadMusicStream("assets/gameplay.mp3");
 }
 // UNLOAD
 void UnloadAssets()
@@ -1113,7 +1115,7 @@ void DrawBossLevel()
 }
 void bossLevel(float deltaTime)
 {
-      
+    StopMusicStream(gameplayMusic);
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
@@ -1134,6 +1136,11 @@ void bossLevel(float deltaTime)
 
 void game()
 {
+    if (!IsMusicStreamPlaying(gameplayMusic)) {
+        PlayMusicStream(gameplayMusic);
+    }
+    SetMusicVolume(gameplayMusic, 1.0f);
+    UpdateMusicStream(gameplayMusic);
     if (playerInvincible > 0) {
         playerInvincible--;
     }
@@ -1141,6 +1148,7 @@ void game()
     float deltaTime = GetFrameTime();
     static float levelTimer = 0.0f;
     bool isGameOver = false; 
+
 
     if (InfoPlayer.nyawa <= 0)
     {
@@ -1152,7 +1160,7 @@ void game()
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 20)
         {
-            level = 6;
+            level = 1;
         }
         else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
         {

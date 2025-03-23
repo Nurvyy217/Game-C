@@ -239,6 +239,3 @@ void level2(float deltaTime){
     inipowerup();
     UpdateSpark();
 }
-
-
-

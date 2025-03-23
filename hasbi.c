@@ -185,14 +185,6 @@ void InitPlayer()
 
 void InitBullets()
 {
-    if (bulletTexture.id == 0)
-    {
-        printf("ERROR: bullet.png gagal dimuat!\n");
-    }
-    else
-    {
-        printf("bullet.png berhasil dimuat! Ukuran: %d x %d\n", bulletTexture.width, bulletTexture.height);
-    }
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         bullets[i].active = false;
@@ -1132,6 +1124,7 @@ void bossLevel(float deltaTime)
         isLevelTransition = true;
     }
     StopMusicStream(gameplayMusic);
+    InitialBoss();
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();

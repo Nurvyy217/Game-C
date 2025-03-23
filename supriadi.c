@@ -66,6 +66,7 @@ void gameover(){
         ResetEnemyBullets();
         ResetEnemies();
         ResetAsteroid();
+        bosses.aktif=false;
     }
 }
 

@@ -43,6 +43,7 @@ typedef struct {
 extern Bosses bosses;
 extern BossLaser bossLaser;
 
+
 void InitBosses();
 void DrawBosses();
 void BossBar();
@@ -63,3 +64,4 @@ void UpdateStar();
 void InitBGM();
 void UpdateBGM();
 void UnloadBGM();
+void InitialBoss();

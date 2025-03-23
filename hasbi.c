@@ -444,7 +444,7 @@ void CheckCollisions(GameState *S)
     {
         if (asteroids[i].active)
         {
-                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
+                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
                 { // user menabrak asteroid
                     updateNyawa(S);
                     PlaySound(userPlaneExplosions);
@@ -907,7 +907,7 @@ void UnloadAssets()
 // GAMEPLAY
 int previousLevel = 0;
 bool isLevelTransition=false;
-char currentText[10];    // Menyimpan teks level
+char currentText[12];    // Menyimpan teks level
 int letterIndex = 0;     // Indeks huruf yang sudah muncul
 float letterTimer = 0; 
 void DrawLevelTransition(float deltaTime)
@@ -930,6 +930,7 @@ void DrawLevelTransition(float deltaTime)
     // Tampilkan huruf satu per satu
     if (!removing && letterIndex < textLength && letterTimer > 0.2f)
     {
+        SetSoundVolume(typing,3.0f);
         PlaySound(typing);
         letterIndex++;
         letterTimer = 0.0f; // Reset timer
@@ -1193,7 +1194,13 @@ void game()
             ResetAsteroid();
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
-            snprintf(currentText, sizeof(currentText), "Level %d", level);
+            if (level<6){
+                snprintf(currentText, sizeof(currentText), "Level %d", level);
+            }else{
+                StopMusicStream(gameplayMusic);
+                snprintf(currentText, sizeof(currentText), "Final Level");
+            }
+            
             letterIndex = 0;
             letterTimer = 0;
             isLevelTransition = true;

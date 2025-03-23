@@ -174,6 +174,10 @@ void mainMenu(bool *gameStart)
         DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
         varMenu(&isSoundOn);
         // varHeart(heartTexture);
+        tampilNyawa();
+        Tampil_Score();
+        TampilInfoPowerup();
+        
         
         if (IsKeyPressed(KEY_ENTER)) {
             *gameStart = true;  // Set gameStart = true untuk keluar dari menu
@@ -216,6 +220,7 @@ void DrawLvl2()
     DrawEnemies(ufoTexture, ufoBroken,1.5f,80,110, &gamestate);
     DrawEnemyBullets(eneBul,1.2f, &gamestate);
     tampilspark();
+    mainMenu(&gameStart);
 }
 
 void level2(float deltaTime){

@@ -22,6 +22,8 @@ typedef struct {
     bool DoubleAttack;
     float AttackTimer;
 
+    bool AddNyawa;
+
 }infoPlayer;
 
 
@@ -39,6 +41,7 @@ typedef struct {
     Texture2D powerupIMG;
     bool active;
     PowerUpType type;
+    float  SpawnTime;
 
 } PowerUp;
 
@@ -53,6 +56,7 @@ extern sparkle Sparkles;
 extern infoPlayer InfoPlayer;
 extern PowerUp powerup;
 extern int AddSpeed;
+extern int playerInvincible;
 
 void tampilNyawa();
 void infokanPlayer();
@@ -60,6 +64,7 @@ void Tampil_Score();
 void gameover();
 void infoPowerUp();
 void spawnPowerUp();
+void SpawnPowerUpTime();
 void tampilPowerUp();
 void updateScore(int berapa);
 void updateNyawa(int tambah , GameState *S);
@@ -72,6 +77,7 @@ void updatePowerupTime();
 void powerupAttack();
 void ResetSpark();
 void TampilInfoPowerup();
-void PowerupShield();
+void ShowPowerupShield();
+void ShowWingDoubleAttack();
 
 #endif

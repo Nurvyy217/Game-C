@@ -151,4 +151,10 @@ void setHealthBroke(GameState *S, int value);
 void setEnemyDamage(GameState *S, int value);
 //GETTER
 int getEnemyDamage(GameState *S);
+
+void ResetPlayerBulet();
+void ResetExplosions();
+void ResetEnemyBullets();
+void ResetEnemies();
+void ResetAsteroid();
 #endif

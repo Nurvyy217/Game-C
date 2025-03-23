@@ -10,7 +10,7 @@ extern Texture2D logoDeveloper;
 extern Texture2D gameNamePhoto;
 extern Texture2D background;
 void initBG();
-
+extern Sound clickMenu;
 
 typedef enum GameScreen {
     MENU,

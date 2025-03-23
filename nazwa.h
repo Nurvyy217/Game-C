@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 extern bool isPaused;
+extern bool gameStart;
 
 void mainMenu(bool *gameStart);
 void varQuit();
@@ -14,6 +15,7 @@ void varRestart();
 void loadAssetMenu();
 void unloadAssetMenu();
 void level2(float deltaTime);
+
 
 
 

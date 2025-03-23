@@ -2,16 +2,19 @@
 #include "hasbi.h"
 #include "stdlib.h"
 #include <stdio.h>
+#include "fawwaz.h"
+#include "suci.h"
 
 infoPlayer InfoPlayer;
 PowerUp powerup;
 sparkle Sparkles;
 Sound powerupSound;
 Texture2D shield;
+Texture2D Wing;
 
-
+int playerInvincible = 0; // Timer kebal (dalam frame)
 int AddSpeed;
-bool ambilpowerup = false;
+float timer = 0;
 
 void infokanPlayer() {
     InfoPlayer.shieldActive = false;
@@ -30,16 +33,15 @@ void updateNyawa(int tambah , GameState *S) {
         }
         
     }
-    if (InfoPlayer.shieldActive == false)
+    if (InfoPlayer.shieldActive == false && playerInvincible <= 0)
     {
         InfoPlayer.nyawa -= getEnemyDamage(S);
+        playerInvincible = 60;
     }
 }
 
+
 void updateScore(int berapa) {
-    if (InfoPlayer.score % 10 != 0) {
-        ambilpowerup = false;
-    }
     InfoPlayer.score += berapa;
 }
 
@@ -64,42 +66,57 @@ void Tampil_Score(){
 
 void gameover(){
     ClearBackground(BLACK);
-    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 120, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
+    DrawText("Game Over", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
+    DrawText("Press R to Restart", (GAMEPLAY_WIDTH+MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
     if (IsKeyPressed(KEY_R)){
+        PlaySound(clickMenu);
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
         InitPlayer();
         InitBullets();
-
+        ResetPlayerBulet();
+        ResetExplosions();
+        ResetEnemyBullets();
+        ResetEnemies();
+        ResetAsteroid();
     }
 }
 
 void inipowerup(){
-    spawnPowerUp();
+    SpawnPowerUpTime();
     tampilPowerUp();
     checkPowerUpCollision();
     UpdateSpark();
     updatePowerupTime();
-    PowerupShield();
+    ShowPowerupShield();
+    ShowWingDoubleAttack();
     tampilspark();
 }
 
 void infoPowerUp() {
     powerup.powerupIMG = LoadTexture("assets/powerup.png");
     shield = LoadTexture("assets/shield.png");
+    Wing = LoadTexture("assets/wing.png");
     powerupSound = LoadSound("assets/powerup.wav");
     powerup.active = false;
     Sparkles.sparkIMG = LoadTexture("assets/sparkel1.png");
     Sparkles.aktif = false;
+    powerup.SpawnTime = 0;
+}
+
+void SpawnPowerUpTime(){
+    powerup.SpawnTime += GetFrameTime();
+    if (powerup.SpawnTime >= 8){
+        spawnPowerUp();
+    }
 }
 
 void spawnPowerUp() {
-    if (!powerup.active && InfoPlayer.score > 0 && InfoPlayer.score % 10 == 0 && !ambilpowerup) {
+    if (!powerup.active) {
         powerup.active = true;
         powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
         powerup.posisi.y = 0;
-        powerup.type = GetRandomValue(0, 3);
+        powerup.type = 1;
     }
 
     if (powerup.active) {
@@ -107,7 +124,7 @@ void spawnPowerUp() {
 
         if (powerup.posisi.y > SCREEN_HEIGHT) {
             powerup.active = false;
-            ambilpowerup = true;
+            powerup.SpawnTime = 0;
         }
     }
 }
@@ -122,14 +139,16 @@ void checkPowerUpCollision(){
     GameState *S = &gamestate;
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
     if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+        PlaySound(powerupSound);
         powerup.active = false;
-        ambilpowerup = true;
+        powerup.SpawnTime = 0;
         ShowSpark(powerup.posisi);
 
         switch (powerup.type) {
 
             case POWERUP_LIFE:
                 updateNyawa(3, S);
+                InfoPlayer.AddNyawa = true;
             break;
             
             case POWERUP_FASTFIRE:
@@ -152,7 +171,6 @@ void checkPowerUpCollision(){
     
 
 void updatePowerupTime() {
-
     // Timer Shield
     if (InfoPlayer.shieldActive) {
         InfoPlayer.shieldTimer -= GetFrameTime();
@@ -160,6 +178,15 @@ void updatePowerupTime() {
         if (InfoPlayer.shieldTimer <= 0) {
             InfoPlayer.shieldActive = false;
             InfoPlayer.shieldTimer = 0;
+        }
+    }
+
+    if (InfoPlayer.AddNyawa) {
+        timer += GetFrameTime();
+
+        if (timer >= 2) {
+            InfoPlayer.AddNyawa = false;
+            timer = 0;
         }
     }
 
@@ -171,7 +198,7 @@ void updatePowerupTime() {
             InfoPlayer.speedActive = false;
             InfoPlayer.SpeedTimer = 0;
         }
-        AddSpeed = 4;
+        AddSpeed = 5;
     }
 
     else {
@@ -197,10 +224,10 @@ void powerupAttack() {
         if (!bullets[i].active)
         {
             if (bulletmuncul == 0) {
-                bullets[i].position = (Vector2){(player.position.x - 50) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                bullets[i].position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             }
             else if (bulletmuncul == 1) {
-                bullets[i].position = (Vector2){(player.position.x + 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                bullets[i].position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             }
             
             bullets[i].active = true;
@@ -212,10 +239,9 @@ void powerupAttack() {
             PlaySound(shootSound);
         }
     }
-    
 }   
 
-void PowerupShield(){
+void ShowPowerupShield(){
     Vector2 playerPosition = (Vector2){player.position.x + 153, player.position.y + 130};
     if (InfoPlayer.shieldActive)
     {
@@ -223,20 +249,32 @@ void PowerupShield(){
     }
 }
 
-void TampilInfoPowerup(){
-    DrawText(TextFormat("POWERUP : "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 350, 15, WHITE);
-
+void ShowWingDoubleAttack(){
+    Vector2 playerPosition = (Vector2){player.position.x + 153, player.position.y + 130};
     if (InfoPlayer.DoubleAttack)
     {
-        DrawText(TextFormat("DoubleAttack! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+        DrawTextureEx(Wing , playerPosition , 0.0f, 0.4f, WHITE);
+    }
+}
+
+void TampilInfoPowerup(){
+    DrawText(TextFormat("Powerup: "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 350, 30, WHITE);
+
+    if (InfoPlayer.AddNyawa)
+    {
+        DrawText(TextFormat("GetHealth! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 -85 , 390, 25, WHITE);
+    }
+    if (InfoPlayer.DoubleAttack)
+    {
+        DrawText(TextFormat("DoubleAttack! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 -85 , 390, 25, WHITE);
     }
     if (InfoPlayer.shieldActive)
     {
-        DrawText(TextFormat("ShieldActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+        DrawText(TextFormat("ShieldActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 390, 25, WHITE);
     }
     if (InfoPlayer.speedActive)
     {
-        DrawText(TextFormat("SpeedActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 , 350, 15, WHITE);
+        DrawText(TextFormat("SpeedActive! "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 390, 25, WHITE);
     }
 }
 
@@ -264,4 +302,3 @@ void tampilspark() {
 void ResetSpark(){
     Sparkles.aktif=false;
 }
-

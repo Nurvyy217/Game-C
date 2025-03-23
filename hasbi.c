@@ -192,14 +192,6 @@ void InitPlayer()
 
 void InitBullets()
 {
-    if (bulletTexture.id == 0)
-    {
-        printf("ERROR: bullet.png gagal dimuat!\n");
-    }
-    else
-    {
-        printf("bullet.png berhasil dimuat! Ukuran: %d x %d\n", bulletTexture.width, bulletTexture.height);
-    }
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         bullets[i].active = false;
@@ -452,6 +444,8 @@ void CheckCollisions(GameState *S)
     {
         if (asteroids[i].active)
         {
+            if (playerInvincible <= 0)
+            {
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
                 { // user menabrak asteroid
                     updateNyawa(S);
@@ -464,6 +458,8 @@ void CheckCollisions(GameState *S)
                     asteroids[i].active = false;
                     break;
                 }
+            }
+            
         }
     }
 }
@@ -476,7 +472,7 @@ void SpawnAsteroid()
         {
             asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
             asteroids[i].size = GetRandomValue(1, 3);
-            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
+            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(5, 7)};
             asteroids[i].active = true;
             break;
         }
@@ -799,41 +795,42 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     enemies[i].isActive = false;
                     enemies[i].hitEffectTimer = 0;
                     enemies[i].hitEffectFrame = 0;
-                    updateScore(1); // Matikan musuh
+                    updateScore(2); // Matikan musuh
                     PlaySound(asteroidDestroyed);
                     CreateExplosion(enemiesPosition);
                     break; // Hindari multiple hits dalam satu frame
                 }
             }
         }
-
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
-        if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
-        {
-            updateNyawa(S);
-            PlaySound(userPlaneExplosions);
-            if (!InfoPlayer.shieldActive)
-            {
-                CreateExplosion(playerPosition);
-            }
-            enemies[i].isActive = false; // Hancurkan musuh
-            break;
-        }
-
-        // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
-        for (int k = 0; k < getMaxEnemyBullet(S); k++)
-        {
-            if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
-            {
-                enemyBullets[k].isActive = false;
-                PlaySound(asteroidDestroyed);
+        if (playerInvincible <= 0){
+            if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35)){
+                updateScore(1);
+                updateNyawa(S);
+                PlaySound(userPlaneExplosions);
                 if (!InfoPlayer.shieldActive)
                 {
                     CreateExplosion(playerPosition);
                 }
-                
-                updateNyawa(S);
+                enemies[i].isActive = false; // Hancurkan musuh
                 break;
+            }}
+
+        // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
+        for (int k = 0; k < getMaxEnemyBullet(S); k++){
+            if (playerInvincible <= 0){
+                if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+                {
+                    enemyBullets[k].isActive = false;
+                    PlaySound(asteroidDestroyed);
+                    if (!InfoPlayer.shieldActive)
+                    {
+                        CreateExplosion(playerPosition);
+                    }
+                    
+                    updateNyawa(S);
+                    break;
+                }
             }
         }
     }
@@ -1150,6 +1147,7 @@ void bossLevel(float deltaTime)
         isLevelTransition = true;
     }
     StopMusicStream(gameplayMusic);
+    InitialBoss();
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
@@ -1192,27 +1190,27 @@ void game()
     {
         UpdateStar();
         // Tentukan level berdasarkan skor
-        if (InfoPlayer.score < 20)
+        if (InfoPlayer.score < 150)
         {
             level = 1;
         }
-        else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
+        else if (InfoPlayer.score >= 150 && InfoPlayer.score < 250)
         {
             level = 2;
         }
-        else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60)
+        else if (InfoPlayer.score >= 250 && InfoPlayer.score < 300)
         {
             level = 3;
         }
-        else if (InfoPlayer.score >= 60 && InfoPlayer.score < 80)
+        else if (InfoPlayer.score >= 300 && InfoPlayer.score < 400)
         {
             level = 4;
         }
-        else if (InfoPlayer.score >= 80 && InfoPlayer.score < 100)
+        else if (InfoPlayer.score >= 400 && InfoPlayer.score < 500)
         {
             level = 5;
         }
-        else if (InfoPlayer.score >= 100 && InfoPlayer.score < 120)
+        else if (InfoPlayer.score >= 500)
         {
             level = 6;
         }
@@ -1259,7 +1257,7 @@ void game()
                 // Jika sudah mencapai 20 detik, naik ke level 3
                 if (levelTimer >= 20.0f)
                 {
-                    InfoPlayer.score=60;
+                    InfoPlayer.score=300;
                 }
                 break;
             case 4:
@@ -1280,6 +1278,3 @@ void game()
         gameover();
     }
 }
-
-
-

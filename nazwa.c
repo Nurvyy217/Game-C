@@ -239,5 +239,4 @@ void level2(float deltaTime){
     DrawLvl2();
     inipowerup();
     UpdateSpark();
-    UpdateStar();
 }

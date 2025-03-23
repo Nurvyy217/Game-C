@@ -17,20 +17,6 @@ bool isFlashing = false;
 
 void InitBosses()
 {
-    bosses.position = (Vector2){70, 300};
-    bosses.aktif = true;
-    bossLaser.active = false;
-    bosses.bossRage = false;
-    bossLaser.timer = 0.0f;
-    bossLaser.cooldown = 3.0f;
-    bossLaser.animationTimer = 0.0f;
-    bossLaser.currentFrame = 0;
-    bosses.health = 300;
-    bosses.maxHealth = 300;
-    bossLaser.length = 720;
-    bosses.hitEffectFrame = 0;
-    bosses.hitEffectTimer = 0;
-    bosses.theEnd= false;
 
     // Load texture dari boss
     bosses.texture = LoadTexture("assets/bossesTest.png");
@@ -51,6 +37,30 @@ void InitBosses()
     //Load BGM dari boss
     laserSound = LoadSound("assets/bossLaser.wav");
 }
+
+static int states;
+static float lastStateChange;
+void InitialBoss(){
+if(bosses.aktif == false){
+    bosses.position = (Vector2){70, 300};
+    bosses.aktif = true;
+    bossLaser.active = false;
+    bosses.bossRage = false;
+    bossLaser.timer = 0.0f;
+    bossLaser.cooldown = 3.0f;
+    bossLaser.animationTimer = 0.0f;
+    bossLaser.currentFrame = 0;
+    bosses.health = 300;
+    bosses.maxHealth = 300;
+    bossLaser.length = 720;
+    bosses.hitEffectFrame = 0;
+    bosses.hitEffectTimer = 0;
+    bosses.theEnd= false;
+    states = 0;
+    lastStateChange = 0.0f;
+}
+}
+
 void InitStar(){
     for (int i = 0; i < MAX_STARS; i++)
     {
@@ -100,6 +110,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 150) 
         {
             bosses.bossRage = false;
+            ResetAsteroid();
             currentBossTexture = BD2;
         } 
         else if (bosses.health <= (bosses.maxHealth * 0.5) && bosses.health > 120)
@@ -110,6 +121,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.4) && bosses.health > 60) 
         {
             bosses.bossRage = false;
+            ResetAsteroid();
             currentBossTexture = BD3;
         }
         else if (bosses.health <= (bosses.maxHealth * 0.2) && bosses.health > 0)
@@ -120,6 +132,7 @@ void DrawBosses()
         else if (bosses.health <= 0)
         {
             bosses.bossRage = false;
+            ResetAsteroid();
             bosses.defeat = true;
             currentBossTexture = BDef;
         }
@@ -201,8 +214,6 @@ void DrawBossLaser()
 
 void BossMov()
 {
-    static int state = 0;
-    static float lastStateChange = 0.0f;
     const float stateDuration = 1.6f;
     float deltaTime = GetFrameTime();
     float speed = 130.0f * GetFrameTime(); // Sesuaikan kecepatan dengan frame rate
@@ -223,7 +234,7 @@ void BossMov()
         // Periksa apakah sudah waktunya pindah state
         if (currentTime - lastStateChange >= stateDuration)
         {
-            state = (state + 1) % 4; // Looping antar state
+            states = (states + 1) % 4; // Looping antar state
             lastStateChange = currentTime;
 
             // Debugging: Tampilkan perubahan state di terminal
@@ -232,7 +243,7 @@ void BossMov()
         // Gerakan sesuai state saat ini
         if (bosses.health > 0)
         {
-            switch (state)
+            switch (states)
             {
             case 0: // Maju kanan-bawah
                 bosses.position.x += speed;

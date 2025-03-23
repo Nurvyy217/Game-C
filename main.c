@@ -22,10 +22,8 @@ int main(void) {
     infoPowerUp();
     
     while (!WindowShouldClose()) {
-        isLoadingDone=true;
         if (!isLoadingDone) {
-            // loadingAnimation();
-            isLoadingDone = true;
+            loadingAnimation();
         }  // Tampilkan loading lebih dulu
         else {
                 menuSuci();

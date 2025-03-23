@@ -80,7 +80,7 @@ void gameover(){
         ResetEnemyBullets();
         ResetEnemies();
         ResetAsteroid();
-        
+        bosses.aktif=false;
     }
 }
 
@@ -121,7 +121,7 @@ void spawnPowerUp() {
         powerup.active = true;
         powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
         powerup.posisi.y = 0;
-        powerup.type = 0;
+        powerup.type = GetRandomValue(0,3);
     }
 
     if (powerup.active) {
@@ -144,6 +144,7 @@ void checkPowerUpCollision(){
     GameState *S = &gamestate;
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
     if (powerup.active && CheckCollisionCircles(playerPosition, 30, powerup.posisi, 30)){
+        updateScore(5);
         PlaySound(powerupSound);
         powerup.active = false;
         powerup.SpawnTime = 0;

@@ -11,7 +11,6 @@
 #define GAMEPLAY_WIDTH (SCREEN_WIDTH * 5 / 7)
 #define MENU_WIDTH (SCREEN_WIDTH * 2 /7)
 //USER PLANE AND BULLET
-#define BULLET_SPEED 7
 #define PLAYER_SPEED 4
 #define BULLET_SPEED 7
 #define MAX_BULLETS 10
@@ -19,6 +18,7 @@
 #define MAX_ASTEROIDS 8
 //EXPLOSION
 #define MAX_EXPLOSIONS 50
+extern Sound asteroidDestroyed;
 //ENEMY
 #define SPEED_ENEMY_BULLETS 3
 #define MAX_ENEMIES 10
@@ -104,7 +104,8 @@ extern int level;
 extern bool isLoadingDone; 
 extern int playerHealth;
 extern Texture2D explosionsTexture;
-
+extern Texture2D hitEffect1, hitEffect2;
+extern Explosion explosions[MAX_EXPLOSIONS];
 
 /***************************************** MODUL MODUL ****************************************/
 // LAYOUT
@@ -126,10 +127,12 @@ void level1(float deltaTime);
 void InitAsteroids();
 void CheckCollisions();
 void AsteroidLoop();
+void callAsteroid(GameState *S);
 // EXPLOSIONS
 void DrawExplosions(Texture2D explosionsTexture);
 void UpdateExplosions(float deltaTime);
 void LoadAssets();
+void CreateExplosion(Vector2 position);
 // ENEMY
 void initGameState(GameState *S);
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);

@@ -60,7 +60,7 @@ int level = 0;
 void DrawLayout()
 {
     
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
 
     // Gameplay area (3/4 of screen, left part)
     // DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
@@ -74,7 +74,7 @@ void DrawLayout()
     // mainMenu(&gameStart);
     // tampilNyawa();
     // Tampil_Score();
-
+    DrawStar();
     // Separator line
     DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); // strat posX, start posY, end posX, end posY
 }
@@ -452,11 +452,9 @@ void CheckCollisions(GameState *S)
     {
         if (asteroids[i].active)
         {
-            for (int j = 0; j < MAX_BULLETS; j++)
-            {
-                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
+                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
                 { // user menabrak asteroid
-                    updateNyawa(0,S);
+                    updateNyawa(S);
                     PlaySound(userPlaneExplosions);
                     if (!InfoPlayer.shieldActive)
                     {
@@ -466,7 +464,6 @@ void CheckCollisions(GameState *S)
                     asteroids[i].active = false;
                     break;
                 }
-            }
         }
     }
 }
@@ -813,7 +810,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
         {
-            updateNyawa(0,S);
+            updateNyawa(S);
             PlaySound(userPlaneExplosions);
             if (!InfoPlayer.shieldActive)
             {
@@ -835,7 +832,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     CreateExplosion(playerPosition);
                 }
                 
-                updateNyawa(0,S);
+                updateNyawa(S);
                 break;
             }
         }
@@ -881,6 +878,7 @@ void ResetPlayerBulet()
 
 Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
 Sound typing;
+Music gameplayMusic;
 // ASSETS
 void LoadAssets()
 {
@@ -902,6 +900,7 @@ void LoadAssets()
     enemyBulletLv3 = LoadTexture("assets/laserUfo.png");
     enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
     enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
+    gameplayMusic = LoadMusicStream("assets/gameplay.mp3");
 }
 // UNLOAD
 void UnloadAssets()
@@ -927,7 +926,7 @@ void UnloadAssets()
 // GAMEPLAY
 int previousLevel = 0;
 bool isLevelTransition=false;
-char currentText[10];    // Menyimpan teks level
+char currentText[12];    // Menyimpan teks level
 int letterIndex = 0;     // Indeks huruf yang sudah muncul
 float letterTimer = 0; 
 void DrawLevelTransition(float deltaTime)
@@ -950,6 +949,7 @@ void DrawLevelTransition(float deltaTime)
     // Tampilkan huruf satu per satu
     if (!removing && letterIndex < textLength && letterTimer > 0.2f)
     {
+        SetSoundVolume(typing,3.0f);
         PlaySound(typing);
         letterIndex++;
         letterTimer = 0.0f; // Reset timer
@@ -965,14 +965,20 @@ void DrawLevelTransition(float deltaTime)
             removeTimer = 0.0f;
         }
     }
+    if (strcmp(currentText, "The End") == 0) // Jika yang ditampilkan "The End"
+    {
+        StopMusicStream(gameplayMusic);
+    }else{
+        if (removing && letterIndex > 0 && letterTimer > 0.2f)
+        {
+            PlaySound(typing);
+            letterIndex--;
+            letterTimer = 0.0f;
+        }
+        
+    }
 
     // Animasi menghilangkan teks satu per satu
-    if (removing && letterIndex > 0 && letterTimer > 0.2f)
-    {
-        PlaySound(typing);
-        letterIndex--;
-        letterTimer = 0.0f;
-    }
 
     // Gambar teks dengan huruf sesuai indeks yang sudah muncul
     DrawText(TextSubtext(levelText, 0, letterIndex), textX, textY, 40, WHITE);
@@ -983,6 +989,7 @@ void DrawLevelTransition(float deltaTime)
         isLevelTransition = false;
         removing = false;
     }
+    
 }
 
 void GameplayWithoutEnemies(float deltaTime){
@@ -1056,6 +1063,7 @@ void level3(GameState *S, float deltaTime)
     CheckCollisions(S);
     DrawLvl3();
     AsteroidLoop();
+    inipowerup();
 }
 
 
@@ -1128,26 +1136,44 @@ void DrawBossLevel()
     DrawPlayer();
     DrawBullets();
     DrawBosses();
+    DrawExplosions(explosionsTexture);
     DrawBossLaser();
     mainMenu(&gameStart);
 }
 void bossLevel(float deltaTime)
 {
-      
+    if (bosses.theEnd) // Jika boss mati
+    {
+        snprintf(currentText, sizeof(currentText), "The End");
+        letterIndex = 0;
+        letterTimer = 0;
+        isLevelTransition = true;
+    }
+    StopMusicStream(gameplayMusic);
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
     UpdatePlayer();
     UpdateShooting(deltaTime);
+    UpdateExplosions(deltaTime);
     CheckBossCollisions(&gamestate);
     UpdateBullets();
     DrawBossLevel();
+    BossBar();
     inipowerup();
     UpdateSpark();
+    BossRage(&gamestate);
+    BossExplosions();
+    UpdateBGM();
 }
 
 void game()
 {
+    if (!IsMusicStreamPlaying(gameplayMusic)) {
+        PlayMusicStream(gameplayMusic);
+    }
+    SetMusicVolume(gameplayMusic, 1.0f);
+    UpdateMusicStream(gameplayMusic);
     if (playerInvincible > 0) {
         playerInvincible--;
     }
@@ -1156,6 +1182,7 @@ void game()
     static float levelTimer = 0.0f;
     bool isGameOver = false; 
 
+
     if (InfoPlayer.nyawa <= 0)
     {
         isGameOver = true;
@@ -1163,6 +1190,7 @@ void game()
 
     if (!isGameOver)
     {
+        UpdateStar();
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 20)
         {
@@ -1199,7 +1227,13 @@ void game()
             ResetAsteroid();
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
-            snprintf(currentText, sizeof(currentText), "Level %d", level);
+            if (level<6){
+                snprintf(currentText, sizeof(currentText), "Level %d", level);
+            }else{
+                StopMusicStream(gameplayMusic);
+                snprintf(currentText, sizeof(currentText), "Final Level");
+            }
+            
             letterIndex = 0;
             letterTimer = 0;
             isLevelTransition = true;
@@ -1247,69 +1281,5 @@ void game()
     }
 }
 
-void CheckBossCollisions(GameState *S) {
-    // Player terkena laser boss
-    if (bossLaser.active) {
-        Rectangle laserHitbox = {
-            bossLaser.position.x-330, 
-            bossLaser.position.y, 
-            // bossLaser.textures[bossLaser.currentFrame].width * 1.2f, 
-            5,
-            bossLaser.length
-        };
 
-        Rectangle playerHitbox = {
-            player.position.x-140, 
-            player.position.y-100, 
-            40,
-            30
-        };
-
-        if (CheckCollisionRecs(laserHitbox, playerHitbox)) {
-            updateNyawa(0, S);
-        }
-    }
-
-    // Player menabrak boss
-    Rectangle bossHitbox = {
-        bosses.position.x+50, 
-        bosses.position.y, 
-        bosses.texture.width * 11.0f, 
-        bosses.texture.height * 12.0f
-    };
-
-    Rectangle playerHitbox = {
-        player.position.x+50, 
-        player.position.y+50, 
-        30, 
-        30
-    };
-
-
-    if (CheckCollisionRecs(bossHitbox, playerHitbox)) {
-        updateNyawa(0,S); 
-    }
-
-    // Peluru player mengenai boss
-    for (int i = 0; i < MAX_BULLETS; i++) {
-        if (bullets[i].active) {
-            Rectangle bulletHitbox = {
-                bullets[i].position.x, 
-                bullets[i].position.y, 
-                20, 
-                10
-            };
-
-            if (CheckCollisionRecs(bulletHitbox, bossHitbox)) {
-                bosses.health -= 1; // Boss kehilangan 1 HP per tembakan
-                bullets[i].active = false; // Nonaktifkan peluru setelah kena
-                if (bosses.health <= 0){
-                    bosses.aktif = false;
-                    bossLaser.active = false;
-                    bossLaser.cooldown = 10000;
-                } 
-            }
-        }
-    }
-}
 

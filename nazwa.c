@@ -1,6 +1,7 @@
 #include "nazwa.h"
 #include "hasbi.h"
 #include "supriadi.h"
+#include "fawwaz.h"
 
 Texture2D heartTexture;
 Texture2D enemyBulletlv3;
@@ -238,4 +239,5 @@ void level2(float deltaTime){
     DrawLvl2();
     inipowerup();
     UpdateSpark();
+    UpdateStar();
 }

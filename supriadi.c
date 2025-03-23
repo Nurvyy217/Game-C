@@ -23,20 +23,21 @@ void infokanPlayer() {
     InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
 }
 
-void updateNyawa(int tambah , GameState *S) {
-    if (InfoPlayer.nyawa < NYAWA_AWAL)
+void updateNyawa(GameState *S) {
+    if (InfoPlayer.AddNyawa)
     {
-        InfoPlayer.nyawa += tambah;
-        if (InfoPlayer.nyawa > NYAWA_AWAL)
-        {
-            InfoPlayer.nyawa = NYAWA_AWAL;
-        }
-        
+        InfoPlayer.nyawa += 3;
     }
-    if (InfoPlayer.shieldActive == false && playerInvincible <= 0)
+
+    else if (!InfoPlayer.shieldActive && playerInvincible <= 0)
     {
         InfoPlayer.nyawa -= getEnemyDamage(S);
         playerInvincible = 60;
+    }
+
+    if (InfoPlayer.nyawa > NYAWA_AWAL)
+    {
+        InfoPlayer.nyawa = NYAWA_AWAL;
     }
 }
 
@@ -56,7 +57,7 @@ void tampilNyawa() {
             }
         }
     }
-    DrawText(TextFormat("Health: "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 190, 30, WHITE);
+    DrawText(TextFormat("Health: %d", InfoPlayer.nyawa), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 190, 30, WHITE);
 
 }
 
@@ -79,11 +80,15 @@ void gameover(){
         ResetEnemyBullets();
         ResetEnemies();
         ResetAsteroid();
+        
     }
 }
 
 void inipowerup(){
-    SpawnPowerUpTime();
+    if (level != 3){
+
+        SpawnPowerUpTime();
+    }
     tampilPowerUp();
     checkPowerUpCollision();
     UpdateSpark();
@@ -116,7 +121,7 @@ void spawnPowerUp() {
         powerup.active = true;
         powerup.posisi.x = GetRandomValue(20, GAMEPLAY_WIDTH - 100);
         powerup.posisi.y = 0;
-        powerup.type = GetRandomValue(0,3);
+        powerup.type = 0;
     }
 
     if (powerup.active) {
@@ -147,8 +152,8 @@ void checkPowerUpCollision(){
         switch (powerup.type) {
 
             case POWERUP_LIFE:
-                updateNyawa(3, S);
-                InfoPlayer.AddNyawa = true;
+                InfoPlayer.AddNyawa = true; 
+                updateNyawa(S);
             break;
             
             case POWERUP_FASTFIRE:
@@ -184,7 +189,7 @@ void updatePowerupTime() {
     if (InfoPlayer.AddNyawa) {
         timer += GetFrameTime();
 
-        if (timer >= 2) {
+        if (timer >= 1) {
             InfoPlayer.AddNyawa = false;
             timer = 0;
         }

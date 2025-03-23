@@ -67,7 +67,7 @@ void spawnPowerUp();
 void SpawnPowerUpTime();
 void tampilPowerUp();
 void updateScore(int berapa);
-void updateNyawa(int tambah , GameState *S);
+void updateNyawa(GameState *S);
 void checkPowerUpCollision();
 void inipowerup();
 void UpdateSpark();

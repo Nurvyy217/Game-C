@@ -3,7 +3,6 @@
 
 #include "raylib.h"
 
-
 extern bool texturesLoaded;
 void initLoadScreen();
 extern Texture2D logoDeveloper;
@@ -12,23 +11,24 @@ extern Texture2D background;
 void initBG();
 extern Sound clickMenu;
 
-typedef enum GameScreen {
+typedef enum GameScreen
+{
     MENU,
     PLAY,
     SETTINGS
 } GameScreen;
 
-
-typedef enum MenuOption {
+typedef enum MenuOption
+{
     MENU_PLAY,
     MENU_SETTINGS,
     MENU_EXIT,
     MENU_TOTAL // Jumlah total opsi menu
 } MenuOption;
 
-
 // Struktur untuk menyimpan aset
-typedef struct Assets{
+typedef struct Assets
+{
     Texture2D bg;
     Texture2D title;
     Texture2D btnPlay;
@@ -39,6 +39,5 @@ typedef struct Assets{
 
 // Deklarasi fungsi
 void menuSuci();
-
 
 #endif

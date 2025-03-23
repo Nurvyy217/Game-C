@@ -8,11 +8,12 @@
 #define MAX_POWERUPS 5
 
 // Struktur untuk menyimpan data pemain
-typedef struct {
+typedef struct
+{
     int nyawa;
     int score;
     Texture2D nyawaIMG;
-    
+
     bool shieldActive;
     float shieldTimer;
 
@@ -24,28 +25,29 @@ typedef struct {
 
     bool AddNyawa;
 
-}infoPlayer;
+} infoPlayer;
 
-
-typedef enum {
-    POWERUP_LIFE,  
-    POWERUP_FASTFIRE,   
-    // POWERUP_SCORE,   
-    POWERUP_SPEED, 
+typedef enum
+{
+    POWERUP_LIFE,
+    POWERUP_FASTFIRE,
+    // POWERUP_SCORE,
+    POWERUP_SPEED,
     POWERUP_SHIELD,
 } PowerUpType;
 
-
-typedef struct {
+typedef struct
+{
     Vector2 posisi;
     Texture2D powerupIMG;
     bool active;
     PowerUpType type;
-    float  SpawnTime;
+    float SpawnTime;
 
 } PowerUp;
 
-typedef struct{
+typedef struct
+{
     Vector2 PosisiSpark;
     bool aktif;
     float timer;

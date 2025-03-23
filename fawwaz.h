@@ -6,15 +6,15 @@
 #define BOSS_BULLET_SPEED 8
 #define MAX_STARS 100
 
-
 // Bosses
-typedef struct {
+typedef struct
+{
     Vector2 position;
     Texture2D texture;
     int health;
     int maxHealth;
     int hitEffectFrame; // 0 atau 1, untuk efek tembakan
-    float hitEffectTimer; 
+    float hitEffectTimer;
     float destroyTime;
     bool aktif;
     bool bossRage;
@@ -23,13 +23,15 @@ typedef struct {
     bool theEnd;
 } Bosses;
 
-typedef struct {
+typedef struct
+{
     Vector2 position;
     float speed;
     int size;
 } Star;
 
-typedef struct {
+typedef struct
+{
     Vector2 position;
     bool active;
     float timer;
@@ -42,25 +44,22 @@ typedef struct {
 
 extern Bosses bosses;
 extern BossLaser bossLaser;
-
+extern Sound laserSound;
+extern Music bossbgm;
 
 void InitBosses();
 void DrawBosses();
 void BossBar();
 void BossRage(GameState *S);
-
-//
-void DrawPositions();
 void BossMov();
 void ShootBossLaser();
 void UpdateBossLaser();
 void DrawBossLaser();
 void BossExplosions();
-
+void CheckBossCollisions(GameState *S);
 void InitStar();
 void DrawStar();
 void UpdateStar();
-
 void InitBGM();
 void UpdateBGM();
 void UnloadBGM();

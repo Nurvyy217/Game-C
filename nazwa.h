@@ -17,13 +17,4 @@ void unloadAssetMenu();
 void level2(float deltaTime);
 
 
-
-
-typedef struct {
-    char name[MAX_INPUT_CHARS + 1];
-} user;
-
-void inputName(user *U);
-
-
 #endif

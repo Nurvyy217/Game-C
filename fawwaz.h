@@ -20,6 +20,7 @@ typedef struct {
     bool bossRage;
     bool defeat;
     bool destroyed;
+    bool theEnd;
 } Bosses;
 
 typedef struct {

@@ -946,14 +946,20 @@ void DrawLevelTransition(float deltaTime)
             removeTimer = 0.0f;
         }
     }
+    if (strcmp(currentText, "The End") == 0) // Jika yang ditampilkan "The End"
+    {
+        StopMusicStream(gameplayMusic);
+    }else{
+        if (removing && letterIndex > 0 && letterTimer > 0.2f)
+        {
+            PlaySound(typing);
+            letterIndex--;
+            letterTimer = 0.0f;
+        }
+        
+    }
 
     // Animasi menghilangkan teks satu per satu
-    if (removing && letterIndex > 0 && letterTimer > 0.2f)
-    {
-        PlaySound(typing);
-        letterIndex--;
-        letterTimer = 0.0f;
-    }
 
     // Gambar teks dengan huruf sesuai indeks yang sudah muncul
     DrawText(TextSubtext(levelText, 0, letterIndex), textX, textY, 40, WHITE);
@@ -964,6 +970,7 @@ void DrawLevelTransition(float deltaTime)
         isLevelTransition = false;
         removing = false;
     }
+    
 }
 
 void GameplayWithoutEnemies(float deltaTime){
@@ -1018,7 +1025,6 @@ void level1(float deltaTime)
     DrawLvl1();
     inipowerup();
     UpdateSpark();
-    UpdateStar();
 }
 void DrawLvl3()
 {
@@ -1038,7 +1044,6 @@ void level3(GameState *S, float deltaTime)
     CheckCollisions(S);
     DrawLvl3();
     AsteroidLoop();
-    UpdateStar();
 }
 
 
@@ -1072,7 +1077,6 @@ void level4(float deltaTime)
     DrawLvl4();
     inipowerup();
     UpdateSpark();
-    UpdateStar();
 }
 
 void DrawLvl5()
@@ -1106,7 +1110,6 @@ void level5(float deltaTime)
     DrawLvl5();
     inipowerup();
     UpdateSpark();
-    UpdateStar();
 }
 
 void DrawBossLevel()
@@ -1121,6 +1124,13 @@ void DrawBossLevel()
 }
 void bossLevel(float deltaTime)
 {
+    if (bosses.theEnd) // Jika boss mati
+    {
+        snprintf(currentText, sizeof(currentText), "The End");
+        letterIndex = 0;
+        letterTimer = 0;
+        isLevelTransition = true;
+    }
     StopMusicStream(gameplayMusic);
     BossMov();
     ShootBossLaser();
@@ -1134,7 +1144,6 @@ void bossLevel(float deltaTime)
     BossBar();
     inipowerup();
     UpdateSpark();
-    UpdateStar();
     BossRage(&gamestate);
     BossExplosions();
     UpdateBGM();
@@ -1169,10 +1178,11 @@ void game()
 
     if (!isGameOver)
     {
+        UpdateStar();
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 20)
         {
-            level = 1;
+            level = 6;
         }
         else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
         {

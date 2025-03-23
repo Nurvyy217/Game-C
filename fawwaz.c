@@ -30,6 +30,7 @@ void InitBosses()
     bossLaser.length = 720;
     bosses.hitEffectFrame = 0;
     bosses.hitEffectTimer = 0;
+    bosses.theEnd= false;
 
     // Load texture dari boss
     bosses.texture = LoadTexture("assets/bossesTest.png");
@@ -377,6 +378,8 @@ void BossExplosions() {
     
             if (bosses.destroyTime >= 5.0f) { // Jika sudah 5 detik
                 bosses.aktif = false; // Matikan musuh
+                StopMusicStream(bossbgm);
+                bosses.theEnd= true;
             }
         }
     }

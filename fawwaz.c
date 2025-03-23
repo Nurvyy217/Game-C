@@ -3,24 +3,30 @@
 #include "hasbi.h"
 #include "supriadi.h"
 
-// Menyesuaikan layar dengan laptop user
 Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
 Star stars[MAX_STARS];
-Texture2D BD1, BD2, BD3;
+Texture2D BD1, BD2, BD3, RB, RB1, RB2, RB3, BDef;
+Music bossbgm;
+float timerExp = 0;
+float timerExp2 = 0;
+float flashTimer = 0.0f;
+bool isFlashing = false;
+
 
 void InitBosses()
 {
     bosses.position = (Vector2){70, 300};
     bosses.aktif = true;
     bossLaser.active = false;
+    bosses.bossRage = false;
     bossLaser.timer = 0.0f;
     bossLaser.cooldown = 3.0f;
     bossLaser.animationTimer = 0.0f;
     bossLaser.currentFrame = 0;
-    bosses.health = 100;
-    bosses.maxHealth = 100;
+    bosses.health = 3;
+    bosses.maxHealth = 300;
     bossLaser.length = 720;
     bosses.hitEffectFrame = 0;
     bosses.hitEffectTimer = 0;
@@ -30,14 +36,20 @@ void InitBosses()
     BD1 = LoadTexture("assets/bossesBroken1.png");
     BD2 = LoadTexture("assets/bossesBroken2.png");
     BD3 = LoadTexture("assets/bossesBroken3.png");
+    RB = LoadTexture("assets/rageBoss.png");
+    RB1 = LoadTexture("assets/rageBossBroken1.png");
+    RB2 = LoadTexture("assets/rageBossBroken2.png");
+    RB3 = LoadTexture("assets/rageBossBroken3.png");
+    BDef = LoadTexture("assets/bossesDefeat.png");
     
     // Load dua gambar laser
     bossLaser.textures[0] = LoadTexture("assets/laser1.png");
     bossLaser.textures[1] = LoadTexture("assets/laser2.png");
     bossLaser.textures[2] = LoadTexture("assets/laser3.png");
+
+    //Load BGM dari boss
     laserSound = LoadSound("assets/bossLaser.wav");
 }
-
 void InitStar(){
     for (int i = 0; i < MAX_STARS; i++)
     {
@@ -73,16 +85,44 @@ void DrawBosses()
         float scale = 12.0; // Skala 800% dari ukuran aslinya
         Texture2D currentBossTexture = bosses.texture;
         
-        if (bosses.health <= (bosses.maxHealth * 0.8) && bosses.health > 60) {
+        
+        if (bosses.health <= 250 && bosses.health > 225) 
+        {
             
             currentBossTexture = BD1;
         } 
-        else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 40) {
+        else if (bosses.health <= 225 && bosses.health > 180)
+        {
+            bosses.bossRage = true;
+            currentBossTexture = RB1;
+        }
+        else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 150) 
+        {
+            bosses.bossRage = false;
             currentBossTexture = BD2;
         } 
-        else if (bosses.health <= (bosses.maxHealth * 0.4)) {
+        else if (bosses.health <= (bosses.maxHealth * 0.5) && bosses.health > 120)
+        {
+            bosses.bossRage = true;
+            currentBossTexture = RB2;
+        }
+        else if (bosses.health <= (bosses.maxHealth * 0.4) && bosses.health > 60) 
+        {
+            bosses.bossRage = false;
             currentBossTexture = BD3;
         }
+        else if (bosses.health <= (bosses.maxHealth * 0.2) && bosses.health > 0)
+        {
+            bosses.bossRage = true;
+            currentBossTexture = RB3;
+        }
+        else if (bosses.health <= 0)
+        {
+            bosses.bossRage = false;
+            bosses.defeat = true;
+            currentBossTexture = BDef;
+        }
+
 
         DrawTextureEx(currentBossTexture, bosses.position, 0.0f, scale, WHITE);
         if (bosses.hitEffectTimer > 0)
@@ -167,6 +207,8 @@ void BossMov()
     float speed = 130.0f * GetFrameTime(); // Sesuaikan kecepatan dengan frame rate
 
     float currentTime = GetTime();
+
+
     if (bosses.aktif)
     {
         if (bosses.hitEffectTimer > 0)
@@ -187,33 +229,33 @@ void BossMov()
         }
 
         // Gerakan sesuai state saat ini
-        switch (state)
+        if (bosses.health > 0)
         {
-        case 0: // Maju kanan-bawah
-            bosses.position.x += speed;
-            bosses.position.y += speed;
-            break;
+            switch (state)
+            {
+            case 0: // Maju kanan-bawah
+                bosses.position.x += speed;
+                bosses.position.y += speed;
+                break;
 
-        case 1: // Mundur kanan-atas
-            bosses.position.x += speed;
-            bosses.position.y -= speed;
-            break;
+            case 1: // Mundur kanan-atas
+                bosses.position.x += speed;
+                bosses.position.y -= speed;
+                break;
 
-        case 2: // Mundur kiri-atas
-            bosses.position.x -= speed;
-            bosses.position.y -= speed;
-            break;
+            case 2: // Mundur kiri-atas
+                bosses.position.x -= speed;
+                bosses.position.y -= speed;
+                break;
 
-        case 3: // Maju kiri-bawah
-            bosses.position.x -= speed;
-            bosses.position.y += speed;
-            break;
+            case 3: // Maju kiri-bawah
+                bosses.position.x -= speed;
+                bosses.position.y += speed;
+                break;
+            }
         }
     }
-}
-
-void tes(){
-    printf("tes");
+    
 }
 
 void CheckBossCollisions(GameState *S) {
@@ -248,8 +290,8 @@ void CheckBossCollisions(GameState *S) {
     };
 
     Rectangle playerHitbox = {
-        player.position.x+50, 
-        player.position.y+50, 
+        player.position.x+250, 
+        player.position.y+150, 
         30, 
         30
     };
@@ -274,8 +316,7 @@ void CheckBossCollisions(GameState *S) {
                 bullets[i].active = false; // Nonaktifkan peluru setelah kena
                 bosses.hitEffectTimer = 0.15f;
                 bosses.hitEffectFrame = (bosses.health % 2);
-                if (bosses.health <= 0){
-                    bosses.aktif = false;
+                if (bosses.health <= 0){ 
                     bossLaser.active = false;
                     bossLaser.cooldown = 10000;
                     bosses.hitEffectTimer = 0;
@@ -288,12 +329,69 @@ void CheckBossCollisions(GameState *S) {
 
 void BossBar(){
     float healthBarWidth = 400 * ((float)bosses.health/ bosses.maxHealth);
-    DrawRectangle(200, 50, 400, 20, RED);
-
-    // Gambar health bar berdasarkan sisa HP (hijau)
     if (bosses.health>0){
-        DrawRectangle(200, 50, healthBarWidth, 20, GREEN);
+        DrawRectangle(60, 50, 400, 20, RED);
+        DrawRectangle(60, 50, healthBarWidth, 20, GREEN);
+        DrawText(TextFormat("Xaeph, The Last Alien"), 150, 80, 20, WHITE);
     }
-        // Tampilkan teks HP
-    DrawText(TextFormat("Boss HP: %d/%d", bosses.health, bosses.maxHealth), 320, 80, 20, WHITE);
 }
+
+void BossRage(GameState *S){
+    if (bosses.bossRage == true)
+    {
+        callAsteroid(S);
+    }
+}
+
+// void BossExplosions()
+// {
+//     if (bosses.defeat == true)
+//     {
+//         timerExp += GetFrameTime();
+//         if (timerExp >= GetRandomValue(1,3) * 0.1f)
+//         {
+//                 Vector2 posisi = {explosions->position.x = GetRandomValue( 0, 540), explosions->position.y = GetRandomValue(0, 240)};
+//                 CreateExplosion(posisi);
+//                 timerExp = 0;
+//             }
+//     }
+// }
+
+void BossExplosions() {
+    float dt = GetFrameTime();
+    int jmlledakan = 2;
+    if (bosses.defeat) {
+        timerExp += GetFrameTime();
+        timerExp2 += GetFrameTime();
+        if (timerExp >= 0.15f && timerExp2 < 5.0f) {
+            for (int i = 0; i < jmlledakan; i++)
+            {
+                Vector2 posisi1 = {explosions->position.x = GetRandomValue( bosses.position.x-100, bosses.position.x + 350), explosions->position.y = GetRandomValue(bosses.position.y - 100 , bosses.position.y + 250)};
+                CreateExplosion(posisi1);
+                PlaySound(asteroidDestroyed);
+            }
+            timerExp = 0;
+        }
+        if (bosses.destroyTime >= 0.0f) {
+            bosses.destroyTime += dt; // Tambah waktu berjalan
+    
+            if (bosses.destroyTime >= 5.0f) { // Jika sudah 5 detik
+                bosses.aktif = false; // Matikan musuh
+            }
+        }
+    }
+}
+
+void InitBGM() {
+    bossbgm = LoadMusicStream("assets/vordt.mp3"); // Load BGM
+    PlayMusicStream(bossbgm); // Mulai memutar musik
+}
+
+void UpdateBGM() {
+    UpdateMusicStream(bossbgm);
+}
+
+void UnloadBGM() {
+    UnloadMusicStream(bossbgm);
+}
+

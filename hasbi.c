@@ -1015,6 +1015,7 @@ void level1(float deltaTime)
     DrawLvl1();
     inipowerup();
     UpdateSpark();
+    UpdateStar();
 }
 void DrawLvl3()
 {
@@ -1068,6 +1069,7 @@ void level4(float deltaTime)
     DrawLvl4();
     inipowerup();
     UpdateSpark();
+    UpdateStar();
 }
 
 void DrawLvl5()
@@ -1101,6 +1103,7 @@ void level5(float deltaTime)
     DrawLvl5();
     inipowerup();
     UpdateSpark();
+    UpdateStar();
 }
 
 void DrawBossLevel()
@@ -1109,6 +1112,7 @@ void DrawBossLevel()
     DrawPlayer();
     DrawBullets();
     DrawBosses();
+    DrawExplosions(explosionsTexture);
     DrawBossLaser();
     mainMenu(&gameStart);
 }
@@ -1120,6 +1124,7 @@ void bossLevel(float deltaTime)
     UpdateBossLaser();
     UpdatePlayer();
     UpdateShooting(deltaTime);
+    UpdateExplosions(deltaTime);
     CheckBossCollisions(&gamestate);
     UpdateBullets();
     DrawBossLevel();
@@ -1127,6 +1132,9 @@ void bossLevel(float deltaTime)
     inipowerup();
     UpdateSpark();
     UpdateStar();
+    BossRage(&gamestate);
+    BossExplosions();
+    UpdateBGM();
 }
 
 

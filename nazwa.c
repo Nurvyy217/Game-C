@@ -16,7 +16,7 @@ Texture2D ufoTexture;
 bool soundOn = true;
 bool startGame = false;
 
-void varMenu(bool *isSoundOn)
+void varMenu(bool *soundAssets)
 {
     static bool showPopup = false; // Status pop-up
 
@@ -48,36 +48,32 @@ void varMenu(bool *isSoundOn)
         int popupX = (SCREEN_WIDTH - popupWidth) / 2;
         int popupY = (SCREEN_HEIGHT - popupHeight) / 2;
 
-        // Efek Shadow (kotak lebih besar dengan transparansi)
         DrawRectangle(popupX - 5, popupY - 5, popupWidth + 10, popupHeight + 10, Fade(BLACK, 0.5f));
 
-        // Kotak utama pop-up
-        DrawRectangle(popupX, popupY, popupWidth, popupHeight, DARKGRAY);
+        DrawRectangle(popupX, popupY, popupWidth, popupHeight, BLACK);
 
-        // Border tebal (lapisan ganda untuk efek lebih bold)
-        DrawRectangleLinesEx((Rectangle){popupX - 2, popupY - 2, popupWidth + 4, popupHeight + 4}, 4, WHITE);
+        DrawRectangleLinesEx((Rectangle){popupX - 2, popupY - 2, popupWidth + 4, popupHeight + 4}, 3, DARKBLUE);
         DrawRectangleLinesEx((Rectangle){popupX - 4, popupY - 4, popupWidth + 8, popupHeight + 8}, 2, BLACK);
 
         DrawText("Popup Menu", popupX + 20, popupY + 20, 25, WHITE);
 
         // Posisi elemen dalam pop-up
-        int iconStartX = popupX + 20; // Posisi kiri dalam pop-up
-        int iconStartY = popupY + 60; // Posisi awal untuk elemen
-        int iconSpacing = 70;         // Jarak antar elemen
+        int iconStartX = popupX + 20; 
+        int iconStartY = popupY + 60; 
+        int iconSpacing = 70; 
         float iconScale = 0.5f;
-        int textOffsetX = 80; // Jarak teks dari ikon
+        int textOffsetX = 80; 
 
-        // Tombol suara dalam pop-up
-        Texture2D currentSoundTexture = *isSoundOn ? soundOnTexture : soundOffTexture;
-        DrawTextureEx(currentSoundTexture, (Vector2){iconStartX, iconStartY}, 0.0f, 0.4f, WHITE);
-        DrawText("Press S to Off/On", iconStartX + textOffsetX, iconStartY + 15, 23, WHITE);
-
-        if (mousePos.x >= iconStartX && mousePos.x <= iconStartX + (soundOnTexture.width * iconScale) &&
-            mousePos.y >= iconStartY && mousePos.y <= iconStartY + (soundOnTexture.height * iconScale) &&
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        // *Cek apakah tombol F ditekan untuk mengubah soundAssets*
+        if (IsKeyPressed(KEY_F))
         {
-            *isSoundOn = !(*isSoundOn);
+            *soundAssets = !(*soundAssets); // Toggle sound on/off
         }
+
+        // Tombol sound
+        Texture2D currentSoundTexture = *soundAssets ? soundOnTexture : soundOffTexture;
+        DrawTextureEx(currentSoundTexture, (Vector2){iconStartX, iconStartY}, 0.0f, 0.4f, WHITE);
+        DrawText("Press F to Off/On", iconStartX + textOffsetX, iconStartY + 15, 23, WHITE);
 
         // Tombol Restart
         DrawTextureEx(restartTexture, (Vector2){iconStartX, iconStartY + iconSpacing}, 0.0f, iconScale, WHITE);
@@ -121,6 +117,8 @@ void gamePaused()
     float iconScale = 0.5f;
     int textOffsetX = 80; // Jarak teks dari ikon
 
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
+    
     DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
     DrawText("Press Enter to start", 235, 530, 23, WHITE);
 }

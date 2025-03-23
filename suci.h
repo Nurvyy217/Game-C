@@ -15,7 +15,8 @@ typedef enum GameScreen
 {
     MENU,
     PLAY,
-    SETTINGS
+    SETTINGS,
+    EXIT
 } GameScreen;
 
 typedef enum MenuOption
@@ -35,9 +36,38 @@ typedef struct Assets
     Texture2D btnMenu;
     Texture2D btnExit;
     Music bgMusic;
+    Texture2D menuBackground;
+    Texture2D settingsBackground;
+    Texture2D btnOn;
+    Texture2D btnOff;
+    Texture2D btnBack;
+    bool isMusicOn;
 } Assets;
+
+// Struktur untuk menu pengaturan
+typedef struct {
+    int selectedOption;
+    float volume;
+    int screenWidth;
+    int screenHeight;
+    const char *options[3];
+} SettingsMenu;
 
 // Deklarasi fungsi
 void menuSuci();
+// Deklarasi fungsi
+void menuSuci();
+void InitAssets(Assets *assets);
+void UnloadAssetss(Assets *assets);
+void UpdateMenu(Assets *assets, GameScreen *currentScreen);
+void UpdatePlayScreen(GameScreen *currentScreen);
+void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets);
+
+
+
+void InitSettingsMenu(SettingsMenu *menu);
+void UpdateSettingsMenu(SettingsMenu *menu);
+void DrawSettingsMenu(SettingsMenu *menu);
+
 
 #endif

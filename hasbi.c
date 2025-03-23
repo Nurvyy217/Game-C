@@ -444,7 +444,7 @@ void CheckCollisions(GameState *S)
     {
         if (asteroids[i].active)
         {
-                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 25))
+                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
                 { // user menabrak asteroid
                     updateNyawa(S);
                     PlaySound(userPlaneExplosions);
@@ -859,6 +859,7 @@ void ResetPlayerBulet()
 
 Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
 Sound typing;
+Music gameplayMusic;
 // ASSETS
 void LoadAssets()
 {
@@ -880,6 +881,7 @@ void LoadAssets()
     enemyBulletLv3 = LoadTexture("assets/laserUfo.png");
     enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
     enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
+    gameplayMusic = LoadMusicStream("assets/gameplay.mp3");
 }
 // UNLOAD
 void UnloadAssets()
@@ -905,7 +907,7 @@ void UnloadAssets()
 // GAMEPLAY
 int previousLevel = 0;
 bool isLevelTransition=false;
-char currentText[10];    // Menyimpan teks level
+char currentText[12];    // Menyimpan teks level
 int letterIndex = 0;     // Indeks huruf yang sudah muncul
 float letterTimer = 0; 
 void DrawLevelTransition(float deltaTime)
@@ -928,6 +930,7 @@ void DrawLevelTransition(float deltaTime)
     // Tampilkan huruf satu per satu
     if (!removing && letterIndex < textLength && letterTimer > 0.2f)
     {
+        SetSoundVolume(typing,3.0f);
         PlaySound(typing);
         letterIndex++;
         letterTimer = 0.0f; // Reset timer
@@ -1118,7 +1121,7 @@ void DrawBossLevel()
 }
 void bossLevel(float deltaTime)
 {
-      
+    StopMusicStream(gameplayMusic);
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
@@ -1145,6 +1148,11 @@ void bossLevel(float deltaTime)
 
 void game()
 {
+    if (!IsMusicStreamPlaying(gameplayMusic)) {
+        PlayMusicStream(gameplayMusic);
+    }
+    SetMusicVolume(gameplayMusic, 1.0f);
+    UpdateMusicStream(gameplayMusic);
     if (playerInvincible > 0) {
         playerInvincible--;
     }
@@ -1152,6 +1160,7 @@ void game()
     float deltaTime = GetFrameTime();
     static float levelTimer = 0.0f;
     bool isGameOver = false; 
+
 
     if (InfoPlayer.nyawa <= 0)
     {
@@ -1163,7 +1172,7 @@ void game()
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 20)
         {
-            level = 6;
+            level = 1;
         }
         else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
         {
@@ -1196,7 +1205,13 @@ void game()
             ResetAsteroid();
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
-            snprintf(currentText, sizeof(currentText), "Level %d", level);
+            if (level<6){
+                snprintf(currentText, sizeof(currentText), "Level %d", level);
+            }else{
+                StopMusicStream(gameplayMusic);
+                snprintf(currentText, sizeof(currentText), "Final Level");
+            }
+            
             letterIndex = 0;
             letterTimer = 0;
             isLevelTransition = true;

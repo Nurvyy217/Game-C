@@ -8,78 +8,22 @@
 #include "raylib.h"
 #include <string.h>
 
-// LOADING SCREEN
-void DrawLayout();
-void loadingAnimation();
-void unloadTextures();
-// USER PLANE
-void InitPlayer();
-void UpdatePlayer();
-void DrawPlayer();
-// BULLETS
-void UpdateShooting(float deltaTime);
-void DrawBullets();
-void UpdateBullets();
-void ShootBullet();
-void InitBullets();
-// EXPLOSIONS
-void CreateExplosion(Vector2 position);
-void UpdateExplosions(float deltaTime);
-void DrawExplosions(Texture2D explosionTexture);
-// ASTEROIDS
-void InitAsteroids();
-void UpdateAsteroids();
-void CheckCollisions();
-void SpawnAsteroid();
-void AsteroidLoop();
-void DrawAsteroids();
-// ENEMY
-//  Deklarasi fungsi musuh
-void InitEnemies();
-void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S);
-void EnemyShoot();
-void UpdateEnemyBullets();
-void DrawEnemyBullets(Texture2D EnemyBulletTexture, float scale, GameState *S);
-void CheckEnemyCollisions();
-void CheckBossCollisions(GameState *S);
-// ASSSETS
-void LoadAssets();
-// GAMEPLAY
-void initGameState(GameState *S);
-// UNLOAD
-void UnloadAssets();
-
-Texture2D enemylvl1;
-Texture2D enemyBulletlv1;
-GameState gamestate;
+/********************************************************* LOADING ANIMATION ******************************************************************/
 bool gameStart = false;
+bool isLoadingDone = false;
 
-int level = 0;
-
-// LOADING SCREEN
 void DrawLayout()
 {
-    
     ClearBackground(BLACK);
-
-    // Gameplay area (3/4 of screen, left part)
-    // DrawRectangle(0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, DARKBLUE); //posX, posY, width, height, color
     Rectangle source = {0, 0, background.width, background.height}; // Seluruh gambar
     Rectangle dest = {0, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT};         // Area gameplay
     Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
 
     DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
-
-    // Menu area (1/4 of screen, right part)
-    // mainMenu(&gameStart);
-    // tampilNyawa();
-    // Tampil_Score();
     DrawStar();
     // Separator line
-    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, BLACK); // strat posX, start posY, end posX, end posY
+    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, WHITE); 
 }
-
-bool isLoadingDone = false;
 
 void loadingAnimation()
 {
@@ -153,7 +97,7 @@ void unloadTextures()
     }
 }
 
-// USER PLANE
+/********************************************************* USER PLANE ******************************************************************/
 Player player;
 Bullet bullets[MAX_BULLETS];
 Texture2D bulletTexture;
@@ -172,7 +116,15 @@ void UpdateShooting(float deltaTime)
     // Cek apakah SPACE ditekan + cooldown <= 0
     if (IsKeyDown(KEY_SPACE) && shootCooldown <= 0.0f)
     {
-        ShootBullet();                  // Fungsi menembak
+        if (!InfoPlayer.DoubleAttack)
+        {
+            ShootBullet(); // Fungsi menembak
+        }
+        else
+        {
+            powerupAttack();
+        }
+
         shootCooldown = SHOOT_INTERVAL; // Reset cooldown
     }
 }
@@ -185,14 +137,6 @@ void InitPlayer()
 
 void InitBullets()
 {
-    if (bulletTexture.id == 0)
-    {
-        printf("ERROR: bullet.png gagal dimuat!\n");
-    }
-    else
-    {
-        printf("bullet.png berhasil dimuat! Ukuran: %d x %d\n", bulletTexture.width, bulletTexture.height);
-    }
     for (int i = 0; i < MAX_BULLETS; i++)
     {
         bullets[i].active = false;
@@ -202,18 +146,18 @@ void InitBullets()
 void UpdatePlayer()
 {
     if ((IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) && player.position.x > -170)
-        player.position.x -= PLAYER_SPEED;
+        player.position.x -= PLAYER_SPEED + AddSpeed;
     if ((IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) && player.position.x < GAMEPLAY_WIDTH - (((player.texture.width * 0.6) / 2) + 50))
-        player.position.x += PLAYER_SPEED;
+        player.position.x += PLAYER_SPEED + AddSpeed;
     if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) && player.position.y > -125)
-        player.position.y -= PLAYER_SPEED;
+        player.position.y -= PLAYER_SPEED + AddSpeed;
     if ((IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) && player.position.y < SCREEN_HEIGHT - (((player.texture.height * 0.6) / 2) + 15))
-        player.position.y += PLAYER_SPEED;
+        player.position.y += PLAYER_SPEED + AddSpeed;
 }
 
 void ShootBullet()
 {
-    for (int i = 0; i < MAX_BULLETS; i++)
+    for (int i = 0; i < MAX_BULLETS - 5; i++)
     {
         if (!bullets[i].active)
         {
@@ -243,7 +187,6 @@ void DrawPlayer()
     float scale = 0.6f; // Skala 60% dari ukuran aslinya
     Color playerColor = (playerInvincible > 0) ? (Color){255, 255, 255, 100} : WHITE;
     DrawTextureEx(player.texture, player.position, 0.0f, scale, playerColor);
-    // DrawTexture(player.texture, player.position.x, player.position.y, WHITE);
 }
 
 void DrawBullets()
@@ -257,7 +200,9 @@ void DrawBullets()
     }
 }
 
-// SETTER GETTER
+/********************************************************* SETTER GETTER ******************************************************************/
+GameState gamestate;
+
 void setMaxEnemy(GameState *S, int value)
 {
     maxEnemy(S) = value;
@@ -324,7 +269,7 @@ int getEnemyDamage(GameState *S)
     return enemyDamage(S);
 }
 
-// EXPLOSIONS
+/********************************************************* EXPLOSIONS ******************************************************************/
 Explosion explosions[MAX_EXPLOSIONS];
 Texture2D explosionsTexture;
 Sound asteroidDestroyed, userPlaneExplosions;
@@ -335,8 +280,7 @@ void CreateExplosion(Vector2 position)
     {
         if (!explosions[i].active)
         {
-            explosions[i].position = position; // Menyesuaikan agar pusat
-            // explosions[i].position.y = position.y + 70;
+            explosions[i].position = position; 
             explosions[i].active = true;
             explosions[i].frame = 0;
             explosions[i].timer = 0;
@@ -373,12 +317,12 @@ void DrawExplosions(Texture2D explosionTexture)
         {
             Rectangle source = {explosions[i].frame * 64, 0, 64, 64}; // Misal sprite 64x64
             Rectangle dest = {explosions[i].position.x, explosions[i].position.y, 128, 128};
-            DrawTexturePro(explosionTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
+            DrawTexturePro(explosionsTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
         }
     }
 }
 
-// ASTEROIDS
+/********************************************************* ASTEROIDS ******************************************************************/
 Asteroid asteroids[MAX_ASTEROIDS];
 Texture2D asteroidTexture;
 Texture2D hitEffect1;
@@ -444,13 +388,21 @@ void CheckCollisions(GameState *S)
     {
         if (asteroids[i].active)
         {
+            if (playerInvincible <= 0)
+            {
+                // User menabrak asteroid
                 if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
-                { // user menabrak asteroid
+                { 
                     updateNyawa(S);
                     PlaySound(userPlaneExplosions);
-                    CreateExplosion(playerPosition);
+                    if (!InfoPlayer.shieldActive)
+                    {
+                        CreateExplosion(playerPosition);
+                    }
+
                     asteroids[i].active = false;
                     break;
+                }
             }
         }
     }
@@ -464,7 +416,7 @@ void SpawnAsteroid()
         {
             asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
             asteroids[i].size = GetRandomValue(1, 3);
-            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
+            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(5, 7)};
             asteroids[i].active = true;
             break;
         }
@@ -508,7 +460,7 @@ void DrawAsteroids()
     }
 }
 
-// ENEMY
+/********************************************************* ENEMIES ******************************************************************/
 Enemy enemies[MAX_ENEMIES];
 EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
 Sound nging, duar;
@@ -610,7 +562,7 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
     {
         if (!enemies[i].isActive || enemies[i].hasShot)
             continue; // Musuh mati tidak boleh menembak
-        if (getEnemyTypeShoot(S) == 0|| getEnemyTypeShoot(S) == 3)
+        if (getEnemyTypeShoot(S) == 0 || getEnemyTypeShoot(S) == 3)
         {
             for (int j = 0; j < getMaxEnemyBullet(S); j++)
             {
@@ -729,7 +681,9 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                         }
                     }
                 }
-            }else{
+            }
+            else
+            {
                 enemyBullets[i].position.x += enemyBullets[i].speed.x;
                 enemyBullets[i].position.y += enemyBullets[i].speed.y;
             }
@@ -787,39 +741,53 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     enemies[i].isActive = false;
                     enemies[i].hitEffectTimer = 0;
                     enemies[i].hitEffectFrame = 0;
-                    updateScore(); // Matikan musuh
+                    updateScore(2); // Matikan musuh
                     PlaySound(asteroidDestroyed);
                     CreateExplosion(enemiesPosition);
                     break; // Hindari multiple hits dalam satu frame
                 }
             }
         }
-
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
-        if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
+        if (playerInvincible <= 0)
         {
-            updateNyawa(S);
-            PlaySound(userPlaneExplosions);
-            CreateExplosion(playerPosition);
-            enemies[i].isActive = false; // Hancurkan musuh
-            break;
+            if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
+            {
+                updateScore(1);
+                updateNyawa(S);
+                PlaySound(userPlaneExplosions);
+                if (!InfoPlayer.shieldActive)
+                {
+                    CreateExplosion(playerPosition);
+                }
+                enemies[i].isActive = false; // Hancurkan musuh
+                break;
+            }
         }
 
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
         for (int k = 0; k < getMaxEnemyBullet(S); k++)
         {
-            if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+            if (playerInvincible <= 0)
             {
-                enemyBullets[k].isActive = false;
-                PlaySound(asteroidDestroyed);
-                CreateExplosion(playerPosition);
-                updateNyawa(S);
-                break;
+                if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+                {
+                    enemyBullets[k].isActive = false;
+                    PlaySound(asteroidDestroyed);
+                    if (!InfoPlayer.shieldActive)
+                    {
+                        CreateExplosion(playerPosition);
+                    }
+
+                    updateNyawa(S);
+                    break;
+                }
             }
         }
     }
 }
 
+/********************************************************* RESET ******************************************************************/
 void ResetEnemies()
 {
     for (int i = 0; i < MAX_ENEMIES; i++)
@@ -857,10 +825,10 @@ void ResetPlayerBulet()
     }
 }
 
-Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken;
+/********************************************************* LOAD AND UNLOAD ******************************************************************/
+Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken, enemylvl1, enemyBulletlv1;
 Sound typing;
 Music gameplayMusic;
-// ASSETS
 void LoadAssets()
 {
     initBG();
@@ -904,12 +872,13 @@ void UnloadAssets()
     UnloadTexture(enePurpleDamaged);
 }
 
-// GAMEPLAY
+/********************************************************* GAMEPLAY ******************************************************************/
+int level = 0;
 int previousLevel = 0;
-bool isLevelTransition=false;
-char currentText[12];    // Menyimpan teks level
-int letterIndex = 0;     // Indeks huruf yang sudah muncul
-float letterTimer = 0; 
+bool isLevelTransition = false;
+char currentText[12]; // Menyimpan teks level
+int letterIndex = 0;  // Indeks huruf yang sudah muncul
+float letterTimer = 0;
 void DrawLevelTransition(float deltaTime)
 {
     static float letterTimer = 0.0f;
@@ -930,7 +899,7 @@ void DrawLevelTransition(float deltaTime)
     // Tampilkan huruf satu per satu
     if (!removing && letterIndex < textLength && letterTimer > 0.2f)
     {
-        SetSoundVolume(typing,3.0f);
+        SetSoundVolume(typing, 3.0f);
         PlaySound(typing);
         letterIndex++;
         letterTimer = 0.0f; // Reset timer
@@ -949,14 +918,15 @@ void DrawLevelTransition(float deltaTime)
     if (strcmp(currentText, "The End") == 0) // Jika yang ditampilkan "The End"
     {
         StopMusicStream(gameplayMusic);
-    }else{
+    }
+    else
+    {
         if (removing && letterIndex > 0 && letterTimer > 0.2f)
         {
             PlaySound(typing);
             letterIndex--;
             letterTimer = 0.0f;
         }
-        
     }
 
     // Animasi menghilangkan teks satu per satu
@@ -970,10 +940,10 @@ void DrawLevelTransition(float deltaTime)
         isLevelTransition = false;
         removing = false;
     }
-    
 }
 
-void GameplayWithoutEnemies(float deltaTime){
+void GameplayWithoutEnemies(float deltaTime)
+{
     UpdatePlayer();
     DrawLayout();
     DrawPlayer();
@@ -993,11 +963,11 @@ void initGameState(GameState *S)
     maxEnemy(S) = 6;
     maxEnemyBullet(S) = 5;
     enemyBulletSpeed(S) = 3;
-    enemyTypeShoot(S)=0;
-    enemySpeed(S)=1;
-    enemyHealth(S)=3;
-    healthBroke(S)=2;
-    enemyDamage(S)=1;
+    enemyTypeShoot(S) = 0;
+    enemySpeed(S) = 1;
+    enemyHealth(S) = 3;
+    healthBroke(S) = 2;
+    enemyDamage(S) = 1;
 }
 
 void DrawLvl1()
@@ -1044,8 +1014,8 @@ void level3(GameState *S, float deltaTime)
     CheckCollisions(S);
     DrawLvl3();
     AsteroidLoop();
+    inipowerup();
 }
-
 
 void DrawLvl4()
 {
@@ -1070,13 +1040,12 @@ void level4(float deltaTime)
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    UpdateEnemies(enemyLvl5, -35, 125, 20, 30,&gamestate);
+    UpdateEnemies(enemyLvl5, -35, 125, 20, 30, &gamestate);
     UpdateEnemyBullets(enemyBulletlv1, &gamestate);
     CheckEnemyCollisions(60, 50, 40, 10, &gamestate);
     EnemiesLoop(enemyLvl5, -35, 125, 20, 30, &gamestate);
     DrawLvl4();
     inipowerup();
-    UpdateSpark();
 }
 
 void DrawLvl5()
@@ -1103,13 +1072,12 @@ void level5(float deltaTime)
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    UpdateEnemies(enemyLvl6, -90, 10, 150, -5,&gamestate);
+    UpdateEnemies(enemyLvl6, -90, 10, 150, -5, &gamestate);
     UpdateEnemyBullets(enemyBulletLv3, &gamestate);
     CheckEnemyCollisions(100, 140, 40, 10, &gamestate);
     EnemiesLoop(enemyLvl6, -90, 10, 150, -5, &gamestate);
     DrawLvl5();
     inipowerup();
-    UpdateSpark();
 }
 
 void DrawBossLevel()
@@ -1132,6 +1100,7 @@ void bossLevel(float deltaTime)
         isLevelTransition = true;
     }
     StopMusicStream(gameplayMusic);
+    InitialBoss();
     BossMov();
     ShootBossLaser();
     UpdateBossLaser();
@@ -1149,27 +1118,22 @@ void bossLevel(float deltaTime)
     UpdateBGM();
 }
 
-
-
-
-
-
-
 void game()
 {
-    if (!IsMusicStreamPlaying(gameplayMusic)) {
+    if (!IsMusicStreamPlaying(gameplayMusic))
+    {
         PlayMusicStream(gameplayMusic);
     }
     SetMusicVolume(gameplayMusic, 1.0f);
     UpdateMusicStream(gameplayMusic);
-    if (playerInvincible > 0) {
+    if (playerInvincible > 0)
+    {
         playerInvincible--;
     }
     initGameState(&gamestate);
     float deltaTime = GetFrameTime();
     static float levelTimer = 0.0f;
-    bool isGameOver = false; 
-
+    bool isGameOver = false;
 
     if (InfoPlayer.nyawa <= 0)
     {
@@ -1180,27 +1144,27 @@ void game()
     {
         UpdateStar();
         // Tentukan level berdasarkan skor
-        if (InfoPlayer.score < 20)
+        if (InfoPlayer.score < 150)
         {
-            level = 6;
+            level = 1;
         }
-        else if (InfoPlayer.score >= 20 && InfoPlayer.score < 40)
+        else if (InfoPlayer.score >= 150 && InfoPlayer.score < 250)
         {
             level = 2;
         }
-        else if (InfoPlayer.score >= 40 && InfoPlayer.score < 60)
+        else if (InfoPlayer.score >= 250 && InfoPlayer.score < 300)
         {
             level = 3;
         }
-        else if (InfoPlayer.score >= 60 && InfoPlayer.score < 80)
+        else if (InfoPlayer.score >= 300 && InfoPlayer.score < 400)
         {
             level = 4;
         }
-        else if (InfoPlayer.score >= 80 && InfoPlayer.score < 100)
+        else if (InfoPlayer.score >= 400 && InfoPlayer.score < 500)
         {
             level = 5;
         }
-        else if (InfoPlayer.score >= 100 && InfoPlayer.score < 120)
+        else if (InfoPlayer.score >= 500)
         {
             level = 6;
         }
@@ -1215,13 +1179,16 @@ void game()
             ResetAsteroid();
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
-            if (level<6){
+            if (level < 6)
+            {
                 snprintf(currentText, sizeof(currentText), "Level %d", level);
-            }else{
+            }
+            else
+            {
                 StopMusicStream(gameplayMusic);
                 snprintf(currentText, sizeof(currentText), "Final Level");
             }
-            
+
             letterIndex = 0;
             letterTimer = 0;
             isLevelTransition = true;
@@ -1231,7 +1198,9 @@ void game()
         if (isLevelTransition)
         {
             GameplayWithoutEnemies(deltaTime);
-        }else{
+        }
+        else
+        {
             switch (level)
             {
             case 1:
@@ -1242,12 +1211,12 @@ void game()
                 break;
             case 3:
                 level3(&gamestate, deltaTime); // Panggil asteroid
-                levelTimer += deltaTime; // Tambahkan waktu saat level 2
+                levelTimer += deltaTime;       // Tambahkan waktu saat level 2
 
                 // Jika sudah mencapai 20 detik, naik ke level 3
                 if (levelTimer >= 20.0f)
                 {
-                    InfoPlayer.score=60;
+                    InfoPlayer.score = 300;
                 }
                 break;
             case 4:
@@ -1268,6 +1237,3 @@ void game()
         gameover();
     }
 }
-
-
-

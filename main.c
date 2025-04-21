@@ -6,7 +6,8 @@
 #include "supriadi.h"
 #include "suci.h"
 
-int main(void) {
+int main(void)
+{
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
@@ -20,25 +21,28 @@ int main(void) {
     loadAssetMenu();
     infokanPlayer();
     infoPowerUp();
-    
-    while (!WindowShouldClose()) {
-        isLoadingDone=true;
-        if (!isLoadingDone) {
-            loadingAnimation();}  // Tampilkan loading lebih dulu
-        else {
-                menuSuci();
-            }
+
+    while (!WindowShouldClose())
+    {
+        if (!isLoadingDone)
+        {
+            loadingAnimation();
+        } // Tampilkan loading lebih dulu
+        else
+        {
+            menuSuci();
+        }
     }
+
+    FreeStars();
 
     CloseAudioDevice();
     UnloadAssets();
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();
-    unloadResources();
     CloseWindow();
     WindowShouldClose();
 
     return 0;
 }
-

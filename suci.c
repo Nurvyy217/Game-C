@@ -4,8 +4,10 @@
 #include "fawwaz.h"
 #include "supriadi.h"
 #include <stdio.h>
+#include <math.h>
 Texture2D logoDeveloper;
 Texture2D gameNamePhoto;
+
 Texture2D background;
 bool texturesLoaded = false; // Cek apakah gambar sudah di-load
 
@@ -24,25 +26,24 @@ void initBG()
     background = LoadTexture("assets/background.png");
 }
 
-// BARU
 Sound clickMenu, selectMenu;
 void InitAssets(Assets *assets)
 {
-    // Muat background yang sudah ada UFO dan teks "space invaders"
     assets->bg = LoadTexture("assets/bgDisplayUtama.png");
 
-    // (Jika memang tidak dipakai lagi, boleh dihapus)
-    // assets->title = LoadTexture("title.png");
-
-    // Muat tombol
     assets->btnPlay = LoadTexture("assets/btnPlay.png");
     assets->btnMenu = LoadTexture("assets/btnMenu.png");
     assets->btnExit = LoadTexture("assets/btnExit.png");
     clickMenu = LoadSound("assets/clickMenu.wav");
     selectMenu = LoadSound("assets/selectMenu.wav");
 
-    // Muat musik
+    assets->menuBackground = LoadTexture("assets/bgMenuScreen.png");
+    assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png");
+    assets->btnOn = LoadTexture("assets/btnOn.png");
+    assets->btnOff = LoadTexture("assets/btnOff.png");
+    assets->btnBack = LoadTexture("assets/btnBack.png");
     assets->bgMusic = LoadMusicStream("assets/background_music.mp3");
+
     PlayMusicStream(assets->bgMusic);
     SetMusicVolume(assets->bgMusic, 0.5f);
 }
@@ -50,11 +51,17 @@ void InitAssets(Assets *assets)
 void UnloadAssetss(Assets *assets)
 {
     UnloadTexture(assets->bg);
-    // UnloadTexture(assets->title); // Jika tidak lagi dipakai
 
     UnloadTexture(assets->btnPlay);
     UnloadTexture(assets->btnMenu);
     UnloadTexture(assets->btnExit);
+
+    UnloadTexture(assets->btnOn);
+    UnloadTexture(assets->btnOff);
+    UnloadTexture(assets->btnBack);
+
+    UnloadTexture(assets->menuBackground);
+    UnloadTexture(assets->settingsBackground);
 
     UnloadMusicStream(assets->bgMusic);
     CloseAudioDevice();
@@ -93,14 +100,11 @@ void UpdateMenu(Assets *assets, GameScreen *currentScreen)
         }
     }
 
-    // --- Gambar ---
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // Gambar background
     DrawTexture(assets->bg, 0, 0, WHITE);
 
-    // --- Pengaturan Tombol ---
     float scaleBtn = 2.0f;
     int scaledWidth = (int)(assets->btnPlay.width * scaleBtn);
     int scaledHeight = (int)(assets->btnPlay.height * scaleBtn);
@@ -109,7 +113,6 @@ void UpdateMenu(Assets *assets, GameScreen *currentScreen)
     int buttonX = SCREEN_WIDTH / 2 - scaledWidth / 2;
     int buttonY = 550; // Posisi awal tombol PLAY
 
-    // Tombol PLAY
     if (assets->btnPlay.id > 0)
     {
         Color tintPlay = (menuIndex == MENU_PLAY) ? PURPLE : WHITE;
@@ -152,15 +155,91 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     }
     EndDrawing();
 }
-
-void UpdateSettingsScreen(GameScreen *currentScreen)
+void InitSettingsMenu(SettingsMenu *menu)
 {
+    menu->selectedOption = 0;
+    menu->volume = 1.0f;
+    menu->screenWidth = SCREEN_WIDTH;
+    menu->screenHeight = SCREEN_HEIGHT;
+    menu->options[0] = "On";
+    menu->options[1] = "Off";
+    menu->options[2] = "Back";
+}
+
+// Menangani input di menu settings
+void UpdateSettingsMenu(SettingsMenu *menu)
+{
+    if (IsKeyPressed(KEY_DOWN))
+        menu->selectedOption = (menu->selectedOption + 1) % 3;
+    if (IsKeyPressed(KEY_UP))
+        menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
+    if (menu->selectedOption == 0)
+    {
+        if (IsKeyPressed(KEY_LEFT))
+            menu->volume = fmax(menu->volume - 0.1f, 0.0f);
+        if (IsKeyPressed(KEY_RIGHT))
+            menu->volume = fmin(menu->volume + 0.1f, 1.0f);
+    }
+    if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER))
+    {
+        menu->selectedOption = 0;
+    }
+}
+
+void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets)
+{
+    // Navigasi dengan tombol panah
+    if (IsKeyPressed(KEY_DOWN))
+    {
+        PlaySound(selectMenu);
+        menu->selectedOption = (menu->selectedOption + 1) % 3;
+    }
+    if (IsKeyPressed(KEY_UP))
+    {
+        PlaySound(selectMenu);
+        menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
+    }
+
+    // Pilihan menu
+    if (IsKeyPressed(KEY_ENTER))
+    {
+        PlaySound(clickMenu);
+        if (menu->selectedOption == 0)
+        {
+            assets->isMusicOn = true;
+            PlayMusicStream(assets->bgMusic);
+        }
+        else if (menu->selectedOption == 1)
+        {
+            assets->isMusicOn = false;
+            StopMusicStream(assets->bgMusic);
+        }
+        else if (menu->selectedOption == 2)
+        {
+            *currentScreen = MENU;
+        }
+    }
+
+    // Gambar tampilan pengaturan
     BeginDrawing();
-    ClearBackground(BLUE);
-    DrawText("Pengaturan", SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2, 20, RAYWHITE);
-    DrawText("Tekan ESC untuk kembali", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 30, 20, RAYWHITE);
-    if (IsKeyPressed(KEY_ESCAPE))
-        *currentScreen = MENU;
+    ClearBackground(RAYWHITE);
+    DrawTexture(assets->settingsBackground, 0, 0, WHITE);
+
+    Color onColor = (menu->selectedOption == 0) ? BLUE : WHITE;
+    Color offColor = (menu->selectedOption == 1) ? BLUE : WHITE;
+    Color backColor = (menu->selectedOption == 2) ? BLUE : WHITE;
+    int centerX = (SCREEN_WIDTH / 2) - ((assets->btnOn.width * 1.5) / 2);
+
+    // Posisi tombol ON dan OFF sejajar
+    int btnSpacing = 20; // Jarak antara ON dan OFF
+    int btnOnX = (SCREEN_WIDTH / 2) - (assets->btnOn.width * 1.5) - (btnSpacing / 2);
+    int btnOffX = (SCREEN_WIDTH / 2) + (btnSpacing / 2);
+
+    DrawTextureEx(assets->btnOn, (Vector2){btnOnX, 180}, 0.0f, 1.5f, onColor);
+    DrawTextureEx(assets->btnOff, (Vector2){btnOffX, 180}, 0.0f, 1.5f, offColor);
+
+    DrawTextureEx(assets->btnBack, (Vector2){centerX, 240}, 0.0f, 1.5f, backColor);
+
     EndDrawing();
 }
 
@@ -168,6 +247,9 @@ void menuSuci()
 {
     Assets assets;
     InitAssets(&assets);
+
+    SettingsMenu settingsMenu;
+    InitSettingsMenu(&settingsMenu);
 
     GameScreen currentScreen = MENU;
     bool isRunning = true;
@@ -183,16 +265,17 @@ void menuSuci()
         }
         else if (currentScreen == PLAY)
         {
-
             UpdatePlayScreen(&currentScreen);
         }
         else if (currentScreen == SETTINGS)
         {
-            UpdateSettingsScreen(&currentScreen);
+            UpdateSettingsScreen(&currentScreen, &settingsMenu, &assets);
         }
-        else
+        if (currentScreen == EXIT)
         {
-            isRunning = false; // Keluar dari game
+            isRunning = false;
         }
     }
+
+    UnloadAssetss(&assets);
 }

@@ -13,14 +13,14 @@
 //USER PLANE AND BULLET
 #define PLAYER_SPEED 4
 #define BULLET_SPEED 7
-#define MAX_BULLETS 5
+#define MAX_BULLETS 10
 //ASTEROIDS
-#define MAX_ASTEROIDS 8
+#define MAX_ASTEROIDS 10
 //EXPLOSION
 #define MAX_EXPLOSIONS 50
 extern Sound asteroidDestroyed;
 //ENEMY
-#define SPEED_ENEMY_BULLETS 3
+#define SPEED_ENEMY_BULLETS 4
 #define MAX_ENEMIES 10
 #define MAX_ENEMY_BULLETS 20
 // SETTER GETTER
@@ -35,16 +35,19 @@ extern Sound asteroidDestroyed;
 
 
 /***************************************** STRUCT ************************************************/
+
 // USER PLANE
 typedef struct {
     Vector2 position;
     Texture2D texture;
 } Player;
+
 // USER BULLET
 typedef struct {
     Vector2 position;
     bool active;
 } Bullet;
+
 // ASTEROID
 typedef struct {
     Texture2D texture;
@@ -55,6 +58,7 @@ typedef struct {
     int hitEffectFrame; // 0 atau 1, untuk efek tembakan
     float hitEffectTimer; // Timer untuk durasi efek
 } Asteroid;
+
 // EXPLOSIONS EFFECT
 typedef struct Explosion {
     Vector2 position;
@@ -62,6 +66,7 @@ typedef struct Explosion {
     int frame;   // Frame animasi ledakan
     float timer; // Untuk mengatur kecepatan animasi
 } Explosion;
+
 // ENEMY
 typedef struct {
     Vector2 position;
@@ -73,6 +78,7 @@ typedef struct {
     int hitEffectFrame; // 0 atau 1, untuk efek tembakan
     float hitEffectTimer; // Timer untuk durasi efek
 } Enemy;
+
 // ENEMY BULLET
 typedef struct {
     Vector2 position;
@@ -94,8 +100,10 @@ typedef struct {
 }GameState;
 
 /***************************************** EXTERN **********************************************/
+
 // EXTERN
 extern Bullet bullets[MAX_BULLETS];
+extern Sound shootSound;
 extern Player player;
 extern GameState *state;
 extern GameState gamestate;
@@ -105,12 +113,14 @@ extern int playerHealth;
 extern Texture2D explosionsTexture;
 extern Texture2D hitEffect1, hitEffect2;
 extern Explosion explosions[MAX_EXPLOSIONS];
+extern Music gameoverMusic;
 
 /***************************************** MODUL MODUL ****************************************/
+
 // LAYOUT
-void unloadTextures();
 void loadingAnimation();
 void DrawLayout();
+
 // USER PLANE
 void DrawPlayer();
 void DrawBullets();
@@ -120,29 +130,48 @@ void InitBullets();
 void UpdatePlayer();
 void ShootBullet();
 void UpdateBullets();
-void UnloadAssets();
-void level1(float deltaTime);
+
 // ASTEROID
-void InitAsteroids();
-void CheckCollisions();
+void DrawAsteroids();
 void AsteroidLoop();
-void callAsteroid(GameState *S);
+void SpawnAsteroid();
+void CheckCollisions(GameState *S);
+void UpdateAsteroids();
+void InitAsteroids();
+
 // EXPLOSIONS
 void DrawExplosions(Texture2D explosionsTexture);
 void UpdateExplosions(float deltaTime);
-void LoadAssets();
 void CreateExplosion(Vector2 position);
+
 // ENEMY
-void initGameState(GameState *S);
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S);
+void SpawnEnemies(GameState *S);
 void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S);
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S);
 void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void DrawEnemies(Texture2D EnemyImage, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S);
+void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S);
+
 // GAME
 void game();
+void DrawLevelTransition(float deltaTime);
+void GameplayWithoutEnemies(float deltaTime);
+void callAsteroid(GameState *S);
+void DrawLvl1();
+void level1(float deltaTime);
+void DrawLvl3();
+void level3(GameState *S, float deltaTime);
+void DrawLvl4();
+void level4(float deltaTime);
+void DrawLvl5();
+void level5(float deltaTime);
+void DrawBossLevel();
+void bossLevel(float deltaTime);
+
 // SETTER 
+void initGameState(GameState *S);
 void setMaxEnemy(GameState *S, int value);
 void setMaxEnemyBullet(GameState *S, int value);
 void setEnemyBulletSpeed(GameState *S, int value);
@@ -151,12 +180,25 @@ void setEnemySpeed(GameState *S, int value);
 void setEnemyHealth(GameState *S, int value);
 void setHealthBroke(GameState *S, int value);
 void setEnemyDamage(GameState *S, int value);
+
 //GETTER
+int getMaxEnemy(GameState *S);
+int getMaxEnemyBullet(GameState *S);
+int getEnemyTypeShoot(GameState *S);
+int getEnemySpeed(GameState *S);
+int getEnemyHealth(GameState *S);
+int getHealthBroke(GameState *S);
 int getEnemyDamage(GameState *S);
 
+//RESET
 void ResetPlayerBulet();
 void ResetExplosions();
 void ResetEnemyBullets();
 void ResetEnemies();
 void ResetAsteroid();
+
+//LOAD & UNLOAD
+void LoadAssets();
+void unloadTextures();
+void UnloadAssets();
 #endif

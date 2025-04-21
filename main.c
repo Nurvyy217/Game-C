@@ -34,6 +34,8 @@ int main(void)
         }
     }
 
+    FreeStars();
+
     CloseAudioDevice();
     UnloadAssets();
     // UnloadPlayer();

@@ -4,7 +4,7 @@
 #define BOSS_SPEED 2
 #define BOSS_MAX_BULLETS 10
 #define BOSS_BULLET_SPEED 8
-#define MAX_STARS 100
+#define MAX_STARS 400
 
 // Bosses
 typedef struct
@@ -29,6 +29,13 @@ typedef struct
     float speed;
     int size;
 } Star;
+
+typedef struct StarNode {
+    Star data;
+    struct StarNode* next;
+} StarNode;
+
+extern StarNode* starHead;
 
 typedef struct
 {
@@ -64,3 +71,4 @@ void InitBGM();
 void UpdateBGM();
 void UnloadBGM();
 void InitialBoss();
+void FreeStars();

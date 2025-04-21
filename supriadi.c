@@ -157,6 +157,7 @@ void tampilPowerUp()
     {
         DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.15f, WHITE);
     }
+    GetTime();
 }
 
 void checkPowerUpCollision()
@@ -173,7 +174,6 @@ void checkPowerUpCollision()
 
         switch (powerup.type)
         {
-
         case POWERUP_LIFE:
             InfoPlayer.AddNyawa = true;
             updateNyawa(S);

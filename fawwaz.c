@@ -13,6 +13,7 @@ float timerExp = 0;
 float timerExp2 = 0;
 float flashTimer = 0.0f;
 bool isFlashing = false;
+StarNode* starHead = NULL;
 
 void InitBosses()
 {
@@ -62,38 +63,93 @@ void InitialBoss()
     }
 }
 
+// void InitStar()
+// {
+//     for (int i = 0; i < MAX_STARS; i++)
+//     {
+//         stars[i].position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
+//         stars[i].speed = GetRandomValue(50, 200) / 100.0f;
+//         stars[i].size = GetRandomValue(0.1, 2.2);
+//     }
+// }
+
 void InitStar()
 {
+    StarNode* current;
     for (int i = 0; i < MAX_STARS; i++)
     {
-        stars[i].position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
-        stars[i].speed = GetRandomValue(50, 200) / 100.0f;
-        stars[i].size = GetRandomValue(0.1, 2.2);
-    }
-}
+        StarNode* newStar = (StarNode*)malloc(sizeof(StarNode));
+        newStar->data.position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
+        newStar->data.speed = GetRandomValue(50, 200) / 100.0f;
+        newStar->data.size = GetRandomValue(1, 22) / 10.0f; // Karena GetRandomValue tidak support float
+        newStar->next = NULL;
 
-void UpdateStar()
-{
-    for (int i = 0; i < MAX_STARS; i++)
-    {
-        stars[i].position.y += stars[i].speed;
-        if (stars[i].position.y > 960)
+        if (starHead == NULL)
         {
-            stars[i].position.y = 0;
-            stars[i].position.x = GetRandomValue(0, 720);
-            stars[i].size = GetRandomValue(0.1, 2.2);
+            starHead = newStar;
+            current = starHead;
+        }
+        else
+        {
+            current->next = newStar;
+            current = newStar;
         }
     }
 }
 
-void DrawStar()
-{
 
-    for (int i = 0; i < MAX_STARS; i++)
+// void UpdateStar()
+// {
+//     for (int i = 0; i < MAX_STARS; i++)
+//     {
+//         stars[i].position.y += stars[i].speed;
+//         if (stars[i].position.y > 960)
+//         {
+//             stars[i].position.y = 0;
+//             stars[i].position.x = GetRandomValue(0, 720);
+//             stars[i].size = GetRandomValue(0.1, 2.2);
+//         }
+//     }
+// }
+
+void UpdateStar()
+{
+    StarNode* current = starHead;
+    while (current != NULL)
     {
-        DrawCircleV(stars[i].position, stars[i].size, WHITE);
+        current->data.position.y += current->data.speed;
+        if (current->data.position.y > 960)
+        {
+            current->data.position.y = 0;
+            current->data.position.x = GetRandomValue(0, 720);
+            current->data.size = GetRandomValue(1, 22) / 10.0f;
+        }
+        current = current->next;
     }
 }
+
+
+// void DrawStar()
+// {
+
+//     for (int i = 0; i < MAX_STARS; i++)
+//     {
+//         DrawCircleV(stars[i].position, stars[i].size, WHITE);
+//     }
+// }
+
+
+
+void DrawStar()
+{
+    StarNode* current = starHead;
+    while (current != NULL)
+    {
+        DrawCircleV(current->data.position, current->data.size, WHITE);
+        current = current->next;
+    }
+}
+
 
 void DrawBosses()
 {
@@ -422,3 +478,16 @@ void UnloadBGM()
 {
     UnloadMusicStream(bossbgm);
 }
+
+void FreeStars()
+{
+    StarNode* current = starHead;
+    while (current != NULL)
+    {
+        StarNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    starHead = NULL;
+}
+

@@ -37,6 +37,19 @@ typedef struct StarNode {
 
 extern StarNode* starHead;
 
+typedef struct EnemyBulletNode* PNodeEB;
+
+typedef EnemyBullet infotype;
+
+typedef struct EnemyBulletNode {
+    infotype Eb;
+    PNodeEB next;
+} EnemyBulletNode;
+
+typedef struct EnemyBulletHead {
+    PNodeEB head;
+} EBHead;
+
 typedef struct
 {
     Vector2 position;

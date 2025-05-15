@@ -88,6 +88,17 @@ typedef struct {
     bool hasPlayedSound;
     bool hasPlayedDuar;
 } EnemyBullet;
+
+typedef struct EnemyBulletNode* PNodeEB;
+
+extern PNodeEB ebHead;
+
+typedef EnemyBullet infotype;
+
+typedef struct EnemyBulletNode {
+    infotype Eb;
+    PNodeEB next;
+} EnemyBulletNode;
 typedef struct {
     int maxEnemy;
     int enemyBulletSpeed;
@@ -145,6 +156,7 @@ void UpdateExplosions(float deltaTime);
 void CreateExplosion(Vector2 position);
 
 // ENEMY
+void InitEnemyBullets();
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S);
 void SpawnEnemies(GameState *S);
@@ -201,4 +213,8 @@ void ResetAsteroid();
 void LoadAssets();
 void unloadTextures();
 void UnloadAssets();
+
+// FREE 
+void FreeEnemyBullets();
+
 #endif

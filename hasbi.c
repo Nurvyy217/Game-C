@@ -672,7 +672,7 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
 
     for (int i = 0; i < getMaxEnemyBullet(S); i++)
     {
-        if (!current->Eb.isActive)
+        if (current->Eb.isActive == false)
         {
             if (getEnemyTypeShoot(S) == 3)
             {
@@ -736,6 +736,7 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                 current->Eb.shooterIndex = -1;
             }
         }
+        current = current->next;
     }
 }
 
@@ -748,12 +749,15 @@ void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
         {
             DrawTextureEx(enemyBulletTexture, current->Eb.position, 0.0f, scale, WHITE);
         }
+        current = current->next; // Pindah ke peluru musuh berikutnya
     }
 }
 
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+
+    PNodeEB current = ebHead;
 
     for (int i = 0; i < getMaxEnemy(S); i++)
     {
@@ -801,13 +805,14 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         }
 
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
-        for (int k = 0; k < getMaxEnemyBullet(S); k++)
+        current = ebHead;
+        while (current != NULL)
         {
             if (playerInvincible <= 0)
             {
-                if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+                if (current->Eb.isActive && CheckCollisionCircles(current->Eb.position, 5, playerPosition, 45))
                 {
-                    enemyBullets[k].isActive = false;
+                    current->Eb.isActive = false;
                     PlaySound(asteroidDestroyed);
                     if (!InfoPlayer.shieldActive)
                     {
@@ -818,6 +823,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     break;
                 }
             }
+            current = current->next; // Pindah ke peluru musuh berikutnya
         }
     }
 }
@@ -840,9 +846,14 @@ void ResetAsteroid()
 
 void ResetEnemyBullets()
 {
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    PNodeEB current = ebHead;
+    while (current != NULL)
     {
-        enemyBullets[i].isActive = false;
+        current->Eb.isActive = false;
+        current->Eb.hasPlayedSound = false;
+        current->Eb.hasPlayedDuar = false;
+        current->Eb.shooterIndex = -1;
+        current = current->next;
     }
 }
 void ResetExplosions()

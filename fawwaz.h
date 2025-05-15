@@ -5,6 +5,7 @@
 #define BOSS_MAX_BULLETS 10
 #define BOSS_BULLET_SPEED 8
 #define MAX_STARS 400
+#define MAX_ENEMY_BULLETS 20
 
 // Bosses
 typedef struct
@@ -39,6 +40,8 @@ extern StarNode* starHead;
 
 typedef struct EnemyBulletNode* PNodeEB;
 
+extern PNodeEB ebHead;
+
 typedef EnemyBullet infotype;
 
 typedef struct EnemyBulletNode {
@@ -46,9 +49,6 @@ typedef struct EnemyBulletNode {
     PNodeEB next;
 } EnemyBulletNode;
 
-typedef struct EnemyBulletHead {
-    PNodeEB head;
-} EBHead;
 
 typedef struct
 {
@@ -85,3 +85,6 @@ void UpdateBGM();
 void UnloadBGM();
 void InitialBoss();
 void FreeStars();
+
+void InitEnemyBullets();
+void FreeEnemyBullets();

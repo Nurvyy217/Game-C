@@ -491,3 +491,15 @@ void FreeStars()
     starHead = NULL;
 }
 
+void FreeEnemyBullets()
+{
+    PNodeEB current = ebHead;
+    while (current != NULL)
+    {
+        PNodeEB temp = current;
+        current = current->next;
+        free(temp);
+    }
+    ebHead = NULL;
+}
+

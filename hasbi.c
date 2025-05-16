@@ -442,7 +442,7 @@ void DrawAsteroids(GameState *S) {
 
 /********************************************************* ENEMIES ******************************************************************/
 Enemy enemies[MAX_ENEMIES];
-EnemyBullet enemyBullets[MAX_ENEMY_BULLETS];
+PNodeEB ebHead = NULL;
 Sound nging, duar;
 
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
@@ -536,92 +536,128 @@ void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, in
     }
 }
 
+void InitEnemyBullets()
+{
+    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    {
+       PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
+        newBullet->Eb.isActive = false;
+        newBullet->Eb.hasPlayedSound = false;
+        newBullet->Eb.shooterIndex = -1; // Inisialisasi index penembak
+        newBullet->next = NULL;
+
+        if (ebHead == NULL)
+        {
+            ebHead = newBullet;
+        }
+        else
+        {
+            PNodeEB current = ebHead;
+            while (current->next != NULL)
+            {
+                current = current->next;
+            }
+            current->next = newBullet;
+        } 
+    }
+}
+
 void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S)
 {
+    PNodeEB current = ebHead;
     for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (!enemies[i].isActive || enemies[i].hasShot)
-            continue; // Musuh mati tidak boleh menembak
+        continue; // Musuh mati tidak boleh menembak
         if (getEnemyTypeShoot(S) == 0 || getEnemyTypeShoot(S) == 3)
         {
+            current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S); j++)
             {
-                if (!enemyBullets[j].isActive)
+                // Create Node 
+                if (current->Eb.isActive == false)
                 {
-                    enemyBullets[j].position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width,
+                    current->Eb.position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width,
                                                          (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
-                    enemyBullets[j].isActive = true;
-                    enemyBullets[j].shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
+                    current->Eb.isActive = true;
+                    current->Eb.shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
                     if (GetRandomValue(0, 1) == 0)
                     {
-                        enemyBullets[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS}; // Vertikal (ke bawah)
+                        current->Eb.speed = (Vector2){0, SPEED_ENEMY_BULLETS}; // Vertikal (ke bawah)
                     }
                     else
                     {
                         int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1;                       // Bisa kiri atau kanan
-                        enemyBullets[j].speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
+                        current->Eb.speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
                     }
                     enemies[i].hasShot = true;
                     break;
                 }
+                current = current->next; 
             }
         }
         else if (getEnemyTypeShoot(S) == 1)
-        {
+        {   
             int bulletsSpawned = 0;
+            current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 4; j++)
             {
-                if (!enemyBullets[j].isActive)
+                if (current->Eb.isActive == false)
                 {
                     float offsetX = (bulletsSpawned % 2 == 0) ? -10 : 10; // Geser kiri & kanan
                     float offsetY = (bulletsSpawned < 2) ? 0 : -35;       // Peluru belakang lebih mundur sedikit
-                    enemyBullets[j].position = (Vector2){
+                    current->Eb.position = (Vector2){
                         (enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
                         (enemies[i].position.y + EnemyTexture.width + yPositionBullet + offsetY)};
-                    enemyBullets[j].isActive = true;
-                    enemyBullets[j].shooterIndex = i;
-                    enemyBullets[j].speed = (Vector2){0, SPEED_ENEMY_BULLETS + 5}; // Lurus ke bawah
+                    current->Eb.isActive = true;
+                    current->Eb.shooterIndex = i;
+                    current->Eb.speed = (Vector2){0, SPEED_ENEMY_BULLETS + 5}; // Lurus ke bawah
                     bulletsSpawned++;
                 }
+                current = current->next;
             }
             enemies[i].hasShot = true;
         }
         else if (getEnemyTypeShoot(S) == 2)
         {
             int bulletsSpawned = 0;
+            current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 3; j++)
             {
-                if (!enemyBullets[j].isActive)
+                if (current->Eb.isActive == false)
                 {
                     float offsetX = (bulletsSpawned == 0) ? -15 : (bulletsSpawned == 1) ? 0
                                                                                         : 15;
                     float speedX = (bulletsSpawned == 0) ? -2.0f : (bulletsSpawned == 1) ? 0
                                                                                          : 2.0f;
-                    enemyBullets[j].position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
+                    current->Eb.position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
                                                          (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
-                    enemyBullets[j].isActive = true;
-                    enemyBullets[j].shooterIndex = i;
-                    enemyBullets[j].speed = (Vector2){speedX, 4}; // Kiri, tengah, kanan
+                    current->Eb.isActive = true;
+                    current->Eb.shooterIndex = i;
+                    current->Eb.speed = (Vector2){speedX, 4}; // Kiri, tengah, kanan
                     bulletsSpawned++;
                 }
+                current = current->next;
             }
             enemies[i].hasShot = true;
         }
     }
 }
 
+
 void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
 {
     int n = getMaxEnemyBullet(S);
     static float delayTimer[MAX_ENEMY_BULLETS] = {0};
+    PNodeEB current = ebHead;
 
     for (int i = 0; i < getMaxEnemyBullet(S); i++)
     {
-        if (enemyBullets[i].isActive)
+        if (current->Eb.isActive == true)
         {
             if (getEnemyTypeShoot(S) == 3)
             {
-                int shooterIdx = enemyBullets[i].shooterIndex; // Ambil index musuh yang menembak
+                int shooterIdx = current->Eb.shooterIndex; // Ambil index musuh yang menembak
 
                 if (shooterIdx >= 0 && shooterIdx < getMaxEnemy(S))
                 {
@@ -630,75 +666,92 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                     if (delayTimer[i] < 2.0f)
                     {
                         // Selama 2 detik pertama, peluru mengikuti musuh
-                        enemyBullets[i].position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
-                        enemyBullets[i].position.y = shooterPos.y + enemyBulletTexture.height + 185;
+                        current->Eb.position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
+                        current->Eb.position.y = shooterPos.y + enemyBulletTexture.height + 185;
 
                         delayTimer[i] += GetFrameTime();
 
-                        if (delayTimer[i] < 2.0f && !enemyBullets[i].hasPlayedSound)
+                        if (delayTimer[i] < 2.0f && current->Eb.hasPlayedSound == false)
                         {
                             SetSoundVolume(nging, 3.0f);
                             PlaySound(nging);                      // Suara "nging"
-                            enemyBullets[i].hasPlayedSound = true; // Tandai agar tidak diulang
+                            current->Eb.hasPlayedSound = true; // Tandai agar tidak diulang
                         }
                     }
 
                     // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
                     if (delayTimer[i] >= 2.0f)
                     {
-                        if (!enemyBullets[i].hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
+                        if (!current->Eb.hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
                         {
                             PlaySound(duar);
-                            enemyBullets[i].hasPlayedDuar = true; // Tandai sudah dimainkan
+                            current->Eb.hasPlayedDuar == true; // Tandai sudah dimainkan
                         }
-                        enemyBullets[i].speed.y = SPEED_ENEMY_BULLETS * 10.0f;
-                        enemyBullets[i].position.y += enemyBullets[i].speed.y;
+                        current->Eb.speed.y = SPEED_ENEMY_BULLETS * 10.0f;
+                        current->Eb.position.y += current->Eb.speed.y;
 
-                        if (enemyBullets[i].position.y > 960)
+                        if (current->Eb.position.y > 960)
                         {
                             delayTimer[i] = 0;
-                            enemyBullets[i].hasPlayedSound = false; // Reset untuk peluru berikutnya
+                            current->Eb.hasPlayedSound = false; // Reset untuk peluru berikutnya
                         }
                     }
                 }
             }
             else
             {
-                enemyBullets[i].position.x += enemyBullets[i].speed.x;
-                enemyBullets[i].position.y += enemyBullets[i].speed.y;
+                current->Eb.position.x += current->Eb.speed.x;
+                current->Eb.position.y += current->Eb.speed.y;
             }
-            if (enemyBullets[i].position.x <= -15 || enemyBullets[i].position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
+            if (current->Eb.position.x <= -15 || current->Eb.position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
             {
-                enemyBullets[i].speed.x *= -1;
+                current->Eb.speed.x *= -1;
             }
 
-            if (enemyBullets[i].position.y > 960)
+            if (current->Eb.position.y > 960)
             {
-                enemyBullets[i].isActive = false;
-                enemyBullets[i].hasPlayedSound = false;
-                enemyBullets[i].hasPlayedDuar = false;
+                current->Eb.isActive = false;
+                current->Eb.hasPlayedSound = false;
+                current->Eb.hasPlayedDuar = false;
                 delayTimer[i] = 0;
-                enemyBullets[i].shooterIndex = -1;
+                current->Eb.shooterIndex = -1;
             }
         }
+        current = current->next;
     }
 }
 
 void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
 {
-
+    PNodeEB current = ebHead;
     for (int i = 0; i < getMaxEnemyBullet(S); i++)
     {
-        if (enemyBullets[i].isActive)
+        if (current->Eb.isActive)
         {
-            DrawTextureEx(enemyBulletTexture, enemyBullets[i].position, 0.0f, scale, WHITE);
+            DrawTextureEx(enemyBulletTexture, current->Eb.position, 0.0f, scale, WHITE);
         }
+        current = current->next; // Pindah ke peluru musuh berikutnya
     }
 }
+
+void FreeEnemyBullets()
+{
+    PNodeEB current = ebHead;
+    while (current != NULL)
+    {
+        PNodeEB temp = current;
+        current = current->next;
+        free(temp);
+    }
+    ebHead = NULL;
+}
+
 
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+
+    PNodeEB current = ebHead;
 
     for (int i = 0; i < getMaxEnemy(S); i++)
     {
@@ -746,13 +799,14 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         }
 
         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
-        for (int k = 0; k < getMaxEnemyBullet(S); k++)
+        current = ebHead;
+        while (current != NULL)
         {
             if (playerInvincible <= 0)
             {
-                if (enemyBullets[k].isActive && CheckCollisionCircles(enemyBullets[k].position, 5, playerPosition, 45))
+                if (current->Eb.isActive && CheckCollisionCircles(current->Eb.position, 5, playerPosition, 45))
                 {
-                    enemyBullets[k].isActive = false;
+                    current->Eb.isActive = false;
                     PlaySound(asteroidDestroyed);
                     if (!InfoPlayer.shieldActive)
                     {
@@ -763,9 +817,11 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     break;
                 }
             }
+            current = current->next; // Pindah ke peluru musuh berikutnya
         }
     }
 }
+
 
 /********************************************************* RESET ******************************************************************/
 void ResetEnemies()
@@ -789,9 +845,14 @@ void ResetAsteroid(GameState *S)
 
 void ResetEnemyBullets()
 {
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    PNodeEB current = ebHead;
+    while (current != NULL)
     {
-        enemyBullets[i].isActive = false;
+        current->Eb.isActive = false;
+        current->Eb.hasPlayedSound = false;
+        current->Eb.hasPlayedDuar = false;
+        current->Eb.shooterIndex = -1;
+        current = current->next;
     }
 }
 void ResetExplosions()

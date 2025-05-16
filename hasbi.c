@@ -22,7 +22,7 @@ void DrawLayout()
     DrawTexturePro(background, source, dest, origin, 0.0f, WHITE);
     DrawStar();
     // Separator line
-    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, WHITE); 
+    DrawLine(GAMEPLAY_WIDTH, 0, GAMEPLAY_WIDTH, SCREEN_HEIGHT, WHITE);
 }
 
 void loadingAnimation()
@@ -99,7 +99,7 @@ void unloadTextures()
 
 /********************************************************* USER PLANE ******************************************************************/
 Player player;
-BulletNode* BulletHead = NULL;
+BulletNode *BulletHead = NULL;
 Texture2D bulletTexture;
 Sound shootSound;
 static float shootCooldown = 0.0f;
@@ -139,12 +139,13 @@ void InitBullets()
 {
     if (BulletHead == NULL)
     {
-        BulletNode* current = NULL;
-        
+        BulletNode *current = NULL;
+
         for (int i = 0; i < MAX_BULLETS; i++)
         {
-            BulletNode* newNode = (BulletNode*)malloc(sizeof(BulletNode));
-            if (newNode == NULL) {
+            BulletNode *newNode = (BulletNode *)malloc(sizeof(BulletNode));
+            if (newNode == NULL)
+            {
                 // Gagal alokasi memori, bisa beri pesan atau hentikan
                 printf("Gagal alokasi memori untuk BulletNode\n");
                 return;
@@ -152,10 +153,13 @@ void InitBullets()
             newNode->data.active = false;
             newNode->next = NULL;
 
-            if (BulletHead == NULL) {
+            if (BulletHead == NULL)
+            {
                 BulletHead = newNode;
                 current = BulletHead;
-            } else {
+            }
+            else
+            {
                 current->next = newNode;
                 current = newNode;
             }
@@ -163,7 +167,7 @@ void InitBullets()
     }
     else
     {
-        BulletNode* current = BulletHead;
+        BulletNode *current = BulletHead;
         while (current != NULL)
         {
             current->data.active = false;
@@ -171,7 +175,6 @@ void InitBullets()
         }
     }
 }
-
 
 void UpdatePlayer()
 {
@@ -187,7 +190,7 @@ void UpdatePlayer()
 
 void ShootBullet()
 {
-    BulletNode* current = BulletHead;
+    BulletNode *current = BulletHead;
 
     while (current != NULL)
     {
@@ -196,7 +199,7 @@ void ShootBullet()
             current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             PlaySound(shootSound);
             current->data.active = true;
-            break; 
+            break;
         }
         current = current->next;
     }
@@ -204,7 +207,7 @@ void ShootBullet()
 
 void UpdateBullets()
 {
-    BulletNode* current = BulletHead;
+    BulletNode *current = BulletHead;
 
     while (current != NULL)
     {
@@ -214,12 +217,11 @@ void UpdateBullets()
             if (current->data.position.y < 0)
             {
                 current->data.active = false;
-            } 
+            }
         }
         current = current->next;
     }
 }
-
 
 void DrawPlayer()
 {
@@ -230,7 +232,7 @@ void DrawPlayer()
 
 void DrawBullets()
 {
-    BulletNode* current = BulletHead;
+    BulletNode *current = BulletHead;
     while (current != NULL)
     {
         if (current->data.active)
@@ -243,10 +245,10 @@ void DrawBullets()
 
 void freeBullets()
 {
-    BulletNode* current = BulletHead;
+    BulletNode *current = BulletHead;
     while (current != NULL)
     {
-        BulletNode* temp = current;
+        BulletNode *temp = current;
         current = current->next;
         free(temp);
     }
@@ -333,7 +335,7 @@ void CreateExplosion(Vector2 position)
     {
         if (!explosions[i].active)
         {
-            explosions[i].position = position; 
+            explosions[i].position = position;
             explosions[i].active = true;
             explosions[i].frame = 0;
             explosions[i].timer = 0;
@@ -381,14 +383,19 @@ Texture2D asteroidTexture;
 Texture2D hitEffect1;
 Texture2D hitEffect2;
 
-void RemoveInactiveAsteroids(GameState *S) {
+void RemoveInactiveAsteroids(GameState *S)
+{
     AsteroidNode **indirect = &S->asteroidHead;
-    while (*indirect != NULL) {
+    while (*indirect != NULL)
+    {
         AsteroidNode *current = *indirect;
-        if (!current->data.active) {
+        if (!current->data.active)
+        {
             *indirect = current->next;
             free(current);
-        } else {
+        }
+        else
+        {
             indirect = &(*indirect)->next;
         }
     }
@@ -407,8 +414,10 @@ int CountActiveAsteroids(GameState *S)
     return count;
 }
 
-void SpawnAsteroid(GameState *S) {
-    if (CountActiveAsteroids(S) >= MAX_ASTEROIDS) return;
+void SpawnAsteroid(GameState *S)
+{
+    if (CountActiveAsteroids(S) >= MAX_ASTEROIDS)
+        return;
     AsteroidNode *newNode = (AsteroidNode *)malloc(sizeof(AsteroidNode));
     newNode->data.position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-50, -100)};
     newNode->data.size = GetRandomValue(1, 3);
@@ -421,20 +430,26 @@ void SpawnAsteroid(GameState *S) {
     S->asteroidHead = newNode;
 }
 
-void UpdateAsteroids(GameState *S) {
+void UpdateAsteroids(GameState *S)
+{
     AsteroidNode *current = S->asteroidHead;
-    while (current != NULL) {
-        if (current->data.active) {
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
             current->data.position.x += current->data.speed.x;
             current->data.position.y += current->data.speed.y;
 
-            float limitX = GAMEPLAY_WIDTH - (asteroidTexture.width * (current->data.size == 1 ? 0.05f : current->data.size == 2 ? 0.07f : 0.09f));
+            float limitX = GAMEPLAY_WIDTH - (asteroidTexture.width * (current->data.size == 1 ? 0.05f : current->data.size == 2 ? 0.07f
+                                                                                                                                : 0.09f));
 
-            if (current->data.position.x <= 0 || current->data.position.x >= limitX) {
+            if (current->data.position.x <= 0 || current->data.position.x >= limitX)
+            {
                 current->data.speed.x *= -1;
             }
 
-            if (current->data.position.y > SCREEN_HEIGHT) {
+            if (current->data.position.y > SCREEN_HEIGHT)
+            {
                 current->data.active = false;
             }
         }
@@ -442,17 +457,21 @@ void UpdateAsteroids(GameState *S) {
     }
 }
 
-
-void CheckCollisions(GameState *S) {
+void CheckCollisions(GameState *S)
+{
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
 
     AsteroidNode *current = S->asteroidHead;
-    while (current != NULL) {
-        if (current->data.active && playerInvincible <= 0) {
-            if (CheckCollisionCircles(playerPosition, 35, current->data.position, current->data.size * 20)) {
+    while (current != NULL)
+    {
+        if (current->data.active && playerInvincible <= 0)
+        {
+            if (CheckCollisionCircles(playerPosition, 35, current->data.position, current->data.size * 20))
+            {
                 updateNyawa(S);
                 PlaySound(userPlaneExplosions);
-                if (!InfoPlayer.shieldActive) {
+                if (!InfoPlayer.shieldActive)
+                {
                     CreateExplosion(playerPosition);
                 }
                 current->data.active = false;
@@ -463,12 +482,13 @@ void CheckCollisions(GameState *S) {
     }
 }
 
-
-void AsteroidLoop(GameState *S) {
+void AsteroidLoop(GameState *S)
+{
     static float asteroidSpawnTimer = 0.0f;
     asteroidSpawnTimer += GetFrameTime();
 
-    if (asteroidSpawnTimer >= 0.2f) {
+    if (asteroidSpawnTimer >= 0.2f)
+    {
         SpawnAsteroid(S);
         asteroidSpawnTimer = 0.0f;
     }
@@ -477,21 +497,21 @@ void AsteroidLoop(GameState *S) {
     RemoveInactiveAsteroids(S);
 }
 
-
-void DrawAsteroids(GameState *S) {
+void DrawAsteroids(GameState *S)
+{
     AsteroidNode *current = S->asteroidHead;
-    while (current != NULL) {
-        if (current->data.active) {
-            float scale = current->data.size == 1 ? 0.05f :
-                          current->data.size == 2 ? 0.07f :
-                          0.09f;
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
+            float scale = current->data.size == 1 ? 0.05f : current->data.size == 2 ? 0.07f
+                                                                                    : 0.09f;
 
             DrawTextureEx(asteroidTexture, current->data.position, 0.0f, scale, WHITE);
         }
         current = current->next;
     }
 }
-
 
 /********************************************************* ENEMIES ******************************************************************/
 Enemy enemies[MAX_ENEMIES];
@@ -593,7 +613,7 @@ void InitEnemyBullets()
 {
     for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
     {
-       PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
+        PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
         newBullet->Eb.isActive = false;
         newBullet->Eb.hasPlayedSound = false;
         newBullet->Eb.shooterIndex = -1; // Inisialisasi index penembak
@@ -611,7 +631,7 @@ void InitEnemyBullets()
                 current = current->next;
             }
             current->next = newBullet;
-        } 
+        }
     }
 }
 
@@ -621,17 +641,17 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
     for (int i = 0; i < getMaxEnemy(S); i++)
     {
         if (!enemies[i].isActive || enemies[i].hasShot)
-        continue; // Musuh mati tidak boleh menembak
+            continue; // Musuh mati tidak boleh menembak
         if (getEnemyTypeShoot(S) == 0 || getEnemyTypeShoot(S) == 3)
         {
             current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S); j++)
             {
-                // Create Node 
+                // Create Node
                 if (current->Eb.isActive == false)
                 {
                     current->Eb.position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width,
-                                                         (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
+                                                     (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
                     current->Eb.isActive = true;
                     current->Eb.shooterIndex = i; // Tandai peluru ini ditembak oleh musuh ke-i
                     if (GetRandomValue(0, 1) == 0)
@@ -640,17 +660,17 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
                     }
                     else
                     {
-                        int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1;                       // Bisa kiri atau kanan
+                        int dirX = GetRandomValue(0, 1) == 0 ? -1 : 1;                   // Bisa kiri atau kanan
                         current->Eb.speed = (Vector2){dirX * 2.0f, SPEED_ENEMY_BULLETS}; // Diagonal
                     }
                     enemies[i].hasShot = true;
                     break;
                 }
-                current = current->next; 
+                current = current->next;
             }
         }
         else if (getEnemyTypeShoot(S) == 1)
-        {   
+        {
             int bulletsSpawned = 0;
             current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 4; j++)
@@ -684,7 +704,7 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
                     float speedX = (bulletsSpawned == 0) ? -2.0f : (bulletsSpawned == 1) ? 0
                                                                                          : 2.0f;
                     current->Eb.position = (Vector2){(enemies[i].position.x - xPositionBullet) + EnemyTexture.width + offsetX,
-                                                         (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
+                                                     (enemies[i].position.y + EnemyTexture.width + yPositionBullet)};
                     current->Eb.isActive = true;
                     current->Eb.shooterIndex = i;
                     current->Eb.speed = (Vector2){speedX, 4}; // Kiri, tengah, kanan
@@ -696,7 +716,6 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
         }
     }
 }
-
 
 void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
 {
@@ -726,7 +745,7 @@ void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
                         if (current->Eb.delayTimer < 2.0f && current->Eb.hasPlayedSound == false)
                         {
                             SetSoundVolume(nging, 3.0f);
-                            PlaySound(nging);                      // Suara "nging"
+                            PlaySound(nging);                  // Suara "nging"
                             current->Eb.hasPlayedSound = true; // Tandai agar tidak diulang
                         }
                     }
@@ -798,7 +817,6 @@ void FreeEnemyBullets()
     ebHead = NULL;
 }
 
-
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
@@ -813,7 +831,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         Vector2 enemiesPosition = (Vector2){enemies[i].position.x + xEnemy, enemies[i].position.y + yEnemy};
 
         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
-        BulletNode* currentB = BulletHead;
+        BulletNode *currentB = BulletHead;
         while (currentB != NULL)
         {
             if (currentB->data.active && CheckCollisionCircles(enemiesPosition, radiusPlayer, currentB->data.position, radiusBulletEnemy))
@@ -878,7 +896,6 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
     }
 }
 
-
 /********************************************************* RESET ******************************************************************/
 void ResetEnemies()
 {
@@ -897,7 +914,6 @@ void ResetAsteroid(GameState *S)
         current = current->next;
     }
 }
-
 
 void ResetEnemyBullets()
 {
@@ -920,7 +936,7 @@ void ResetExplosions()
 }
 void ResetPlayerBulet()
 {
-    BulletNode* current = BulletHead;
+    BulletNode *current = BulletHead;
     while (current != NULL)
     {
         current->data.active = false;
@@ -980,65 +996,120 @@ void UnloadAssets()
 int level = 0;
 int previousLevel = 0;
 bool isLevelTransition = false;
-char currentText[12]; // Menyimpan teks level
+static CharNode *levelTextHead = NULL;
+char buffer[12];
 int letterIndex = 0;  // Indeks huruf yang sudah muncul
 float letterTimer = 0;
-void DrawLevelTransition(float deltaTime)
+
+bool IsSameText(CharNode *a, CharNode *b) {
+    while (a && b) {
+        if (a->character != b->character) return false;
+        a = a->next;
+        b = b->next;
+    }
+    return (a == NULL && b == NULL);
+}
+
+
+CharNode *SetLevelText(const char *text)
+{
+    CharNode *head = NULL;
+    CharNode *curr = NULL;
+
+    for (int i = 0; text[i] != '\0'; i++)
+    {
+        CharNode *newNode = (CharNode *)malloc(sizeof(CharNode));
+        newNode->character = text[i];
+        newNode->next = NULL;
+
+        if (head == NULL)
+        {
+            head = newNode;
+        }
+        else
+        {
+            curr->next = newNode;
+        }
+        curr = newNode;
+    }
+
+    return head; // Return linked list head
+}
+void FreeLevelText(CharNode *head)
+{
+    CharNode *curr = head;
+    while (curr != NULL)
+    {
+        CharNode *next = curr->next;
+        free(curr);
+        curr = next;
+    }
+}
+
+void DrawLevelTransition(float deltaTime, CharNode *head)
 {
     static float letterTimer = 0.0f;
     static float removeTimer = 0.0f;
     static int letterIndex = 0;
-    static bool removing = false; // Menandakan apakah teks sedang menghilang
+    static bool removing = false;
+    static CharNode *previousHead = NULL;
 
-    const char *levelText = currentText;
-    int textLength = strlen(levelText);
+    // Reset semua variabel jika teks berubah
+    if (!IsSameText(head, previousHead)) {
+        letterTimer = 0.0f;
+        removeTimer = 0.0f;
+        letterIndex = 0;
+        removing = false;
+        previousHead = head;
+    }
 
-    // Hitung posisi tengah layar
-    int textX = GAMEPLAY_WIDTH / 2 - MeasureText(levelText, 40) / 2;
+    // Hitung jumlah huruf
+    int totalLetters = 0;
+    for (CharNode *temp = head; temp != NULL; temp = temp->next)
+        totalLetters++;
+    
+    int textX = GAMEPLAY_WIDTH / 2 - (totalLetters * 20) / 2;
     int textY = SCREEN_HEIGHT / 2 - 20;
 
-    // Tambah timer untuk menampilkan huruf
     letterTimer += deltaTime;
 
-    // Tampilkan huruf satu per satu
-    if (!removing && letterIndex < textLength && letterTimer > 0.2f)
+    if (!removing && letterIndex < totalLetters && letterTimer > 0.2f)
     {
         SetSoundVolume(typing, 3.0f);
         PlaySound(typing);
         letterIndex++;
-        letterTimer = 0.0f; // Reset timer
+        letterTimer = 0.0f;
     }
 
-    // Jika semua huruf sudah muncul, tunggu sebelum mulai menghilang
-    if (letterIndex == textLength)
+    if (letterIndex == totalLetters)
     {
         removeTimer += deltaTime;
-        if (removeTimer > 2.0f) // Tahan teks selama 2 detik sebelum mulai menghilang
+        if (removeTimer > 2.0f)
         {
             removing = true;
             removeTimer = 0.0f;
         }
     }
-    if (strcmp(currentText, "The End") == 0) // Jika yang ditampilkan "The End"
+
+    if (removing && letterIndex > 0 && letterTimer > 0.2f &&!bosses.theEnd)
     {
-        StopMusicStream(gameplayMusic);
-    }
-    else
-    {
-        if (removing && letterIndex > 0 && letterTimer > 0.2f)
-        {
-            PlaySound(typing);
-            letterIndex--;
-            letterTimer = 0.0f;
-        }
+        PlaySound(typing);
+        letterIndex--;
+        letterTimer = 0.0f;
     }
 
-    // Animasi menghilangkan teks satu per satu
+    // Gambar karakter satu-satu
+    CharNode *curr = head;
+    int x = textX;
+    
 
-    // Gambar teks dengan huruf sesuai indeks yang sudah muncul
-    DrawText(TextSubtext(levelText, 0, letterIndex), textX, textY, 40, WHITE);
+    for (int i = 0; i < letterIndex && curr != NULL; i++)
+    {
+        DrawText(TextFormat("%c", curr->character), x, textY, 40, WHITE);
+        x += 25;
+        curr = curr->next;
+    }
 
-    // Jika semua huruf sudah hilang, akhiri animasi
     if (removing && letterIndex == 0)
     {
         isLevelTransition = false;
@@ -1046,12 +1117,75 @@ void DrawLevelTransition(float deltaTime)
     }
 }
 
-void GameplayWithoutEnemies(float deltaTime)
+
+// void DrawLevelTransition(float deltaTime)
+// {
+//     static float letterTimer = 0.0f;
+//     static float removeTimer = 0.0f;
+//     static int letterIndex = 0;
+//     static bool removing = false; // Menandakan apakah teks sedang menghilang
+
+//     const char *levelText = currentText;
+//     int textLength = strlen(levelText);
+
+//     // Hitung posisi tengah layar
+//     int textX = GAMEPLAY_WIDTH / 2 - MeasureText(levelText, 40) / 2;
+//     int textY = SCREEN_HEIGHT / 2 - 20;
+
+//     // Tambah timer untuk menampilkan huruf
+//     letterTimer += deltaTime;
+
+//     // Tampilkan huruf satu per satu
+//     if (!removing && letterIndex < textLength && letterTimer > 0.2f)
+//     {
+//         SetSoundVolume(typing, 3.0f);
+//         PlaySound(typing);
+//         letterIndex++;
+//         letterTimer = 0.0f; // Reset timer
+//     }
+
+//     // Jika semua huruf sudah muncul, tunggu sebelum mulai menghilang
+//     if (letterIndex == textLength)
+//     {
+//         removeTimer += deltaTime;
+//         if (removeTimer > 2.0f) // Tahan teks selama 2 detik sebelum mulai menghilang
+//         {
+//             removing = true;
+//             removeTimer = 0.0f;
+//         }
+//     }
+//     if (strcmp(currentText, "The End") == 0) // Jika yang ditampilkan "The End"
+//     {
+//         StopMusicStream(gameplayMusic);
+//     }
+//     else
+//     {
+//         if (removing && letterIndex > 0 && letterTimer > 0.2f)
+//         {
+//             PlaySound(typing);
+//             letterIndex--;
+//             letterTimer = 0.0f;
+//         }
+//     }
+
+//     // Animasi menghilangkan teks satu per satu
+
+//     // Gambar teks dengan huruf sesuai indeks yang sudah muncul
+//     DrawText(TextSubtext(levelText, 0, letterIndex), textX, textY, 40, WHITE);
+
+//     // Jika semua huruf sudah hilang, akhiri animasi
+//     if (removing && letterIndex == 0)
+//     {
+//         isLevelTransition = false;
+//         removing = false;
+//     }
+// }
+
+void GameplayWithoutEnemies()
 {
     UpdatePlayer();
     DrawLayout();
     DrawPlayer();
-    DrawLevelTransition(deltaTime);
     mainMenu(&gameStart);
 }
 
@@ -1198,7 +1332,8 @@ void bossLevel(float deltaTime)
 {
     if (bosses.theEnd) // Jika boss mati
     {
-        snprintf(currentText, sizeof(currentText), "The End");
+        snprintf(buffer, sizeof(buffer), "The End");
+        levelTextHead = SetLevelText(buffer);
         letterIndex = 0;
         letterTimer = 0;
         isLevelTransition = true;
@@ -1224,7 +1359,8 @@ void bossLevel(float deltaTime)
 
 void game()
 {
-    if (!IsMusicStreamPlaying(gameplayMusic))
+    
+    if (!IsMusicStreamPlaying(gameplayMusic)&&!bosses.theEnd)
     {
         PlayMusicStream(gameplayMusic);
     }
@@ -1248,27 +1384,27 @@ void game()
     {
         UpdateStar();
         // Tentukan level berdasarkan skor
-        if (InfoPlayer.score < 150)
+        if (InfoPlayer.score < 25)
         {
-            level = 5;
+            level = 1;
         }
-        else if (InfoPlayer.score >= 150 && InfoPlayer.score < 250)
+        else if (InfoPlayer.score >= 25 && InfoPlayer.score < 50)
         {
             level = 2;
         }
-        else if (InfoPlayer.score >= 250 && InfoPlayer.score < 300)
+        else if (InfoPlayer.score >= 50 && InfoPlayer.score < 75)
         {
             level = 3;
         }
-        else if (InfoPlayer.score >= 300 && InfoPlayer.score < 400)
+        else if (InfoPlayer.score >= 75 && InfoPlayer.score < 100)
         {
             level = 4;
         }
-        else if (InfoPlayer.score >= 400 && InfoPlayer.score < 500)
+        else if (InfoPlayer.score >= 100 && InfoPlayer.score < 125)
         {
             level = 5;
         }
-        else if (InfoPlayer.score >= 500)
+        else if (InfoPlayer.score >= 125)
         {
             level = 6;
         }
@@ -1283,25 +1419,27 @@ void game()
             ResetAsteroid(&gamestate);
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
+            FreeLevelText(levelTextHead);
             if (level < 6)
             {
-                snprintf(currentText, sizeof(currentText), "Level %d", level);
+                snprintf(buffer, sizeof(buffer), "Level%d", level);
+                levelTextHead = SetLevelText(buffer);
             }
             else
             {
                 StopMusicStream(gameplayMusic);
-                snprintf(currentText, sizeof(currentText), "Final Level");
+                snprintf(buffer, sizeof(buffer), "Boss Level");
+                levelTextHead = SetLevelText(buffer);
             }
 
-            letterIndex = 0;
-            letterTimer = 0;
             isLevelTransition = true;
         }
 
         // Jalankan level yang sesuai
         if (isLevelTransition)
         {
-            GameplayWithoutEnemies(deltaTime);
+            GameplayWithoutEnemies();
+            DrawLevelTransition(GetFrameTime(), levelTextHead);
         }
         else
         {
@@ -1320,7 +1458,7 @@ void game()
                 // Jika sudah mencapai 20 detik, naik ke level 3
                 if (levelTimer >= 20.0f)
                 {
-                    InfoPlayer.score = 300;
+                    InfoPlayer.score = 75;
                 }
                 break;
             case 4:

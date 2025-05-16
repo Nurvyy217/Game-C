@@ -71,7 +71,7 @@ void Tampil_Score()
     DrawText(TextFormat("Score: %d", InfoPlayer.score), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 140, 25, RAYWHITE);
 }
 
-void gameover()
+void gameover(GameState *S)
 {
     ClearBackground(BLACK);
     DrawText("Game Over", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
@@ -87,7 +87,7 @@ void gameover()
         ResetExplosions();
         ResetEnemyBullets();
         ResetEnemies();
-        ResetAsteroid();
+        ResetAsteroid(S);
         bosses.aktif = false;
     }
 }

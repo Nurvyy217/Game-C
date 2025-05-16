@@ -323,142 +323,122 @@ void DrawExplosions(Texture2D explosionTexture)
 }
 
 /********************************************************* ASTEROIDS ******************************************************************/
-Asteroid asteroids[MAX_ASTEROIDS];
+
 Texture2D asteroidTexture;
 Texture2D hitEffect1;
 Texture2D hitEffect2;
 
-void InitAsteroids()
-{
-    asteroidTexture = LoadTexture("assets/Asteroid.png");
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
-    {
-        asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
-        asteroids[i].size = GetRandomValue(1, 3);
-        asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(4, 6)};
-        asteroids[i].active = true;
-    }
-}
-
-void UpdateAsteroids()
-{
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
-    {
-        if (asteroids[i].active)
-        {
-            asteroids[i].position.x += asteroids[i].speed.x;
-            asteroids[i].position.y += asteroids[i].speed.y;
-
-            if (asteroids[i].size == 1)
-            {
-                if (asteroids[i].position.x <= 0 || asteroids[i].position.x >= GAMEPLAY_WIDTH - (asteroidTexture.width * 0.05f))
-                {
-                    asteroids[i].speed.x *= -1; // Pantulan jika mencapai batas
-                }
-            }
-
-            if (asteroids[i].size == 2)
-            {
-                if (asteroids[i].position.x <= 0 || asteroids[i].position.x >= GAMEPLAY_WIDTH - (asteroidTexture.width * 0.07f))
-                {
-                    asteroids[i].speed.x *= -1; // Pantulan jika mencapai batas
-                }
-            }
-
-            if (asteroids[i].size == 3)
-            {
-                if (asteroids[i].position.x <= 0 || asteroids[i].position.x >= GAMEPLAY_WIDTH - (asteroidTexture.width * 0.09f))
-                {
-                    asteroids[i].speed.x *= -1; // Pantulan jika mencapai batas
-                }
-            }
-
-            if (asteroids[i].position.y > SCREEN_HEIGHT)
-            {
-                asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-300, -50)};
-            }
+void RemoveInactiveAsteroids(GameState *S) {
+    AsteroidNode **indirect = &S->asteroidHead;
+    while (*indirect != NULL) {
+        AsteroidNode *current = *indirect;
+        if (!current->data.active) {
+            *indirect = current->next;
+            free(current);
+        } else {
+            indirect = &(*indirect)->next;
         }
     }
 }
 
-void CheckCollisions(GameState *S)
+int CountActiveAsteroids(GameState *S)
 {
+    int count = 0;
+    AsteroidNode *current = S->asteroidHead;
+    while (current != NULL)
+    {
+        if (current->data.active)
+            count++;
+        current = current->next;
+    }
+    return count;
+}
+
+void SpawnAsteroid(GameState *S) {
+    if (CountActiveAsteroids(S) >= MAX_ASTEROIDS) return;
+    AsteroidNode *newNode = (AsteroidNode *)malloc(sizeof(AsteroidNode));
+    newNode->data.position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-50, -100)};
+    newNode->data.size = GetRandomValue(1, 3);
+    newNode->data.speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(5, 7)};
+    newNode->data.active = true;
+    newNode->next = NULL;
+
+    // Masukkan ke head list
+    newNode->next = S->asteroidHead;
+    S->asteroidHead = newNode;
+}
+
+void UpdateAsteroids(GameState *S) {
+    AsteroidNode *current = S->asteroidHead;
+    while (current != NULL) {
+        if (current->data.active) {
+            current->data.position.x += current->data.speed.x;
+            current->data.position.y += current->data.speed.y;
+
+            float limitX = GAMEPLAY_WIDTH - (asteroidTexture.width * (current->data.size == 1 ? 0.05f : current->data.size == 2 ? 0.07f : 0.09f));
+
+            if (current->data.position.x <= 0 || current->data.position.x >= limitX) {
+                current->data.speed.x *= -1;
+            }
+
+            if (current->data.position.y > SCREEN_HEIGHT) {
+                current->data.active = false;
+            }
+        }
+        current = current->next;
+    }
+}
+
+
+void CheckCollisions(GameState *S) {
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
-    {
-        if (asteroids[i].active)
-        {
-            if (playerInvincible <= 0)
-            {
-                // User menabrak asteroid
-                if (CheckCollisionCircles(playerPosition, 35, asteroids[i].position, asteroids[i].size * 20))
-                { 
-                    updateNyawa(S);
-                    PlaySound(userPlaneExplosions);
-                    if (!InfoPlayer.shieldActive)
-                    {
-                        CreateExplosion(playerPosition);
-                    }
 
-                    asteroids[i].active = false;
-                    break;
+    AsteroidNode *current = S->asteroidHead;
+    while (current != NULL) {
+        if (current->data.active && playerInvincible <= 0) {
+            if (CheckCollisionCircles(playerPosition, 35, current->data.position, current->data.size * 20)) {
+                updateNyawa(S);
+                PlaySound(userPlaneExplosions);
+                if (!InfoPlayer.shieldActive) {
+                    CreateExplosion(playerPosition);
                 }
+                current->data.active = false;
+                break;
             }
         }
+        current = current->next;
     }
 }
 
-void SpawnAsteroid()
-{
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
-    {
-        if (!asteroids[i].active)
-        {
-            asteroids[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-1, -50)};
-            asteroids[i].size = GetRandomValue(1, 3);
-            asteroids[i].speed = (Vector2){GetRandomValue(-1, 1), GetRandomValue(5, 7)};
-            asteroids[i].active = true;
-            break;
-        }
-    }
-}
 
-void AsteroidLoop()
-{
+void AsteroidLoop(GameState *S) {
     static float asteroidSpawnTimer = 0.0f;
     asteroidSpawnTimer += GetFrameTime();
 
-    if (asteroidSpawnTimer >= 0.2f)
-    { // Setiap 2 detik, spawn asteroid baru
-        SpawnAsteroid();
+    if (asteroidSpawnTimer >= 0.2f) {
+        SpawnAsteroid(S);
         asteroidSpawnTimer = 0.0f;
     }
-    UpdateAsteroids();
+
+    UpdateAsteroids(S);
+    RemoveInactiveAsteroids(S);
 }
 
-void DrawAsteroids()
-{
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
-    {
-        if (asteroids[i].active)
-        {
-            float scale; // Sesuaikan skala asteroid
-            if (asteroids[i].size == 1)
-            {
-                scale = asteroids[i].size * 0.05f;
-            }
-            else if (asteroids[i].size == 2)
-            {
-                scale = asteroids[i].size * 0.035f;
-            }
-            else if (asteroids[i].size == 3)
-            {
-                scale = asteroids[i].size * 0.03f;
-            }
-            DrawTextureEx(asteroidTexture, asteroids[i].position, 0.0f, scale, WHITE);
+
+void DrawAsteroids(GameState *S) {
+    AsteroidNode *current = S->asteroidHead;
+    while (current != NULL) {
+        if (current->data.active) {
+            float scale = current->data.size == 1 ? 0.05f :
+                          current->data.size == 2 ? 0.07f :
+                          0.09f;
+
+            DrawTextureEx(asteroidTexture, current->data.position, 0.0f, scale, WHITE);
         }
+        current = current->next;
     }
 }
+
 
 /********************************************************* ENEMIES ******************************************************************/
 Enemy enemies[MAX_ENEMIES];
@@ -795,13 +775,17 @@ void ResetEnemies()
         enemies[i].isActive = false;
     }
 }
-void ResetAsteroid()
+
+void ResetAsteroid(GameState *S)
 {
-    for (int i = 0; i < MAX_ASTEROIDS; i++)
+    AsteroidNode *current = S->asteroidHead;
+    while (current != NULL)
     {
-        asteroids[i].active = false;
+        current->data.active = false;
+        current = current->next;
     }
 }
+
 
 void ResetEnemyBullets()
 {
@@ -832,6 +816,7 @@ Music gameplayMusic;
 void LoadAssets()
 {
     initBG();
+    asteroidTexture = LoadTexture("assets/Asteroid.png");
     typing = LoadSound("assets/typing.wav");
     shootSound = LoadSound("assets/shoot.wav");
     nging = LoadSound("assets/nging.wav");
@@ -953,9 +938,9 @@ void GameplayWithoutEnemies(float deltaTime)
 
 void callAsteroid(GameState *S)
 {
-    DrawAsteroids();
+    DrawAsteroids(S);
     CheckCollisions(S);
-    AsteroidLoop();
+    AsteroidLoop(S);
 }
 
 void initGameState(GameState *S)
@@ -996,13 +981,13 @@ void level1(float deltaTime)
     inipowerup();
     UpdateSpark();
 }
-void DrawLvl3()
+void DrawLvl3(GameState *S)
 {
     DrawLayout();
     DrawPlayer();
     DrawBullets();
     DrawExplosions(explosionsTexture);
-    DrawAsteroids();
+    DrawAsteroids(S);
     mainMenu(&gameStart);
 }
 void level3(GameState *S, float deltaTime)
@@ -1012,8 +997,8 @@ void level3(GameState *S, float deltaTime)
     UpdateBullets();
     UpdateExplosions(deltaTime);
     CheckCollisions(S);
-    DrawLvl3();
-    AsteroidLoop();
+    DrawLvl3(S);
+    AsteroidLoop(S);
     inipowerup();
 }
 
@@ -1085,7 +1070,7 @@ void DrawBossLevel()
     DrawLayout();
     DrawPlayer();
     DrawBullets();
-    DrawBosses();
+    DrawBosses(&gamestate);
     DrawExplosions(explosionsTexture);
     DrawBossLaser();
     mainMenu(&gameStart);
@@ -1109,7 +1094,7 @@ void bossLevel(float deltaTime)
     UpdateExplosions(deltaTime);
     CheckBossCollisions(&gamestate);
     UpdateBullets();
-    DrawBossLevel();
+    DrawBossLevel(&gamestate);
     BossBar();
     inipowerup();
     UpdateSpark();
@@ -1146,7 +1131,7 @@ void game()
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 150)
         {
-            level = 1;
+            level = 6;
         }
         else if (InfoPlayer.score >= 150 && InfoPlayer.score < 250)
         {
@@ -1176,7 +1161,7 @@ void game()
             ResetEnemyBullets();
             ResetExplosions();
             ResetPlayerBulet();
-            ResetAsteroid();
+            ResetAsteroid(&gamestate);
             ResetSpark();
             previousLevel = level; // Simpan level baru sebagai level sebelumnya
             if (level < 6)
@@ -1234,6 +1219,6 @@ void game()
     else
     {
         levelTimer = 0.0f;
-        gameover();
+        gameover(&gamestate);
     }
 }

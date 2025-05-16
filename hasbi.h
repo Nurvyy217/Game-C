@@ -58,6 +58,12 @@ typedef struct {
     int hitEffectFrame; // 0 atau 1, untuk efek tembakan
     float hitEffectTimer; // Timer untuk durasi efek
 } Asteroid;
+typedef struct AsteroidNode {
+    Asteroid data;
+    struct AsteroidNode *next;
+} AsteroidNode;
+
+
 
 // EXPLOSIONS EFFECT
 typedef struct Explosion {
@@ -97,6 +103,7 @@ typedef struct {
     int enemyHealth;
     int healthBroke;
     int enemyDamage;
+    AsteroidNode *asteroidHead;
 }GameState;
 
 /***************************************** EXTERN **********************************************/
@@ -132,12 +139,13 @@ void ShootBullet();
 void UpdateBullets();
 
 // ASTEROID
-void DrawAsteroids();
-void AsteroidLoop();
-void SpawnAsteroid();
+void DrawAsteroids(GameState *S);
+void AsteroidLoop(GameState *S);
+void SpawnAsteroid(GameState *S);
 void CheckCollisions(GameState *S);
-void UpdateAsteroids();
-void InitAsteroids();
+void UpdateAsteroids(GameState *S);
+int CountActiveAsteroids(GameState *S);
+void RemoveInactiveAsteroids(GameState *S);
 
 // EXPLOSIONS
 void DrawExplosions(Texture2D explosionsTexture);
@@ -161,7 +169,7 @@ void GameplayWithoutEnemies(float deltaTime);
 void callAsteroid(GameState *S);
 void DrawLvl1();
 void level1(float deltaTime);
-void DrawLvl3();
+void DrawLvl3(GameState *S);
 void level3(GameState *S, float deltaTime);
 void DrawLvl4();
 void level4(float deltaTime);
@@ -195,7 +203,7 @@ void ResetPlayerBulet();
 void ResetExplosions();
 void ResetEnemyBullets();
 void ResetEnemies();
-void ResetAsteroid();
+void ResetAsteroid(GameState *S);
 
 //LOAD & UNLOAD
 void LoadAssets();

@@ -63,7 +63,7 @@ extern int playerInvincible;
 void tampilNyawa();
 void infokanPlayer();
 void Tampil_Score();
-void gameover();
+void gameover(GameState *S);
 void infoPowerUp();
 void spawnPowerUp();
 void SpawnPowerUpTime();

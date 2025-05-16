@@ -95,7 +95,7 @@ void DrawStar()
     }
 }
 
-void DrawBosses()
+void DrawBosses(GameState *S)
 {
     if (bosses.aktif)
     {
@@ -115,7 +115,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 150)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             currentBossTexture = BD2;
         }
         else if (bosses.health <= (bosses.maxHealth * 0.5) && bosses.health > 120)
@@ -126,7 +126,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.4) && bosses.health > 60)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             currentBossTexture = BD3;
         }
         else if (bosses.health <= (bosses.maxHealth * 0.2) && bosses.health > 0)
@@ -137,7 +137,7 @@ void DrawBosses()
         else if (bosses.health <= 0)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             bosses.defeat = true;
             currentBossTexture = BDef;
         }

@@ -6,7 +6,6 @@
 Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
-Star stars[MAX_STARS];
 Texture2D BD1, BD2, BD3, RB, RB1, RB2, RB3, BDef;
 Music bossbgm;
 float timerExp = 0;
@@ -79,10 +78,14 @@ void InitStar()
     for (int i = 0; i < MAX_STARS; i++)
     {
         StarNode* newStar = (StarNode*)malloc(sizeof(StarNode));
-        newStar->data.position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
-        newStar->data.speed = GetRandomValue(50, 200) / 100.0f;
-        newStar->data.size = GetRandomValue(1, 22) / 10.0f; // Karena GetRandomValue tidak support float
-        newStar->next = NULL;
+        if (newStar != NULL)
+        {
+            newStar->data.position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
+            newStar->data.speed = GetRandomValue(50, 200) / 100.0f;
+            newStar->data.size = GetRandomValue(1, 22) / 10.0f; // Karena GetRandomValue tidak support float
+            newStar->next = NULL;
+            /* code */
+        }
 
         if (starHead == NULL)
         {
@@ -96,7 +99,6 @@ void InitStar()
         }
     }
 }
-
 
 // void UpdateStar()
 // {

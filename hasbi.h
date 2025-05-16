@@ -100,6 +100,7 @@ typedef struct {
     int shooterIndex; // Menyimpan indeks musuh yang menembakkan peluru
     bool hasPlayedSound;
     bool hasPlayedDuar;
+    float delayTimer;
 } EnemyBullet;
 
 typedef struct EnemyBulletNode* PNodeEB;

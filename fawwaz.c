@@ -314,31 +314,35 @@ void CheckBossCollisions(GameState *S)
     }
 
     // Peluru player mengenai boss
-    for (int i = 0; i < MAX_BULLETS; i++)
+    BulletNode* current = BulletHead;
+    while (current != NULL)
     {
-        if (bullets[i].active)
+        if (current->data.active)
         {
             Rectangle bulletHitbox = {
-                bullets[i].position.x,
-                bullets[i].position.y,
+                current->data.position.x,
+                current->data.position.y,
                 20,
                 10};
 
-            if (CheckCollisionRecs(bulletHitbox, bossHitbox))
-            {
-                bosses.health -= 1;        // Boss kehilangan 1 HP per tembakan
-                bullets[i].active = false; // Nonaktifkan peluru setelah kena
-                bosses.hitEffectTimer = 0.15f;
-                bosses.hitEffectFrame = (bosses.health % 2);
-                if (bosses.health <= 0)
+                if (CheckCollisionRecs(bulletHitbox, bossHitbox))
                 {
-                    bossLaser.active = false;
-                    bossLaser.cooldown = 10000;
-                    bosses.hitEffectTimer = 0;
-                    bosses.hitEffectFrame = 0;
+                    bosses.health -= 1;        // Boss kehilangan 1 HP per tembakan
+                    current->data.active = false; // Nonaktifkan peluru setelah kena
+                    bosses.hitEffectTimer = 0.15f;
+                    bosses.hitEffectFrame = (bosses.health % 2);
+                    if (bosses.health <= 0)
+                    {
+                        bossLaser.active = false;
+                        bossLaser.cooldown = 10000;
+                        bosses.hitEffectTimer = 0;
+                        bosses.hitEffectFrame = 0;
+                    }
                 }
-            }
+            
         }
+        current = current->next;
+        
     }
 }
 

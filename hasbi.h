@@ -48,6 +48,13 @@ typedef struct {
     bool active;
 } Bullet;
 
+typedef struct BulletNode {
+    Bullet data;
+    struct BulletNode* next;
+} BulletNode;
+
+extern BulletNode* BulletHead;
+
 // ASTEROID
 typedef struct {
     Texture2D texture;
@@ -120,7 +127,7 @@ typedef struct {
 /***************************************** EXTERN **********************************************/
 
 // EXTERN
-extern Bullet bullets[MAX_BULLETS];
+// extern Bullet bullets[MAX_BULLETS];
 extern Sound shootSound;
 extern Player player;
 extern GameState *state;
@@ -148,6 +155,7 @@ void InitBullets();
 void UpdatePlayer();
 void ShootBullet();
 void UpdateBullets();
+void freeBullets();
 
 // ASTEROID
 void DrawAsteroids(GameState *S);

@@ -99,7 +99,7 @@ void unloadTextures()
 
 /********************************************************* USER PLANE ******************************************************************/
 Player player;
-Bullet bullets[MAX_BULLETS];
+BulletNode* BulletHead = NULL;
 Texture2D bulletTexture;
 Sound shootSound;
 static float shootCooldown = 0.0f;
@@ -137,11 +137,41 @@ void InitPlayer()
 
 void InitBullets()
 {
-    for (int i = 0; i < MAX_BULLETS; i++)
+    if (BulletHead == NULL)
     {
-        bullets[i].active = false;
+        BulletNode* current = NULL;
+        
+        for (int i = 0; i < MAX_BULLETS; i++)
+        {
+            BulletNode* newNode = (BulletNode*)malloc(sizeof(BulletNode));
+            if (newNode == NULL) {
+                // Gagal alokasi memori, bisa beri pesan atau hentikan
+                printf("Gagal alokasi memori untuk BulletNode\n");
+                return;
+            }
+            newNode->data.active = false;
+            newNode->next = NULL;
+
+            if (BulletHead == NULL) {
+                BulletHead = newNode;
+                current = BulletHead;
+            } else {
+                current->next = newNode;
+                current = newNode;
+            }
+        }
+    }
+    else
+    {
+        BulletNode* current = BulletHead;
+        while (current != NULL)
+        {
+            current->data.active = false;
+            current = current->next;
+        }
     }
 }
+
 
 void UpdatePlayer()
 {
@@ -157,30 +187,39 @@ void UpdatePlayer()
 
 void ShootBullet()
 {
-    for (int i = 0; i < MAX_BULLETS - 5; i++)
+    BulletNode* current = BulletHead;
+
+    while (current != NULL)
     {
-        if (!bullets[i].active)
+        if (!current->data.active)
         {
-            bullets[i].position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+            current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             PlaySound(shootSound);
-            bullets[i].active = true;
-            break;
+            current->data.active = true;
+            break; 
         }
+        current = current->next;
     }
 }
 
 void UpdateBullets()
 {
-    for (int i = 0; i < MAX_BULLETS; i++)
+    BulletNode* current = BulletHead;
+
+    while (current != NULL)
     {
-        if (bullets[i].active)
+        if (current->data.active)
         {
-            bullets[i].position.y -= BULLET_SPEED;
-            if (bullets[i].position.y < 0)
-                bullets[i].active = false;
+            current->data.position.y -= BULLET_SPEED; // <- Perbaikan di sini
+            if (current->data.position.y < 0)
+            {
+                current->data.active = false;
+            } 
         }
+        current = current->next;
     }
 }
+
 
 void DrawPlayer()
 {
@@ -191,13 +230,27 @@ void DrawPlayer()
 
 void DrawBullets()
 {
-    for (int i = 0; i < MAX_BULLETS; i++)
+    BulletNode* current = BulletHead;
+    while (current != NULL)
     {
-        if (bullets[i].active)
+        if (current->data.active)
         {
-            DrawTextureEx(bulletTexture, (Vector2){bullets[i].position.x - 5, bullets[i].position.y - 5}, 0.0f, 1.0f, WHITE);
+            DrawTexture(bulletTexture, current->data.position.x, current->data.position.y, WHITE);
         }
+        current = current->next;
     }
+}
+
+void freeBullets()
+{
+    BulletNode* current = BulletHead;
+    while (current != NULL)
+    {
+        BulletNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    BulletHead = NULL;
 }
 
 /********************************************************* SETTER GETTER ******************************************************************/
@@ -761,25 +814,29 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
         Vector2 enemiesPosition = (Vector2){enemies[i].position.x + xEnemy, enemies[i].position.y + yEnemy};
 
         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
-        for (int j = 0; j < MAX_BULLETS; j++)
+        BulletNode* currentB = BulletHead;
+        while (currentB != NULL)
         {
-            if (bullets[j].active && CheckCollisionCircles(enemiesPosition, radiusPlayer, bullets[j].position, radiusBulletEnemy))
+            if (currentB->data.active && CheckCollisionCircles(enemiesPosition, radiusPlayer, currentB->data.position, radiusBulletEnemy))
             {
                 enemies[i].health--;
                 enemies[i].hitEffectTimer = 0.15f; // Waktu efek aktif
                 enemies[i].hitEffectFrame = (enemies[i].health % 2);
-                bullets[j].active = false;
+                currentB->data.active = false;
+
                 if (enemies[i].health <= 0)
                 {
                     enemies[i].isActive = false;
                     enemies[i].hitEffectTimer = 0;
                     enemies[i].hitEffectFrame = 0;
-                    updateScore(2); // Matikan musuh
+                    updateScore(2);
                     PlaySound(asteroidDestroyed);
                     CreateExplosion(enemiesPosition);
                     break; // Hindari multiple hits dalam satu frame
                 }
             }
+
+            currentB = currentB->next;
         }
         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
         if (playerInvincible <= 0)
@@ -864,9 +921,11 @@ void ResetExplosions()
 }
 void ResetPlayerBulet()
 {
-    for (int i = 0; i < MAX_BULLETS; i++)
+    BulletNode* current = BulletHead;
+    while (current != NULL)
     {
-        bullets[i].active = false;
+        current->data.active = false;
+        current = current->next;
     }
 }
 
@@ -1192,7 +1251,7 @@ void game()
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 150)
         {
-            level = 6;
+            level = 1;
         }
         else if (InfoPlayer.score >= 150 && InfoPlayer.score < 250)
         {

@@ -256,21 +256,22 @@ void updatePowerupTime()
 void powerupAttack()
 {
     int bulletmuncul = 0;
+    BulletNode* current = BulletHead;
 
-    for (int i = 0; i < MAX_BULLETS; i++)
+    while (current != NULL)
     {
-        if (!bullets[i].active)
+        if (!current->data.active)
         {
             if (bulletmuncul == 0)
             {
-                bullets[i].position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             }
             else if (bulletmuncul == 1)
             {
-                bullets[i].position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
             }
 
-            bullets[i].active = true;
+            current->data.active = true;
             bulletmuncul++;
 
             if (bulletmuncul >= 2)
@@ -279,6 +280,7 @@ void powerupAttack()
             }
             PlaySound(shootSound);
         }
+        current = current->next;
     }
 }
 

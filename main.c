@@ -38,6 +38,7 @@ int main(void)
     CloseAudioDevice();
     UnloadAssets();
     FreeEnemyBullets();
+    freeBullets();
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();

@@ -48,7 +48,7 @@ extern Sound laserSound;
 extern Music bossbgm;
 
 void InitBosses();
-void DrawBosses();
+void DrawBosses(GameState *S);
 void BossBar();
 void BossRage(GameState *S);
 void BossMov();

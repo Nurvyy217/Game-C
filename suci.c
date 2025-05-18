@@ -169,28 +169,28 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     EndDrawing();
 }
 // Inisialisasi menu pengaturan
-void InitSettingsMenu(SettingsMenu *menu) {
-    menu->selectedOption = 0;
-    menu->volume = 1.0f;
-    menu->screenWidth = SCREEN_WIDTH;
-    menu->screenHeight = SCREEN_HEIGHT;
-    menu->options[0] = "On";
-    menu->options[1] = "Off";
-    menu->options[2] = "Back";
-    }
+// void InitSettingsMenu(SettingsMenu *menu) {
+//     menu->selectedOption = 0;
+//     menu->volume = 1.0f;
+//     menu->screenWidth = SCREEN_WIDTH;
+//     menu->screenHeight = SCREEN_HEIGHT;
+//     menu->options[0] = "On";
+//     menu->options[1] = "Off";
+//     menu->options[2] = "Back";
+//     }
 
-// Menangani input di menu settings
-void UpdateSettingsMenu(SettingsMenu *menu) {
-    if (IsKeyPressed(KEY_DOWN)) menu->selectedOption = (menu->selectedOption + 1) % 3;
-    if (IsKeyPressed(KEY_UP)) menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
-    if (menu->selectedOption == 0) {
-        if (IsKeyPressed(KEY_LEFT)) menu->volume = fmax(menu->volume - 0.1f, 0.0f);
-        if (IsKeyPressed(KEY_RIGHT)) menu->volume = fmin(menu->volume + 0.1f, 1.0f);
-    }
-    if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER)) {
-        menu->selectedOption = 0;
-    }
-    }
+// // Menangani input di menu settings
+// void UpdateSettingsMenu(SettingsMenu *menu) {
+//     if (IsKeyPressed(KEY_DOWN)) menu->selectedOption = (menu->selectedOption + 1) % 3;
+//     if (IsKeyPressed(KEY_UP)) menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
+//     if (menu->selectedOption == 0) {
+//         if (IsKeyPressed(KEY_LEFT)) menu->volume = fmax(menu->volume - 0.1f, 0.0f);
+//         if (IsKeyPressed(KEY_RIGHT)) menu->volume = fmin(menu->volume + 0.1f, 1.0f);
+//     }
+//     if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER)) {
+//         menu->selectedOption = 0;
+//     }
+//     }
     
     // // Menampilkan menu settings di layar
     // void DrawSettingsMenu(SettingsMenu *menu) {
@@ -204,6 +204,91 @@ void UpdateSettingsMenu(SettingsMenu *menu) {
     // DrawText(TextFormat("Volume: %.1f", menu->volume), SCREEN_WIDTH / 2 - 50, 240, 20, WHITE);
     // EndDrawing();
     // }
+
+void InitSettingsMenu(SettingsMenu *menu) {
+    menu->head = NULL;  // Inisialisasi linked list kosong
+    menu->selectedOption = 0;
+    menu->volume = 1.0f;
+    menu->screenWidth = SCREEN_WIDTH;
+    menu->screenHeight = SCREEN_HEIGHT;
+
+    // Menambahkan opsi ke dalam linked list
+    addOption(menu, "On");
+    addOption(menu, "Off");
+    addOption(menu, "Back");
+}
+
+void addOption(SettingsMenu *menu, const char *option) {
+    Node *newNode = (Node*)malloc(sizeof(Node));  // Alokasikan memori untuk node baru
+    newNode->option = option;                      // Simpan pilihan dalam node
+    newNode->next = NULL;                          // Node terakhir menunjuk ke NULL
+
+    if (menu->head == NULL) {
+        menu->head = newNode;  // Jika linked list kosong, node ini menjadi head
+    } else {
+        Node *current = menu->head;
+        while (current->next != NULL) {
+            current = current->next;  // Cari node terakhir
+        }
+        current->next = newNode;  // Tambahkan node baru di akhir
+    }
+}
+
+
+void printMenuOptions(SettingsMenu *menu) {
+    Node *current = menu->head;
+    while (current != NULL) {
+        printf("%s\n", current->option);  // Cetak pilihan menu
+        current = current->next;          // Pindah ke node berikutnya
+    }
+}
+
+void clearMenuOptions(SettingsMenu *menu) {
+    Node *current = menu->head;
+    while (current != NULL) {
+        Node *next = current->next;  // Simpan pointer ke node berikutnya
+        free(current);               // Hapus node saat ini
+        current = next;              // Pindah ke node berikutnya
+    }
+    menu->head = NULL;  // Set head ke NULL untuk menunjukkan linked list kosong
+}
+
+void DrawSettingsMenu(SettingsMenu *menu) {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    DrawText("Pengaturan", SCREEN_WIDTH / 2 - 50, 100, 20, RAYWHITE);
+    
+    // Tampilkan opsi menu dari linked list
+    Node *current = menu->head;
+    int yOffset = 200;
+    while (current != NULL) {
+        Color color = (menu->selectedOption == 0) ? YELLOW : WHITE; // Pilihan yang dipilih diberi warna khusus
+        DrawText(current->option, SCREEN_WIDTH / 2 - 50, yOffset, 20, color);
+        yOffset += 40;
+        current = current->next;
+    }
+    
+    EndDrawing();
+}
+
+void UpdateSettingsMenu(SettingsMenu *menu) {
+    if (IsKeyPressed(KEY_DOWN)) {
+        menu->selectedOption = (menu->selectedOption + 1) % 3;
+    }
+    if (IsKeyPressed(KEY_UP)) {
+        menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
+    }
+
+    if (menu->selectedOption == 0) {
+        if (IsKeyPressed(KEY_LEFT)) menu->volume = fmax(menu->volume - 0.1f, 0.0f);
+        if (IsKeyPressed(KEY_RIGHT)) menu->volume = fmin(menu->volume + 0.1f, 1.0f);
+    }
+
+    if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER)) {
+        // Implement action for "Back"
+    }
+}
+
 
 void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets) {
     // Navigasi dengan tombol panah

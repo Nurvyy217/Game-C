@@ -80,6 +80,13 @@ typedef struct Explosion {
     float timer; // Untuk mengatur kecepatan animasi
 } Explosion;
 
+typedef struct ExplosionNode {
+    Explosion data;
+    struct ExplosionNode* next;
+} ExplosionNode;
+
+extern ExplosionNode* ExplosionHead;
+
 // ENEMY
 typedef struct {
     Vector2 position;
@@ -137,7 +144,7 @@ extern bool isLoadingDone;
 extern int playerHealth;
 extern Texture2D explosionsTexture;
 extern Texture2D hitEffect1, hitEffect2;
-extern Explosion explosions[MAX_EXPLOSIONS];
+// extern Explosion explosions[MAX_EXPLOSIONS];
 extern Music gameoverMusic;
 
 /***************************************** MODUL MODUL ****************************************/
@@ -170,6 +177,7 @@ void RemoveInactiveAsteroids(GameState *S);
 void DrawExplosions(Texture2D explosionsTexture);
 void UpdateExplosions(float deltaTime);
 void CreateExplosion(Vector2 position);
+void freeExplosions();
 
 // ENEMY
 void InitEnemyBullets();

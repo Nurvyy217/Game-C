@@ -5,10 +5,14 @@
 #include "supriadi.h"
 #include <stdio.h>
 #include <math.h>
+#include <raylib.h>
+#include <math.h>
+
 Texture2D logoDeveloper;
 Texture2D gameNamePhoto;
 
 Texture2D background;
+
 bool texturesLoaded = false; // Cek apakah gambar sudah di-load
 
 void initLoadScreen()
@@ -33,7 +37,6 @@ void InitAssets(Assets *assets)
     // Muat background yang sudah ada UFO dan teks "space invaders"
     assets->bg = LoadTexture("assets/bgDisplayUtama.png");
 
-    // (Jika memang tidak dipakai lagi, boleh dihapus)
     // assets->title = LoadTexture("title.png");
 
     // Muat tombol
@@ -53,16 +56,30 @@ void InitAssets(Assets *assets)
 
     PlayMusicStream(assets->bgMusic);
     SetMusicVolume(assets->bgMusic, 0.5f);
+    SetMusicVolume(assets->bgMusic, 1.0f);
+    assets->isMusicOn = true;
+
+    assets->menuBackground = LoadTexture("aseets/bgMenuScreen.png");  
+    assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png"); 
+    assets->btnOn = LoadTexture("assets/btnOn.png");
+    assets->btnOff = LoadTexture("assets/btnOff.png");
+    assets->btnBack = LoadTexture("assets/btnBack.png");
 }
 
 void UnloadAssetss(Assets *assets)
 {
     UnloadTexture(assets->bg);
-    // UnloadTexture(assets->title); // Jika tidak lagi dipakai
-
+    
     UnloadTexture(assets->btnPlay);
     UnloadTexture(assets->btnMenu);
     UnloadTexture(assets->btnExit);
+
+    UnloadTexture(assets->btnOn);
+    UnloadTexture(assets->btnOff);
+    UnloadTexture(assets->btnBack);
+
+    UnloadTexture(assets->menuBackground);
+    UnloadTexture(assets->settingsBackground);
 
     UnloadTexture(assets->btnOn);
     UnloadTexture(assets->btnOff);
@@ -355,6 +372,10 @@ void menuSuci() {
         } else if (currentScreen == PLAY) {
             UpdatePlayScreen(&currentScreen);
         } else if (currentScreen == SETTINGS) {
+            UpdateSettingsScreen(&currentScreen, &settingsMenu, &assets);
+        }
+           if  (currentScreen == EXIT) 
+           {  isRunning = false; // Keluar dari game
             UpdateSettingsScreen(&currentScreen, &settingsMenu, &assets);
         }
            if  (currentScreen == EXIT) 

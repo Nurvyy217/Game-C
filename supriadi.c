@@ -1,5 +1,6 @@
 #include "supriadi.h"
 #include "hasbi.h"
+#include "suci.h"
 #include "stdlib.h"
 #include <stdio.h>
 #include "fawwaz.h"
@@ -81,6 +82,7 @@ void gameover(GameState *S)
         PlaySound(clickMenu);
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
+
         InitPlayer();
         InitBullets();
         ResetPlayerBulet();
@@ -91,6 +93,8 @@ void gameover(GameState *S)
         bosses.aktif = false;
     }
 }
+
+
 
 void inipowerup()
 {

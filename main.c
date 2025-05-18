@@ -39,6 +39,7 @@ int main(void)
     UnloadAssets();
     FreeEnemyBullets();
     freeBullets();
+    freeExplosions();
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();

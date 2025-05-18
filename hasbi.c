@@ -325,56 +325,99 @@ int getEnemyDamage(GameState *S)
 }
 
 /********************************************************* EXPLOSIONS ******************************************************************/
-Explosion explosions[MAX_EXPLOSIONS];
+// Explosion explosions[MAX_EXPLOSIONS];
+ExplosionNode* ExplosionHead = NULL;
 Texture2D explosionsTexture;
 Sound asteroidDestroyed, userPlaneExplosions;
 
 void CreateExplosion(Vector2 position)
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    ExplosionNode* current = ExplosionHead;
+    ExplosionNode* last = NULL;
+
+    // Cari node yang tidak aktif
+    while (current != NULL)
     {
-        if (!explosions[i].active)
+        if (!current->data.active)
         {
-            explosions[i].position = position;
-            explosions[i].active = true;
-            explosions[i].frame = 0;
-            explosions[i].timer = 0;
-            break; // Keluar setelah menemukan slot kosong
+            current->data.position = position;
+            current->data.active = true;
+            current->data.frame = 0;
+            current->data.timer = 0;
+            return;
         }
+        last = current;
+        current = current->next;
+    }
+
+    // Jika tidak ada node yang tidak aktif, buat node baru
+    ExplosionNode* newNode = (ExplosionNode*)malloc(sizeof(ExplosionNode));
+    newNode->data.position = position;
+    newNode->data.active = true;
+    newNode->data.frame = 0;
+    newNode->data.timer = 0;
+    newNode->next = NULL;
+
+    if (ExplosionHead == NULL)
+    {
+        ExplosionHead = newNode;
+    }
+    else
+    {
+        last->next = newNode;
     }
 }
 
+
 void UpdateExplosions(float deltaTime)
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    ExplosionNode* current = ExplosionHead;
+
+    while (current != NULL)
     {
-        if (explosions[i].active)
+        if (current->data.active)
         {
-            explosions[i].timer += deltaTime;
-            if (explosions[i].timer > 0.1f)
+            current->data.timer += deltaTime;
+            if (current->data.timer > 0.1f)
             { // Ubah frame setiap 0.1 detik
-                explosions[i].frame++;
-                explosions[i].timer = 0;
+                current->data.frame++;
+                current->data.timer = 0;
             }
-            if (explosions[i].frame >= 5)
+
+            if (current->data.frame >= 5)
             { // Misal animasi punya 5 frame
-                explosions[i].active = false;
+                current->data.active = false;
             }
         }
+        current = current->next;
     }
 }
 
 void DrawExplosions(Texture2D explosionTexture)
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    ExplosionNode* current = ExplosionHead;
+    while (current != NULL)
     {
-        if (explosions[i].active)
+        if (current->data.active)
         {
-            Rectangle source = {explosions[i].frame * 64, 0, 64, 64}; // Misal sprite 64x64
-            Rectangle dest = {explosions[i].position.x, explosions[i].position.y, 128, 128};
+            Rectangle source = {current->data.frame * 64, 0, 64, 64}; // Misal sprite 64x64
+            Rectangle dest = {current->data.position.x, current->data.position.y, 128, 128};
             DrawTexturePro(explosionsTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
         }
+        current = current->next;
     }
+}
+
+void freeExplosions()
+{
+    ExplosionNode* current = ExplosionHead;
+    while (current != NULL)
+    {
+        ExplosionNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    ExplosionHead = NULL;
 }
 
 /********************************************************* ASTEROIDS ******************************************************************/
@@ -927,13 +970,17 @@ void ResetEnemyBullets()
         current = current->next;
     }
 }
+
 void ResetExplosions()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    ExplosionNode* current = ExplosionHead;
+    while (current != NULL)
     {
-        explosions[i].active = false;
+        current->data.active = false;
+        current = current->next;
     }
 }
+
 void ResetPlayerBulet()
 {
     BulletNode *current = BulletHead;

@@ -6,6 +6,7 @@
 Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
+// ExplosionNode* ExplosionHead = NULL;
 Star stars[MAX_STARS];
 Texture2D BD1, BD2, BD3, RB, RB1, RB2, RB3, BDef;
 Music bossbgm;
@@ -382,34 +383,38 @@ void BossRage(GameState *S)
 void BossExplosions()
 {
     float dt = GetFrameTime();
-    int jmlledakan = 2;
+    int jumlahLedakan = 2;
+
     if (bosses.defeat)
     {
-        timerExp += GetFrameTime();
-        timerExp2 += GetFrameTime();
-        if (timerExp >= 0.15f && timerExp2 < 5.0f)
+        timerExp += dt;
+        bosses.destroyTime += dt;
+
+        if (timerExp >= 0.15f && bosses.destroyTime < 5.0f)
         {
-            for (int i = 0; i < jmlledakan; i++)
+            for (int i = 0; i < jumlahLedakan; i++)
             {
-                Vector2 posisi1 = {explosions->position.x = GetRandomValue(bosses.position.x - 100, bosses.position.x + 350), explosions->position.y = GetRandomValue(bosses.position.y - 100, bosses.position.y + 250)};
-                CreateExplosion(posisi1);
-                PlaySound(asteroidDestroyed);
+                Vector2 posisi = {
+                    GetRandomValue(bosses.position.x - 100, bosses.position.x + 350),
+                    GetRandomValue(bosses.position.y - 100, bosses.position.y + 250)
+                };
+
+                CreateExplosion(posisi);         // Pakai linked list ledakan
+                PlaySound(asteroidDestroyed);   // Suara ledakan
             }
+
             timerExp = 0;
         }
-        if (bosses.destroyTime >= 0.0f)
-        {
-            bosses.destroyTime += dt; // Tambah waktu berjalan
 
-            if (bosses.destroyTime >= 5.0f)
-            {                         // Jika sudah 5 detik
-                bosses.aktif = false; // Matikan musuh
-                StopMusicStream(bossbgm);
-                bosses.theEnd = true;
-            }
+        if (bosses.destroyTime >= 5.0f)
+        {
+            bosses.aktif = false;
+            StopMusicStream(bossbgm);
+            bosses.theEnd = true;
         }
     }
 }
+
 
 void InitBGM()
 {

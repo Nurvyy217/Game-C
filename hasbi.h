@@ -159,7 +159,7 @@ extern int level;
 extern bool isLoadingDone;
 extern int playerHealth;
 extern Texture2D explosionsTexture;
-extern Texture2D hitEffect1, hitEffect2;
+extern Texture2D hitEffect1, hitEffect2, gameOver;
 // extern Explosion explosions[MAX_EXPLOSIONS];
 extern Music gameoverMusic;
 

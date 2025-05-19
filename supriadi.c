@@ -75,9 +75,14 @@ void Tampil_Score()
 void gameover(GameState *S)
 {
     ClearBackground(BLACK);
-    DrawText("Game Over", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
-    if (IsKeyPressed(KEY_R))
+    Rectangle source = {0, 0, gameOver.width, gameOver.height}; // Seluruh gambar
+    Rectangle dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};         // Area gameplay
+    Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
+
+    DrawTexturePro(gameOver, source, dest, origin, 0.0f, WHITE);
+    // DrawText("Game Over", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
+    // DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
+    if (IsKeyPressed(KEY_ENTER))
     {
         PlaySound(clickMenu);
         InfoPlayer.nyawa = NYAWA_AWAL;

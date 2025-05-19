@@ -992,7 +992,7 @@ void ResetPlayerBulet()
 }
 
 /********************************************************* LOAD AND UNLOAD ******************************************************************/
-Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken, enemylvl1, enemyBulletlv1;
+Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken, enemylvl1, enemyBulletlv1, gameOver;
 Sound typing;
 Music gameplayMusic;
 void LoadAssets()
@@ -1017,6 +1017,7 @@ void LoadAssets()
     enePurpleDamaged = LoadTexture("assets/enePurpleDamaged.png");
     enemyLvl5Broken = LoadTexture("assets/enemyLvl5Broken.png");
     gameplayMusic = LoadMusicStream("assets/gameplay.mp3");
+    gameOver = LoadTexture("assets/gameover.png");
 }
 // UNLOAD
 void UnloadAssets()

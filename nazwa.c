@@ -81,7 +81,7 @@ void varMenu(bool *soundAssets)
 
         // Tombol Pause
         DrawTextureEx(pauseTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 2}, 0.0f, iconScale, WHITE);
-        DrawText("Press Enter to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
+        DrawText("Press P to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
 
         // Tombol Quit
         DrawTextureEx(quitTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 3}, 0.0f, iconScale, WHITE);
@@ -101,7 +101,7 @@ bool isPaused = false;
 
 void togglePause()
 {
-    if (IsKeyPressed(KEY_ENTER))
+    if (IsKeyPressed(KEY_P))
     {
         isPaused = !isPaused;
     }
@@ -120,7 +120,7 @@ void gamePaused()
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     
     DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press Enter to start", 235, 530, 23, WHITE);
+    DrawText("Press P to start", 245, 530, 23, WHITE);
 }
 
 void varRestart()
@@ -184,7 +184,7 @@ void mainMenu(bool *gameStart)
         Tampil_Score();
         TampilInfoPowerup();
 
-        if (IsKeyPressed(KEY_ENTER))
+        if (IsKeyPressed(KEY_P))
         {
             *gameStart = true; // Set gameStart = true untuk keluar dari menu
         }

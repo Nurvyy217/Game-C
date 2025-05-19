@@ -16,8 +16,9 @@ int main(void)
     InitPlayer();
     InitEnemy();
     InitBosses();
+    InitEnemyBullets();
     InitBullets();
-    InitAsteroids();
+    
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();
@@ -39,6 +40,9 @@ int main(void)
     FreeEnemy();
     CloseAudioDevice();
     UnloadAssets();
+    FreeEnemyBullets();
+    freeBullets();
+    freeExplosions();
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();

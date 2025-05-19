@@ -6,13 +6,16 @@
 extern bool isPaused;
 extern bool gameStart;
 
+
+
 void mainMenu(bool *gameStart);
+void varMenu(bool *soundAssets);
 void varQuit();
 void togglePause();
 bool getPauseState();
 void gamePaused();
-void varRestart();
 void loadAssetMenu();
+void loadMusic();
 void unloadAssetMenu();
 void level2(float deltaTime);
 

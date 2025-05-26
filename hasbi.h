@@ -76,6 +76,7 @@ typedef struct
     int hitEffectFrame;   // 0 atau 1, untuk efek tembakan
     float hitEffectTimer; // Timer untuk durasi efek
 } Asteroid;
+
 typedef struct AsteroidNode
 {
     Asteroid data;
@@ -99,8 +100,8 @@ typedef struct ExplosionNode {
 extern ExplosionNode* ExplosionHead;
 
 // ENEMY
-typedef struct
-{
+typedef struct Enemy *address;
+typedef struct Enemy {
     Vector2 position;
     Vector2 speed;
     bool isActive;
@@ -109,7 +110,10 @@ typedef struct
     int health;
     int hitEffectFrame;   // 0 atau 1, untuk efek tembakan
     float hitEffectTimer; // Timer untuk durasi efek
+    address next;
 } Enemy;
+
+extern address EnemiesHead;
 
 // ENEMY BULLET
 typedef struct
@@ -159,7 +163,7 @@ extern int level;
 extern bool isLoadingDone;
 extern int playerHealth;
 extern Texture2D explosionsTexture;
-extern Texture2D hitEffect1, hitEffect2;
+extern Texture2D hitEffect1, hitEffect2, gameOver;
 // extern Explosion explosions[MAX_EXPLOSIONS];
 extern Music gameoverMusic;
 
@@ -197,6 +201,7 @@ void freeExplosions();
 
 // ENEMY
 void InitEnemyBullets();
+void InitEnemy();
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S);
 void SpawnEnemies(GameState *S);
@@ -205,6 +210,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
 void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S);
 void DrawEnemies(Texture2D EnemyImage, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S);
 void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S);
+void FreeEnemy();
 
 // GAME
 void game();

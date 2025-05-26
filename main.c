@@ -14,6 +14,7 @@ int main(void)
     InitBGM();
     InitStar();
     InitPlayer();
+    InitEnemy();
     InitBosses();
     InitEnemyBullets();
     InitBullets();
@@ -35,6 +36,8 @@ int main(void)
         }
     }
 
+    FreeStars();
+    FreeEnemy();
     CloseAudioDevice();
     UnloadAssets();
     FreeEnemyBullets();

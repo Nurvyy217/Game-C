@@ -11,6 +11,7 @@
 /********************************************************* LOADING ANIMATION ******************************************************************/
 bool gameStart = false;
 bool isLoadingDone = false;
+Sound nging, duar;
 
 void DrawLayout()
 {
@@ -232,17 +233,17 @@ int getEnemyDamage(GameState *S)
     return enemyDamage(S);
 }
 
-/********************************************************* EXPLOSIONS ******************************************************************/
-// Explosion explosions[MAX_EXPLOSIONS];
+/********************************************************* EXPLOSIONS ******************************************************************
 
-Sound asteroidDestroyed, userPlaneExplosions;
+
+
+
 
 /********************************************************* ASTEROIDS ******************************************************************/
-
+Sound userPlaneExplosions;
 Texture2D asteroidTexture;
-Texture2D hitEffect1;
-Texture2D hitEffect2;
 
+/* REMOVEINACTIVEASTEROID: MENGHAPUS ASTEROID YANG TIDAK AKTIF DARI LIST */
 void RemoveInactiveAsteroids(GameState *S)
 {
     AsteroidNode **indirect = &S->asteroidHead;
@@ -261,6 +262,7 @@ void RemoveInactiveAsteroids(GameState *S)
     }
 }
 
+/* COUNT ACTIVE ASTEROIDS: MENGHITUNG JUMLAH ASTEROID YANG AKTIF */
 int CountActiveAsteroids(GameState *S)
 {
     int count = 0;
@@ -274,10 +276,13 @@ int CountActiveAsteroids(GameState *S)
     return count;
 }
 
+/* SPAWN ASTEROID: ALOKASI 1 NODE ASTEROID DAN INISIALISASI PROPERTI ASTEROID*/
 void SpawnAsteroid(GameState *S)
 {
+
     if (CountActiveAsteroids(S) >= MAX_ASTEROIDS)
         return;
+
     AsteroidNode *newNode = (AsteroidNode *)malloc(sizeof(AsteroidNode));
     newNode->data.position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 100), GetRandomValue(-50, -100)};
     newNode->data.size = GetRandomValue(1, 3);
@@ -285,14 +290,15 @@ void SpawnAsteroid(GameState *S)
     newNode->data.active = true;
     newNode->next = NULL;
 
-    // Masukkan ke head list
     newNode->next = S->asteroidHead;
     S->asteroidHead = newNode;
 }
 
+/* UPDATE ASTEROIDS: PERBARUI POSISI (PERGERAKAN ASTEROID DI LAYAR)*/
 void UpdateAsteroids(GameState *S)
 {
     AsteroidNode *current = S->asteroidHead;
+
     while (current != NULL)
     {
         if (current->data.active)
@@ -300,14 +306,20 @@ void UpdateAsteroids(GameState *S)
             current->data.position.x += current->data.speed.x;
             current->data.position.y += current->data.speed.y;
 
-            float limitX = GAMEPLAY_WIDTH - (asteroidTexture.width * (current->data.size == 1 ? 0.05f : current->data.size == 2 ? 0.07f
-                                                                                                                                : 0.09f));
+            float forAsteroidSize;
+            if (current->data.size == 1)
+                forAsteroidSize = 0.05f;
+            else if (current->data.size == 2)
+                forAsteroidSize = 0.07f;
+            else
+                forAsteroidSize = 0.09f;
+            
+            float limitX = GAMEPLAY_WIDTH - (asteroidTexture.width * forAsteroidSize);
 
             if (current->data.position.x <= 0 || current->data.position.x >= limitX)
             {
                 current->data.speed.x *= -1;
             }
-
             if (current->data.position.y > SCREEN_HEIGHT)
             {
                 current->data.active = false;
@@ -317,7 +329,8 @@ void UpdateAsteroids(GameState *S)
     }
 }
 
-void CheckCollisions(GameState *S)
+/*CHECKCOLLISIONASTEROID: CEK APAKAH ASTEROID MENYENTUH PEMAIN*/
+void CheckCollisionAsteroid(GameState *S)
 {
     Vector2 playerPosition = (Vector2){player.position.x + 175, player.position.y + 140};
 
@@ -342,6 +355,7 @@ void CheckCollisions(GameState *S)
     }
 }
 
+/* ASTEROID LOOP: MENGGUNAKAN TIMER UNTUK MENGATUR SPAWN ASTEROID */
 void AsteroidLoop(GameState *S)
 {
     static float asteroidSpawnTimer = 0.0f;
@@ -357,6 +371,7 @@ void AsteroidLoop(GameState *S)
     RemoveInactiveAsteroids(S);
 }
 
+/* DRAW ASTEROIDS: MENGGAMBAR ASTEROID DI LAYAR */
 void DrawAsteroids(GameState *S)
 {
     AsteroidNode *current = S->asteroidHead;
@@ -377,8 +392,10 @@ void DrawAsteroids(GameState *S)
 // Enemy enemies[MAX_ENEMIES];
 address EnemiesHead = NULL;
 PNodeEB ebHead = NULL;
-Sound nging, duar;
+Sound nging, duar, enemyDestroyed;
+Texture2D  hitEffect1, hitEffect2;
 
+/* INIT ENEMY: ALOKASI UNTUK 1 NODE */
 void InitEnemy(){
     address currentEnemy;
     for (int i = 0; i < MAX_ENEMIES; i++)
@@ -559,32 +576,6 @@ void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, in
     }
 }
 
-void InitEnemyBullets()
-{
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
-    {
-        PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
-        newBullet->Eb.isActive = false;
-        newBullet->Eb.hasPlayedSound = false;
-        newBullet->Eb.shooterIndex = -1; // Inisialisasi index penembak
-        newBullet->next = NULL;
-
-        if (ebHead == NULL)
-        {
-            ebHead = newBullet;
-        }
-        else
-        {
-            PNodeEB current = ebHead;
-            while (current->next != NULL)
-            {
-                current = current->next;
-            }
-            current->next = newBullet;
-        }
-    }
-}
-
 void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -621,7 +612,7 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
             }
         }
         else if (getEnemyTypeShoot(S) == 1)
-        {
+        {   
             int bulletsSpawned = 0;
             current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 4; j++)
@@ -669,117 +660,6 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
     }
 }
 
-void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
-{
-    address currentEnemy;
-    currentEnemy = EnemiesHead;
-    int n = getMaxEnemyBullet(S);
-    PNodeEB current = ebHead;
-
-    for (int i = 0; i < getMaxEnemyBullet(S); i++)
-    {
-        if (current->Eb.isActive == true)
-        {
-            if (getEnemyTypeShoot(S) == 3)
-            {
-                int shooterIdx = current->Eb.shooterIndex; // Ambil index musuh yang menembak
-
-                if (shooterIdx >= 0 && shooterIdx < getMaxEnemy(S))
-                {
-                    // Vector2 shooterPos = enemies[shooterIdx].position; // Posisi musuh
-                    Vector2 shooterPos;
-                    int shooterLinklistIdx = shooterIdx; 
-                    while (shooterLinklistIdx > 0)
-                    {
-                        currentEnemy = currentEnemy->next;
-                        shooterLinklistIdx--;
-                    }
-                    shooterPos = currentEnemy->position;
-                    currentEnemy = EnemiesHead;
-                    
-                    if (current->Eb.delayTimer < 2.0f)
-                    {
-                        // Selama 2 detik pertama, peluru mengikuti musuh
-                        current->Eb.position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
-                        current->Eb.position.y = shooterPos.y + enemyBulletTexture.height + 185;
-
-                        current->Eb.delayTimer += GetFrameTime();
-
-                        if (current->Eb.delayTimer < 2.0f && current->Eb.hasPlayedSound == false)
-                        {
-                            SetSoundVolume(nging, 3.0f);
-                            PlaySound(nging);                  // Suara "nging"
-                            current->Eb.hasPlayedSound = true; // Tandai agar tidak diulang
-                        }
-                    }
-
-                    // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
-                    if (current->Eb.delayTimer >= 2.0f)
-                    {
-                        if (!current->Eb.hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
-                        {
-                            PlaySound(duar);
-                            current->Eb.hasPlayedDuar = true; // Tandai sudah dimainkan
-                        }
-                        current->Eb.speed.y = SPEED_ENEMY_BULLETS * 10.0f;
-                        current->Eb.position.y += current->Eb.speed.y;
-
-                        if (current->Eb.position.y > 960)
-                        {
-                            current->Eb.delayTimer = 0;
-                            current->Eb.hasPlayedSound = false; // Reset untuk peluru berikutnya
-                        }
-                    }
-                }
-            }
-            else
-            {
-                current->Eb.position.x += current->Eb.speed.x;
-                current->Eb.position.y += current->Eb.speed.y;
-            }
-            if (current->Eb.position.x <= -15 || current->Eb.position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
-            {
-                current->Eb.speed.x *= -1;
-            }
-
-            if (current->Eb.position.y > 960)
-            {
-                current->Eb.isActive = false;
-                current->Eb.hasPlayedSound = false;
-                current->Eb.hasPlayedDuar = false;
-                current->Eb.delayTimer = 0;
-                current->Eb.shooterIndex = -1;
-            }
-        }
-        current = current->next;
-    }
-}
-
-void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
-{
-    PNodeEB current = ebHead;
-    for (int i = 0; i < getMaxEnemyBullet(S); i++)
-    {
-        if (current->Eb.isActive)
-        {
-            DrawTextureEx(enemyBulletTexture, current->Eb.position, 0.0f, scale, WHITE);
-        }
-        current = current->next; // Pindah ke peluru musuh berikutnya
-    }
-}
-
-void FreeEnemyBullets()
-{
-    PNodeEB current = ebHead;
-    while (current != NULL)
-    {
-        PNodeEB temp = current;
-        current = current->next;
-        free(temp);
-    }
-    ebHead = NULL;
-}
-
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -810,7 +690,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                     currentEnemy->hitEffectTimer = 0;
                     currentEnemy->hitEffectFrame = 0;
                     updateScore(2); // Matikan musuh
-                    PlaySound(asteroidDestroyed);
+                    PlaySound(enemyDestroyed);
                     CreateExplosion(enemiesPosition);
                     break; // Hindari multiple hits dalam satu frame
                 }
@@ -844,7 +724,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
                 if (current->Eb.isActive && CheckCollisionCircles(current->Eb.position, 5, playerPosition, 45))
                 {
                     current->Eb.isActive = false;
-                    PlaySound(asteroidDestroyed);
+                    PlaySound(enemyDestroyed);
                     if (!InfoPlayer.shieldActive)
                     {
                         CreateExplosion(playerPosition);
@@ -893,20 +773,6 @@ void ResetAsteroid(GameState *S)
     }
 }
 
-void ResetEnemyBullets()
-{
-    PNodeEB current = ebHead;
-    while (current != NULL)
-    {
-        current->Eb.isActive = false;
-        current->Eb.hasPlayedSound = false;
-        current->Eb.hasPlayedDuar = false;
-        current->Eb.shooterIndex = -1;
-        current = current->next;
-    }
-}
-
-
 /********************************************************* LOAD AND UNLOAD ******************************************************************/
 Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken, enemylvl1, enemyBulletlv1, gameOver;
 Sound typing;
@@ -915,11 +781,11 @@ void LoadAssets()
 {
     initBG();
     asteroidTexture = LoadTexture("assets/Asteroid.png");
+    enemyDestroyed = LoadSound("assets/enemyDestroyed.wav");
     typing = LoadSound("assets/typing.wav");
     shootSound = LoadSound("assets/shoot.wav");
     nging = LoadSound("assets/nging.wav");
     duar = LoadSound("assets/duar.wav");
-    asteroidDestroyed = LoadSound("assets/asteroidDestroyed.wav");
     userPlaneExplosions = LoadSound("assets/userPlaneExplosion.wav");
     hitEffect1 = LoadTexture("assets/efekTembakan1.png");
     hitEffect2 = LoadTexture("assets/efekTembakan2.png");
@@ -940,10 +806,9 @@ void UnloadAssets()
     UnloadSound(shootSound);
     UnloadSound(nging);
     UnloadSound(duar);
-    UnloadSound(asteroidDestroyed);
+    UnloadSound(enemyDestroyed);
     UnloadTexture(explosionsTexture);
     UnloadTexture(asteroidTexture);
-    UnloadSound(asteroidDestroyed);
     UnloadTexture(hitEffect1);
     UnloadTexture(hitEffect2);
     UnloadTexture(enemylvl1);
@@ -1085,13 +950,12 @@ void GameplayWithoutEnemies()
     UpdatePlayer();
     DrawLayout();
     DrawPlayer();
-    mainMenu(&gameStart);
 }
 
 void callAsteroid(GameState *S)
 {
     DrawAsteroids(S);
-    CheckCollisions(S);
+    CheckCollisionAsteroid(S);
     AsteroidLoop(S);
 }
 
@@ -1116,7 +980,7 @@ void DrawLvl1()
     DrawEnemies(enemylvl1, enemylvl1, 2.0f, 120, 150, &gamestate);
     DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
-    mainMenu(&gameStart);
+    
 }
 void level1(float deltaTime)
 {
@@ -1140,7 +1004,7 @@ void DrawLvl3(GameState *S)
     DrawBullets();
     DrawExplosions(explosionsTexture);
     DrawAsteroids(S);
-    mainMenu(&gameStart);
+    
 }
 void level3(GameState *S, float deltaTime)
 {
@@ -1148,7 +1012,7 @@ void level3(GameState *S, float deltaTime)
     UpdateShooting(deltaTime);
     UpdateBullets();
     UpdateExplosions(deltaTime);
-    CheckCollisions(S);
+    CheckCollisionAsteroid(S);
     DrawLvl3(S);
     AsteroidLoop(S);
     inipowerup();
@@ -1163,7 +1027,7 @@ void DrawLvl4()
     DrawEnemies(enemyLvl5, enemyLvl5Broken, 1.2f, 80, 110, &gamestate);
     DrawEnemyBullets(enemyBulletlv1, 0.8f, &gamestate);
     tampilspark();
-    mainMenu(&gameStart);
+    
 }
 void level4(float deltaTime)
 {
@@ -1194,7 +1058,7 @@ void DrawLvl5()
     DrawEnemies(enemyLvl6, enePurpleDamaged, 3.0f, 150, 200, &gamestate);
     DrawEnemyBullets(enemyBulletLv3, 1.3, &gamestate);
     tampilspark();
-    mainMenu(&gameStart);
+
 }
 void level5(float deltaTime)
 {
@@ -1225,7 +1089,6 @@ void DrawBossLevel()
     DrawBosses(&gamestate);
     DrawExplosions(explosionsTexture);
     DrawBossLaser();
-    mainMenu(&gameStart);
 }
 void bossLevel(float deltaTime)
 {
@@ -1258,7 +1121,6 @@ void bossLevel(float deltaTime)
 
 void game()
 {
-    
     if (!IsMusicStreamPlaying(gameplayMusic)&&!bosses.theEnd)
     {
         PlayMusicStream(gameplayMusic);

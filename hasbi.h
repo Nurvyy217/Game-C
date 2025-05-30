@@ -18,7 +18,7 @@
 #define MAX_ASTEROIDS 10
 // EXPLOSION
 #define MAX_EXPLOSIONS 50
-extern Sound asteroidDestroyed;
+extern Sound enemyDestroyed;
 // ENEMY
 #define SPEED_ENEMY_BULLETS 4
 #define MAX_ENEMIES 10
@@ -188,7 +188,7 @@ void freeBullets();
 void DrawAsteroids(GameState *S);
 void AsteroidLoop(GameState *S);
 void SpawnAsteroid(GameState *S);
-void CheckCollisions(GameState *S);
+void CheckCollisionAsteroid(GameState *S);
 void UpdateAsteroids(GameState *S);
 int CountActiveAsteroids(GameState *S);
 void RemoveInactiveAsteroids(GameState *S);

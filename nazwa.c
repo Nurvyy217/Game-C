@@ -14,7 +14,9 @@ Texture2D pauseTexture;
 Texture2D quitTexture;
 Texture2D gameOverTexture;
 Texture2D ufoTexture;
+
 bool soundOn = true;
+bool soundAssets = true;
 bool startGame = false;
 
 void varMenu(bool *soundAssets)

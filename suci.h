@@ -44,17 +44,31 @@ typedef struct Assets
     bool isMusicOn;
 } Assets;
 
-// Struktur untuk menu pengaturan
+
+typedef struct Node {
+    const char *option;   // Menyimpan pilihan menu
+    struct Node *next;    // Pointer ke node berikutnya
+} Node;
+
+// // Struktur untuk menu pengaturan array
+// typedef struct {
+//     int selectedOption;
+//     float volume;
+//     int screenWidth;
+//     int screenHeight;
+//     const char *options[3];
+// } SettingsMenu;
+
+
+// Struktur  settings menu dengan linked list
 typedef struct {
-    int selectedOption;
+    Node *head;           // Pointer ke node pertama dalam linked list
+    int selectedOption;   // Pilihan menu yang dipilih
     float volume;
     int screenWidth;
     int screenHeight;
-    const char *options[3];
 } SettingsMenu;
 
-// Deklarasi fungsi
-void menuSuci();
 // Deklarasi fungsi
 void menuSuci();
 void InitAssets(Assets *assets);
@@ -66,6 +80,10 @@ void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets 
 
 
 void InitSettingsMenu(SettingsMenu *menu);
+void InitSettingsMenu(SettingsMenu *menu);
+void addOption(SettingsMenu *menu, const char *option);  // Fungsi untuk menambah opsi menu ke linked list
+void printMenuOptions(SettingsMenu *menu);  // Fungsi untuk menampilkan pilihan menu dari linked list
+void clearMenuOptions(SettingsMenu *menu);   // Fungsi untuk menghapus linked list
 void UpdateSettingsMenu(SettingsMenu *menu);
 void DrawSettingsMenu(SettingsMenu *menu);
 

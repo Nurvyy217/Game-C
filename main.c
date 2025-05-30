@@ -14,8 +14,11 @@ int main(void)
     InitBGM();
     InitStar();
     InitPlayer();
+    InitEnemy();
     InitBosses();
+    InitEnemyBullets();
     InitBullets();
+    
     InitEnemyBullets();
     InitAsteroids();
     LoadAssets();
@@ -37,9 +40,12 @@ int main(void)
 
     FreeStars();
     FreeEnemyBullets();
-
+    FreeEnemy();
     CloseAudioDevice();
     UnloadAssets();
+    FreeEnemyBullets();
+    freeBullets();
+    freeExplosions();
     // UnloadPlayer();
     unloadTextures();
     unloadAssetMenu();

@@ -5,10 +5,14 @@
 #include "supriadi.h"
 #include <stdio.h>
 #include <math.h>
+#include <raylib.h>
+#include <math.h>
+
 Texture2D logoDeveloper;
 Texture2D gameNamePhoto;
 
 Texture2D background;
+
 bool texturesLoaded = false; // Cek apakah gambar sudah di-load
 
 void initLoadScreen()
@@ -46,11 +50,20 @@ void InitAssets(Assets *assets)
 
     PlayMusicStream(assets->bgMusic);
     SetMusicVolume(assets->bgMusic, 0.5f);
+    SetMusicVolume(assets->bgMusic, 1.0f);
+    assets->isMusicOn = true;
+
+    assets->menuBackground = LoadTexture("aseets/bgMenuScreen.png");  
+    assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png"); 
+    assets->btnOn = LoadTexture("assets/btnOn.png");
+    assets->btnOff = LoadTexture("assets/btnOff.png");
+    assets->btnBack = LoadTexture("assets/btnBack.png");
 }
 
 void UnloadAssetss(Assets *assets)
 {
     UnloadTexture(assets->bg);
+    // UnloadTexture(assets->title); // Jika tidak lagi dipakai
 
     UnloadTexture(assets->btnPlay);
     UnloadTexture(assets->btnMenu);
@@ -62,6 +75,14 @@ void UnloadAssetss(Assets *assets)
 
     UnloadTexture(assets->menuBackground);
     UnloadTexture(assets->settingsBackground);
+
+    UnloadTexture(assets->btnOn);
+    UnloadTexture(assets->btnOff);
+    UnloadTexture(assets->btnBack);
+
+    UnloadTexture(assets->menuBackground);
+    UnloadTexture(assets->settingsBackground);
+
 
     UnloadMusicStream(assets->bgMusic);
     CloseAudioDevice();
@@ -155,40 +176,93 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     }
     EndDrawing();
 }
-void InitSettingsMenu(SettingsMenu *menu)
-{
+
+void InitSettingsMenu(SettingsMenu *menu) {
+    menu->head = NULL;  // Inisialisasi linked list kosong
     menu->selectedOption = 0;
     menu->volume = 1.0f;
     menu->screenWidth = SCREEN_WIDTH;
     menu->screenHeight = SCREEN_HEIGHT;
-    menu->options[0] = "On";
-    menu->options[1] = "Off";
-    menu->options[2] = "Back";
+
+    // Menambahkan opsi ke dalam linked list
+    addOption(menu, "On");
+    addOption(menu, "Off");
+    addOption(menu, "Back");
 }
 
-// Menangani input di menu settings
-void UpdateSettingsMenu(SettingsMenu *menu)
-{
-    if (IsKeyPressed(KEY_DOWN))
+void addOption(SettingsMenu *menu, const char *option) {
+    Node *newNode = (Node*)malloc(sizeof(Node));  // Alokasikan memori untuk node baru
+    newNode->option = option;                      // Simpan pilihan dalam node
+    newNode->next = NULL;                          // Node terakhir menunjuk ke NULL
+
+    if (menu->head == NULL) {
+        menu->head = newNode;  // Jika linked list kosong, node ini menjadi head
+    } else {
+        Node *current = menu->head;
+        while (current->next != NULL) {
+            current = current->next;  // Cari node terakhir
+        }
+        current->next = newNode;  // Tambahkan node baru di akhir
+    }
+}
+
+
+void printMenuOptions(SettingsMenu *menu) {
+    Node *current = menu->head;
+    while (current != NULL) {
+        printf("%s\n", current->option);  // Cetak pilihan menu
+        current = current->next;          // Pindah ke node berikutnya
+    }
+}
+
+void clearMenuOptions(SettingsMenu *menu) {
+    Node *current = menu->head;
+    while (current != NULL) {
+        Node *next = current->next;  // Simpan pointer ke node berikutnya
+        free(current);               // Hapus node saat ini
+        current = next;              // Pindah ke node berikutnya
+    }
+    menu->head = NULL;  // Set head ke NULL untuk menunjukkan linked list kosong
+}
+
+void DrawSettingsMenu(SettingsMenu *menu) {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    DrawText("Pengaturan", SCREEN_WIDTH / 2 - 50, 100, 20, RAYWHITE);
+    
+    // Tampilkan opsi menu dari linked list
+    Node *current = menu->head;
+    int yOffset = 200;
+    while (current != NULL) {
+        Color color = (menu->selectedOption == 0) ? YELLOW : WHITE; // Pilihan yang dipilih diberi warna khusus
+        DrawText(current->option, SCREEN_WIDTH / 2 - 50, yOffset, 20, color);
+        yOffset += 40;
+        current = current->next;
+    }
+    
+    EndDrawing();
+}
+
+void UpdateSettingsMenu(SettingsMenu *menu) {
+    if (IsKeyPressed(KEY_DOWN)) {
         menu->selectedOption = (menu->selectedOption + 1) % 3;
-    if (IsKeyPressed(KEY_UP))
-        menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
-    if (menu->selectedOption == 0)
-    {
-        if (IsKeyPressed(KEY_LEFT))
-            menu->volume = fmax(menu->volume - 0.1f, 0.0f);
-        if (IsKeyPressed(KEY_RIGHT))
-            menu->volume = fmin(menu->volume + 0.1f, 1.0f);
     }
-    if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER))
-    {
-        menu->selectedOption = 0;
+    if (IsKeyPressed(KEY_UP)) {
+        menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
+    }
+
+    if (menu->selectedOption == 0) {
+        if (IsKeyPressed(KEY_LEFT)) menu->volume = fmax(menu->volume - 0.1f, 0.0f);
+        if (IsKeyPressed(KEY_RIGHT)) menu->volume = fmin(menu->volume + 0.1f, 1.0f);
+    }
+
+    if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER)) {
+        // Implement action for "Back"
     }
 }
 
-void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets)
-{
-    // Navigasi dengan tombol panah
+
+void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets) {
     if (IsKeyPressed(KEY_DOWN))
     {
         PlaySound(selectMenu);
@@ -243,8 +317,7 @@ void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets 
     EndDrawing();
 }
 
-void menuSuci()
-{
+void menuSuci(){
     Assets assets;
     InitAssets(&assets);
 
@@ -256,7 +329,6 @@ void menuSuci()
 
     while (isRunning)
     {
-
         UpdateMusicStream(assets.bgMusic);
 
         if (currentScreen == MENU)
@@ -271,11 +343,11 @@ void menuSuci()
         {
             UpdateSettingsScreen(&currentScreen, &settingsMenu, &assets);
         }
-        if (currentScreen == EXIT)
+        else if (currentScreen == EXIT)
         {
             isRunning = false;
+            UpdateSettingsScreen(&currentScreen, &settingsMenu, &assets);
         }
     }
-
     UnloadAssetss(&assets);
 }

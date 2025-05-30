@@ -6,7 +6,6 @@
 Bosses bosses;
 BossLaser bossLaser;
 Sound laserSound;
-Star stars[MAX_STARS];
 Texture2D BD1, BD2, BD3, RB, RB1, RB2, RB3, BDef;
 Music bossbgm;
 float timerExp = 0;
@@ -79,10 +78,14 @@ void InitStar()
     for (int i = 0; i < MAX_STARS; i++)
     {
         StarNode* newStar = (StarNode*)malloc(sizeof(StarNode));
-        newStar->data.position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
-        newStar->data.speed = GetRandomValue(50, 200) / 100.0f;
-        newStar->data.size = GetRandomValue(1, 22) / 10.0f; // Karena GetRandomValue tidak support float
-        newStar->next = NULL;
+        if (newStar != NULL)
+        {
+            newStar->data.position = (Vector2){GetRandomValue(0, 720), GetRandomValue(0, 960)};
+            newStar->data.speed = GetRandomValue(50, 200) / 100.0f;
+            newStar->data.size = GetRandomValue(1, 22) / 10.0f; // Karena GetRandomValue tidak support float
+            newStar->next = NULL;
+            /* code */
+        }
 
         if (starHead == NULL)
         {
@@ -96,7 +99,6 @@ void InitStar()
         }
     }
 }
-
 
 // void UpdateStar()
 // {
@@ -128,7 +130,6 @@ void UpdateStar()
     }
 }
 
-
 // void DrawStar()
 // {
 
@@ -151,7 +152,7 @@ void DrawStar()
 }
 
 
-void DrawBosses()
+void DrawBosses(GameState *S)
 {
     if (bosses.aktif)
     {
@@ -171,7 +172,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.6) && bosses.health > 150)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             currentBossTexture = BD2;
         }
         else if (bosses.health <= (bosses.maxHealth * 0.5) && bosses.health > 120)
@@ -182,7 +183,7 @@ void DrawBosses()
         else if (bosses.health <= (bosses.maxHealth * 0.4) && bosses.health > 60)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             currentBossTexture = BD3;
         }
         else if (bosses.health <= (bosses.maxHealth * 0.2) && bosses.health > 0)
@@ -193,7 +194,7 @@ void DrawBosses()
         else if (bosses.health <= 0)
         {
             bosses.bossRage = false;
-            ResetAsteroid();
+            ResetAsteroid(S);
             bosses.defeat = true;
             currentBossTexture = BDef;
         }
@@ -370,31 +371,35 @@ void CheckBossCollisions(GameState *S)
     }
 
     // Peluru player mengenai boss
-    for (int i = 0; i < MAX_BULLETS; i++)
+    BulletNode* current = BulletHead;
+    while (current != NULL)
     {
-        if (bullets[i].active)
+        if (current->data.active)
         {
             Rectangle bulletHitbox = {
-                bullets[i].position.x,
-                bullets[i].position.y,
+                current->data.position.x,
+                current->data.position.y,
                 20,
                 10};
 
-            if (CheckCollisionRecs(bulletHitbox, bossHitbox))
-            {
-                bosses.health -= 1;        // Boss kehilangan 1 HP per tembakan
-                bullets[i].active = false; // Nonaktifkan peluru setelah kena
-                bosses.hitEffectTimer = 0.15f;
-                bosses.hitEffectFrame = (bosses.health % 2);
-                if (bosses.health <= 0)
+                if (CheckCollisionRecs(bulletHitbox, bossHitbox))
                 {
-                    bossLaser.active = false;
-                    bossLaser.cooldown = 10000;
-                    bosses.hitEffectTimer = 0;
-                    bosses.hitEffectFrame = 0;
+                    bosses.health -= 1;        // Boss kehilangan 1 HP per tembakan
+                    current->data.active = false; // Nonaktifkan peluru setelah kena
+                    bosses.hitEffectTimer = 0.15f;
+                    bosses.hitEffectFrame = (bosses.health % 2);
+                    if (bosses.health <= 0)
+                    {
+                        bossLaser.active = false;
+                        bossLaser.cooldown = 10000;
+                        bosses.hitEffectTimer = 0;
+                        bosses.hitEffectFrame = 0;
+                    }
                 }
-            }
+            
         }
+        current = current->next;
+        
     }
 }
 
@@ -434,34 +439,37 @@ void BossRage(GameState *S)
 void BossExplosions()
 {
     float dt = GetFrameTime();
-    int jmlledakan = 2;
+    int jumlahLedakan = 2;
+
     if (bosses.defeat)
     {
-        timerExp += GetFrameTime();
-        timerExp2 += GetFrameTime();
-        if (timerExp >= 0.15f && timerExp2 < 5.0f)
+        timerExp += dt;
+        bosses.destroyTime += dt;
+
+        if (timerExp >= 0.15f && bosses.destroyTime < 5.0f)
         {
-            for (int i = 0; i < jmlledakan; i++)
+            for (int i = 0; i < jumlahLedakan; i++)
             {
-                Vector2 posisi1 = {explosions->position.x = GetRandomValue(bosses.position.x - 100, bosses.position.x + 350), explosions->position.y = GetRandomValue(bosses.position.y - 100, bosses.position.y + 250)};
-                CreateExplosion(posisi1);
-                PlaySound(asteroidDestroyed);
+                Vector2 posisi = {
+                    GetRandomValue(bosses.position.x - 100, bosses.position.x + 350),
+                    GetRandomValue(bosses.position.y - 100, bosses.position.y + 250)
+                };
+
+                CreateExplosion(posisi);         // Pakai linked list ledakan
+                PlaySound(asteroidDestroyed);   // Suara ledakan
             }
             timerExp = 0;
         }
-        if (bosses.destroyTime >= 0.0f)
-        {
-            bosses.destroyTime += dt; // Tambah waktu berjalan
 
-            if (bosses.destroyTime >= 5.0f)
-            {                         // Jika sudah 5 detik
-                bosses.aktif = false; // Matikan musuh
-                StopMusicStream(bossbgm);
-                bosses.theEnd = true;
-            }
+        if (bosses.destroyTime >= 5.0f)
+        {
+            bosses.aktif = false;
+            StopMusicStream(bossbgm);
+            bosses.theEnd = true;
         }
     }
 }
+
 
 void InitBGM()
 {
@@ -490,16 +498,3 @@ void FreeStars()
     }
     starHead = NULL;
 }
-
-void FreeEnemyBullets()
-{
-    PNodeEB current = ebHead;
-    while (current != NULL)
-    {
-        PNodeEB temp = current;
-        current = current->next;
-        free(temp);
-    }
-    ebHead = NULL;
-}
-

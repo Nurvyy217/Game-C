@@ -944,7 +944,6 @@ void GameplayWithoutEnemies()
     UpdatePlayer();
     DrawLayout();
     DrawPlayer();
-    mainMenu(&gameStart);
 }
 
 void callAsteroid(GameState *S)

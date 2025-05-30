@@ -121,7 +121,7 @@ void gamePaused()
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
 
     DrawTextureEx(gamePauseTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press P to start", 245, 530, 23, WHITE);
+    DrawText("Press P to start", 260, 530, 23, WHITE);
 }
 
 void varRestart()
@@ -130,6 +130,8 @@ void varRestart()
     {
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
+        ResetEnemies();
+        ResetEnemyBullets();
         InitPlayer();
         InitBullets();
     }

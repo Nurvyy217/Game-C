@@ -165,11 +165,13 @@ void UpdatePlayScreen(GameScreen *currentScreen)
 
     ClearBackground(DARKGRAY);
     varQuit();
+    varRestart();
     togglePause();
     if (!getPauseState())
     {
         game();
         mainMenu(&gameStart);
+        
     }
     else
     {

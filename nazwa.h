@@ -11,6 +11,8 @@ extern bool gameStart;
 void mainMenu(bool *gameStart);
 void varMenu(bool *soundAssets);
 void varQuit();
+void varRestart();
+void varSound(bool *gameStart);
 void togglePause();
 bool getPauseState();
 void gamePaused();

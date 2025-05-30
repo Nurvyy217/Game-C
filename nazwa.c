@@ -19,7 +19,7 @@ bool startGame = false;
 
 void varMenu(bool *soundAssets)
 {
-    static bool showPopup = false; // Status pop-up
+    static bool showPopup = false;
 
     int menuX = GAMEPLAY_WIDTH;
     int startY = 20;
@@ -41,7 +41,6 @@ void varMenu(bool *soundAssets)
 
     DrawTextureEx(menuTexture, texturePos, 0.0f, scale, WHITE);
 
-    // Jika pop-up aktif, tampilkan di tengah layar
     if (showPopup)
     {
         int popupWidth = 370;
@@ -58,33 +57,27 @@ void varMenu(bool *soundAssets)
 
         DrawText("Popup Menu", popupX + 20, popupY + 20, 25, WHITE);
 
-        // Posisi elemen dalam pop-up
         int iconStartX = popupX + 20; 
         int iconStartY = popupY + 60; 
         int iconSpacing = 70; 
         float iconScale = 0.5f;
         int textOffsetX = 80; 
 
-        // *Cek apakah tombol F ditekan untuk mengubah soundAssets*
         if (IsKeyPressed(KEY_F))
         {
-            *soundAssets = !(*soundAssets); // Toggle sound on/off
+            *soundAssets = !(*soundAssets);
         }
 
-        // Tombol sound
         Texture2D currentSoundTexture = *soundAssets ? soundOnTexture : soundOffTexture;
         DrawTextureEx(currentSoundTexture, (Vector2){iconStartX, iconStartY}, 0.0f, 0.4f, WHITE);
         DrawText("Press F to Off/On", iconStartX + textOffsetX, iconStartY + 15, 23, WHITE);
 
-        // Tombol Restart
         DrawTextureEx(restartTexture, (Vector2){iconStartX, iconStartY + iconSpacing}, 0.0f, iconScale, WHITE);
         DrawText("Press R to Restart", iconStartX + textOffsetX, iconStartY + iconSpacing + 20, 23, WHITE);
 
-        // Tombol Pause
         DrawTextureEx(pauseTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 2}, 0.0f, iconScale, WHITE);
         DrawText("Press P to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
 
-        // Tombol Quit
         DrawTextureEx(quitTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 3}, 0.0f, iconScale, WHITE);
         DrawText("Press Q to Quit", iconStartX + textOffsetX, iconStartY + iconSpacing * 3 + 25, 23, WHITE);
     }
@@ -105,9 +98,6 @@ void togglePause()
     if (IsKeyPressed(KEY_P))
     {
         isPaused = !isPaused;
-        if (!isPaused) {
-            startGame = true;
-        }
     }
 }
 
@@ -122,14 +112,6 @@ void gamePaused()
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.7f));
     DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
     DrawText("Press P to continue", 245, 530, 23, WHITE);
-    
-    bool soundAssets = true;
-    DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, BLACK);
-    DrawText(TextFormat("Level: %d", level), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 40, 30, RAYWHITE);
-    varMenu(&soundAssets);
-    tampilNyawa();
-    Tampil_Score();
-    TampilInfoPowerup();
 }
 
 void varRestart()
@@ -442,7 +424,7 @@ void DrawLvl2()
     DrawEnemies(ufoTexture, ufoBroken, 1.5f, 80, 110, &gamestate);
     DrawEnemyBullets(eneBul, 1.2f, &gamestate);
     tampilspark();
-    mainMenu(&gameStart);
+    mainMenu(&startGame);
 }
 
 void level2(float deltaTime)

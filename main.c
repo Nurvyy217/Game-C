@@ -9,6 +9,8 @@
 int main(void)
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders");
+    Image IconNa = LoadImage("assets/IconNa.png");
+    SetWindowIcon(IconNa);
     SetTargetFPS(60);
     InitAudioDevice(); // Inisialisasi perangkat audio
     InitBGM();
@@ -36,6 +38,7 @@ int main(void)
         }
     }
 
+    UnloadImage(IconNa);
     FreeStars();
     FreeEnemy();
     CloseAudioDevice();

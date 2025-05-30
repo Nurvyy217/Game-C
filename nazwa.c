@@ -1,8 +1,8 @@
 #include "nazwa.h"
 #include "hasbi.h"
-#include "supriadi.h"
 #include "fawwaz.h"
-#include "stdio.h"
+#include "supriadi.h"
+#include <stdio.h>
 
 Texture2D heartTexture;
 Texture2D enemyBulletlv3;
@@ -93,8 +93,8 @@ void varMenu(bool *soundAssets)
 void varQuit()
 {
     if (IsKeyPressed(KEY_Q))
-    {                  // Tekan Q untuk keluar
-        CloseWindow(); // Tutup jendela Raylib
+    {                  
+        CloseWindow(); 
     }
 }
 
@@ -105,6 +105,9 @@ void togglePause()
     if (IsKeyPressed(KEY_P))
     {
         isPaused = !isPaused;
+        if (!isPaused) {
+            startGame = true;
+        }
     }
 }
 
@@ -116,12 +119,17 @@ bool getPauseState()
 void gamePaused()
 {
     float iconScale = 0.5f;
-    int textOffsetX = 80; // Jarak teks dari ikon
-
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-    
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.7f));
     DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press P to start", 245, 530, 23, WHITE);
+    DrawText("Press P to continue", 245, 530, 23, WHITE);
+    
+    bool soundAssets = true;
+    DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, BLACK);
+    DrawText(TextFormat("Level: %d", level), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 40, 30, RAYWHITE);
+    varMenu(&soundAssets);
+    tampilNyawa();
+    Tampil_Score();
+    TampilInfoPowerup();
 }
 
 void varRestart()
@@ -147,47 +155,38 @@ void varSound(bool *isSoundOn)
     int width = soundOnTexture.width * scale1;
     int height = soundOnTexture.height * scale1;
 
-    // Ambil posisi mouse
     Vector2 mousePos = GetMousePosition();
 
-    // Cek apakah mouse ada di dalam area tombol suara
     bool isHovered = (mousePos.x >= posX && mousePos.x <= posX + width &&
                       mousePos.y >= posY && mousePos.y <= posY + height);
 
-    // Jika tombol suara diklik, ubah gambar
     if (isHovered && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
         *isSoundOn = !(*isSoundOn);
     }
 
-    // Pilih tekstur berdasarkan status
     Texture2D currentTexture = *isSoundOn ? soundOnTexture : soundOffTexture;
 
-    // Gambar tombol suara sesuai status saat ini
     DrawTextureEx(currentTexture, (Vector2){posX, posY}, 0.0f, scale1, WHITE);
 }
 
 void mainMenu(bool *gameStart)
 {
-    // Koordinat menu
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
     int startY = 20;
     bool isSoundOn = true;
     if (!*gameStart)
     {
-        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, DARKBLUE);
         DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, BLACK);
-        // DrawRectangle(GAMEPLAY_WIDTH, 0, MENU_WIDTH, SCREEN_HEIGHT, (Color){3, 24, 37, 255});
         DrawText(TextFormat("Level: %d", level), menuX - 85, startY + 80, 30, RAYWHITE);
         varMenu(&isSoundOn);
-        // varHeart(heartTexture);
         tampilNyawa();
         Tampil_Score();
         TampilInfoPowerup();
 
         if (IsKeyPressed(KEY_P))
         {
-            *gameStart = true; // Set gameStart = true untuk keluar dari menu
+            *gameStart = true;
         }
     }
 }
@@ -206,7 +205,6 @@ void InitBullets()
             BulletNode *newNode = (BulletNode *)malloc(sizeof(BulletNode));
             if (newNode == NULL)
             {
-                // Gagal alokasi memori, bisa beri pesan atau hentikan
                 printf("Gagal alokasi memori untuk BulletNode\n");
                 return;
             }
@@ -314,7 +312,6 @@ void CreateExplosion(Vector2 position)
     ExplosionNode* current = ExplosionHead;
     ExplosionNode* last = NULL;
 
-    // Cari node yang tidak aktif
     while (current != NULL)
     {
         if (!current->data.active)
@@ -329,7 +326,6 @@ void CreateExplosion(Vector2 position)
         current = current->next;
     }
 
-    // Jika tidak ada node yang tidak aktif, buat node baru
     ExplosionNode* newNode = (ExplosionNode*)malloc(sizeof(ExplosionNode));
     newNode->data.position = position;
     newNode->data.active = true;
@@ -346,7 +342,6 @@ void CreateExplosion(Vector2 position)
         last->next = newNode;
     }
 }
-
 
 void UpdateExplosions(float deltaTime)
 {
@@ -412,7 +407,6 @@ void ResetExplosions()
 Texture2D eneBul, ufoBroken;
 void loadAssetMenu()
 {
-    
     menuTexture = LoadTexture("asset-menu/6.png");
     soundOnTexture = LoadTexture("asset-menu/7.png");
     soundOffTexture = LoadTexture("asset-menu/5.png");
@@ -425,7 +419,7 @@ void loadAssetMenu()
     ufoTexture = LoadTexture("assets/ufo.png");
     enemyBulletlv3 = LoadTexture("assets/laserUfo.png");
     eneBul = LoadTexture("assets/eneBull.png");
-    ufoBroken = LoadTexture("assets/ufoBroken.png");\
+    ufoBroken = LoadTexture("assets/ufoBroken.png");
 }
 
 void unloadAssetMenu()
@@ -462,7 +456,7 @@ void level2(float deltaTime)
     UpdateExplosions(deltaTime);
     UpdateEnemies(ufoTexture, -30, 100, 0, 70, &gamestate);
     UpdateEnemyBullets(eneBul, &gamestate);
-    CheckEnemyCollisions(65, 70, 55, 10, &gamestate); // x,y,radP,radBE
+    CheckEnemyCollisions(65, 70, 55, 10, &gamestate);
     EnemiesLoop(ufoTexture, -30, 100, 0, 70, &gamestate);
     DrawLvl2();
     inipowerup();

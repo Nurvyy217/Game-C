@@ -72,6 +72,33 @@ void InitialBoss()
 //     }
 // }
 
+void InitEnemyBullets()
+{
+    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
+    {
+        PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
+        newBullet->Eb.isActive = false;
+        newBullet->Eb.hasPlayedSound = false;
+        newBullet->Eb.shooterIndex = -1; // Inisialisasi index penembak
+        newBullet->next = NULL;
+
+        if (ebHead == NULL)
+        {
+            ebHead = newBullet;
+        }
+        else
+        {
+            PNodeEB current = ebHead;
+            while (current->next != NULL)
+            {
+                current = current->next;
+            }
+            current->next = newBullet;
+        }
+    }
+}
+
+
 void InitStar()
 {
     StarNode* current;
@@ -487,6 +514,118 @@ void UnloadBGM()
     UnloadMusicStream(bossbgm);
 }
 
+void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
+{
+    address currentEnemy;
+    currentEnemy = EnemiesHead;
+    int n = getMaxEnemyBullet(S);
+    PNodeEB current = ebHead;
+
+    for (int i = 0; i < getMaxEnemyBullet(S); i++)
+    {
+        if (current->Eb.isActive == true)
+        {
+            if (getEnemyTypeShoot(S) == 3)
+            {
+                int shooterIdx = current->Eb.shooterIndex; // Ambil index musuh yang menembak
+
+                if (shooterIdx >= 0 && shooterIdx < getMaxEnemy(S))
+                {
+                    // Vector2 shooterPos = enemies[shooterIdx].position; // Posisi musuh
+                    Vector2 shooterPos;
+                    int shooterLinklistIdx = shooterIdx; 
+                    while (shooterLinklistIdx > 0)
+                    {
+                        currentEnemy = currentEnemy->next;
+                        shooterLinklistIdx--;
+                    }
+                    shooterPos = currentEnemy->position;
+                    currentEnemy = EnemiesHead;
+                    
+                    if (current->Eb.delayTimer < 2.0f)
+                    {
+                        // Selama 2 detik pertama, peluru mengikuti musuh
+                        current->Eb.position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
+                        current->Eb.position.y = shooterPos.y + enemyBulletTexture.height + 185;
+
+                        current->Eb.delayTimer += GetFrameTime();
+
+                        if (current->Eb.delayTimer < 2.0f && current->Eb.hasPlayedSound == false)
+                        {
+                            SetSoundVolume(nging, 3.0f);
+                            PlaySound(nging);                  // Suara "nging"
+                            current->Eb.hasPlayedSound = true; // Tandai agar tidak diulang
+                        }
+                    }
+
+                    // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
+                    if (current->Eb.delayTimer >= 2.0f)
+                    {
+                        if (!current->Eb.hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
+                        {
+                            PlaySound(duar);
+                            current->Eb.hasPlayedDuar = true; // Tandai sudah dimainkan
+                        }
+                        current->Eb.speed.y = SPEED_ENEMY_BULLETS * 10.0f;
+                        current->Eb.position.y += current->Eb.speed.y;
+
+                        if (current->Eb.position.y > 960)
+                        {
+                            current->Eb.delayTimer = 0;
+                            current->Eb.hasPlayedSound = false; // Reset untuk peluru berikutnya
+                        }
+                    }
+                }
+            }
+            else
+            {
+                current->Eb.position.x += current->Eb.speed.x;
+                current->Eb.position.y += current->Eb.speed.y;
+            }
+            if (current->Eb.position.x <= -15 || current->Eb.position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
+            {
+                current->Eb.speed.x *= -1;
+            }
+
+            if (current->Eb.position.y > 960)
+            {
+                current->Eb.isActive = false;
+                current->Eb.hasPlayedSound = false;
+                current->Eb.hasPlayedDuar = false;
+                current->Eb.delayTimer = 0;
+                current->Eb.shooterIndex = -1;
+            }
+        }
+        current = current->next;
+    }
+}
+
+void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
+{
+    PNodeEB current = ebHead;
+    for (int i = 0; i < getMaxEnemyBullet(S); i++)
+    {
+        if (current->Eb.isActive)
+        {
+            DrawTextureEx(enemyBulletTexture, current->Eb.position, 0.0f, scale, WHITE);
+        }
+        current = current->next; // Pindah ke peluru musuh berikutnya
+    }
+}
+
+void FreeEnemyBullets()
+{
+    PNodeEB current = ebHead;
+    while (current != NULL)
+    {
+        PNodeEB temp = current;
+        current = current->next;
+        free(temp);
+    }
+    ebHead = NULL;
+}
+
+
 void FreeStars()
 {
     StarNode* current = starHead;
@@ -497,4 +636,17 @@ void FreeStars()
         free(temp);
     }
     starHead = NULL;
+}
+
+void ResetEnemyBullets()
+{
+    PNodeEB current = ebHead;
+    while (current != NULL)
+    {
+        current->Eb.isActive = false;
+        current->Eb.hasPlayedSound = false;
+        current->Eb.hasPlayedDuar = false;
+        current->Eb.shooterIndex = -1;
+        current = current->next;
+    }
 }

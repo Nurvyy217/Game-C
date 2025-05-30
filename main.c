@@ -20,7 +20,6 @@ int main(void)
     InitBullets();
     
     InitEnemyBullets();
-    InitAsteroids();
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();

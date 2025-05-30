@@ -40,15 +40,6 @@ extern StarNode* starHead;
 
 typedef struct EnemyBulletNode* PNodeEB;
 
-extern PNodeEB ebHead;
-
-typedef EnemyBullet infotype;
-
-typedef struct EnemyBulletNode {
-    infotype Eb;
-    PNodeEB next;
-} EnemyBulletNode;
-
 
 typedef struct
 {
@@ -66,6 +57,7 @@ extern Bosses bosses;
 extern BossLaser bossLaser;
 extern Sound laserSound;
 extern Music bossbgm;
+extern Sound nging, duar;
 
 void InitBosses();
 void DrawBosses(GameState *S);

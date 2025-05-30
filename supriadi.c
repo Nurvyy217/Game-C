@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include <stdio.h>
 #include "fawwaz.h"
-#include "suci.h"
+#include "nazwa.h"
 
 infoPlayer InfoPlayer;
 PowerUp powerup;

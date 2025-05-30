@@ -106,11 +106,17 @@ Sound shootSound;
 static float shootCooldown = 0.0f;
 static const float SHOOT_INTERVAL = 0.2f;
 
-
+bool isSoundPlaying = true;
 
 void UpdateShooting(float deltaTime)
 {
     // Kurangi cooldown
+    if (IsKeyPressed(KEY_F)) {
+        isSoundPlaying = !isSoundPlaying;
+        
+        SetMasterVolume(isSoundPlaying ? 1.0f : 0.0f);
+    }
+
     if (shootCooldown > 0.0f)
     {
         shootCooldown -= deltaTime;

@@ -2,6 +2,7 @@
 #include "fawwaz.h"
 #include "hasbi.h"
 #include "supriadi.h"
+#include "nazwa.h"
 
 Bosses bosses;
 BossLaser bossLaser;

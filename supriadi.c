@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include <stdio.h>
 #include "fawwaz.h"
-#include "suci.h"
+#include "nazwa.h"
 
 infoPlayer InfoPlayer;
 PowerUp powerup;
@@ -265,7 +265,24 @@ void updatePowerupTime()
 void powerupAttack()
 {
     int bulletmuncul = 0;
+    int maxBullets = InfoPlayer.DoubleAttack ? 10 : 5;
+    int currentActiveBullets = 0;
+
     BulletNode* current = BulletHead;
+
+    // Hitung bullet yang aktif
+    while (current != NULL)
+    {
+        if (current->data.active)
+            currentActiveBullets++;
+        current = current->next;
+    }
+
+    // Jika sudah mencapai batas, keluar
+    if (currentActiveBullets >= maxBullets)
+        return;
+
+    current = BulletHead;
 
     while (current != NULL)
     {
@@ -273,25 +290,25 @@ void powerupAttack()
         {
             if (bulletmuncul == 0)
             {
-                current->data.position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
             }
             else if (bulletmuncul == 1)
             {
-                current->data.position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
             }
 
             current->data.active = true;
-            bulletmuncul++;
-
-            if (bulletmuncul >= 2)
-            {
-                break;
-            }
             PlaySound(shootSound);
+            bulletmuncul++;
+            currentActiveBullets++;
+
+            if (bulletmuncul >= 2 || currentActiveBullets >= maxBullets)
+                break;
         }
         current = current->next;
     }
 }
+
 
 void ShowPowerupShield()
 {

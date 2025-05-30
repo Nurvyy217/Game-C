@@ -483,7 +483,7 @@ void BossExplosions()
                 };
 
                 CreateExplosion(posisi);         // Pakai linked list ledakan
-                PlaySound(asteroidDestroyed);   // Suara ledakan
+                PlaySound(enemyDestroyed);   // Suara ledakan
             }
             timerExp = 0;
         }

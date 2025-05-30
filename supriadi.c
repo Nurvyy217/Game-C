@@ -22,7 +22,7 @@ void infokanPlayer()
     InfoPlayer.shieldActive = false;
     InfoPlayer.nyawa = NYAWA_AWAL;
     InfoPlayer.score = 0;
-    InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
+    InfoPlayer.nyawaIMG = LoadTexture("assets/heart.png");
 }
 
 void updateNyawa(GameState *S)

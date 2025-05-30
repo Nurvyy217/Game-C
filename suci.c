@@ -169,11 +169,13 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     if (!getPauseState())
     {
         game();
+        mainMenu(&gameStart);
     }
     else
     {
         gamePaused();
     }
+    
     EndDrawing();
 }
 

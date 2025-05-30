@@ -235,13 +235,27 @@ void InitBullets()
 
 void ShootBullet()
 {
+    int maxBullets = InfoPlayer.DoubleAttack ? 10 : 5;
+    int currentActiveBullets = 0;
     BulletNode *current = BulletHead;
+
+    while (current != NULL)
+    {
+        if (current->data.active)
+            currentActiveBullets++;
+        current = current->next;
+    }
+
+    if (currentActiveBullets >= maxBullets)
+        return;
+
+    current = BulletHead;
 
     while (current != NULL)
     {
         if (!current->data.active)
         {
-            current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+            current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
             PlaySound(shootSound);
             current->data.active = true;
             break;
@@ -249,6 +263,8 @@ void ShootBullet()
         current = current->next;
     }
 }
+
+
 
 void UpdateBullets()
 {

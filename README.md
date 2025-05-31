@@ -14,6 +14,21 @@
 
 ---
 
+## 🕹️ How To Play
+
+| Action         | Keybindings       |
+|----------------|------------------|
+| Move Up        | `W` / `↑️`         |
+| Move Down      | `S` / `↓️`         |
+| Move Left      | `A` / `⬅️`         |
+| Move Right     | `D` / `➡️`         |
+| Shoot          | `Spacebar` 💥     |
+| Pause Game     | `P` ⏸️            |
+| Toggle Sound   | `F` 🔊 / 🔇        |
+| Restart Game   | `R` 🔁            |
+
+---
+
 ## 🛠️ Teknologi yang Digunakan
 
 - Bahasa: **C**
@@ -23,10 +38,15 @@
 
 ---
 
-## 📸 Cuplikan Layar
+## 📑 Pembagian Tugas
 
-![Gameplay](images/screenshot1.png)
-> Tampilan utama saat pertempuran melawan boss.
+| Nama   | Peran          | Kontribusi                                   |
+| ------ | -------------- | -------------------------------------------- |
+| Hasbi  | Lead Developer | Core logic, UI, Game Loop, Integration       |
+| Fawwaz | Developer      | Boss Level, Star Background          |
+| Supri  | Developer      | Score System, High Score Persistence, Assets |
+| Suci   | Developer      | Player Controls, Shooting Mechanics, Assets  |
+| Nazwa  | Developer      | Projectile Physics, Collision System, Assets |
 
 ---
 
@@ -36,9 +56,10 @@
 2. Clone repository:
 
 ```bash
-git clone https://github.com/username/space-blaster.git
-cd space-blaster
-./build.bat
+git clone https://github.com/Nurvyy217/Game-C.git
+cd Game-C
+./build.bat (or make (kalo MakeFile sudah terinstall)
+./main.exe
+```
 
-## Anggota
 

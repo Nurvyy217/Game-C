@@ -19,6 +19,7 @@ bool soundOn = true;
 bool soundAssets = true;
 bool startGame = false;
 
+/* VARMENU: MENAMPILKAN MENU SAMPING DAN POPUP UNTUK TOGGLE SOUND, RESTART, PAUSE, DAN QUIT */
 void varMenu(bool *soundAssets)
 {
     static bool showPopup = false; // Status pop-up
@@ -92,6 +93,7 @@ void varMenu(bool *soundAssets)
     }
 }
 
+/* VARQUIT: MENGHANDLE TEKANAN TOMBOL Q UNTUK MENUTUP JENDELA GAME */
 void varQuit()
 {
     if (IsKeyPressed(KEY_Q))
@@ -102,6 +104,7 @@ void varQuit()
 
 bool isPaused = false;
 
+/* TOGGLEPAUSE: MENGAKTIFKAN ATAU MENONAKTIFKAN STATUS PAUSE DENGAN TOMBOL P */
 void togglePause()
 {
     if (IsKeyPressed(KEY_P))
@@ -110,11 +113,13 @@ void togglePause()
     }
 }
 
+/* GETPAUSESTATE: MENGEMBALIKAN STATUS PAUSE SAAT INI */
 bool getPauseState()
 {
     return isPaused;
 }
 
+/* GAMEPAUSED: MENAMPILKAN TAMPILAN SAAT GAME DIPAUSET */
 void gamePaused()
 {
     float iconScale = 0.5f;
@@ -126,6 +131,7 @@ void gamePaused()
     DrawText("Press P to start", 260, 530, 23, WHITE);
 }
 
+/* VARRESTART: MENGHANDLE TOMBOL R UNTUK ME-RESET GAME KE KONDISI AWAL */
 void varRestart()
 {
     if (IsKeyPressed(KEY_R))
@@ -139,6 +145,7 @@ void varRestart()
     }
 }
 
+/* VARSOUND: MENGGAMBAR DAN MENGUBAH STATUS SOUND ON/OFF DARI TOMBOL DI MENU */
 void varSound(bool *isSoundOn)
 {
     int menuX = GAMEPLAY_WIDTH + MENU_WIDTH / 2;
@@ -171,6 +178,7 @@ void varSound(bool *isSoundOn)
     DrawTextureEx(currentTexture, (Vector2){posX, posY}, 0.0f, scale1, WHITE);
 }
 
+/* MAINMENU: MENAMPILKAN MENU UTAMA SAAT GAME BELUM DIMULAI */
 void mainMenu(bool *gameStart)
 {
     // Koordinat menu
@@ -194,6 +202,7 @@ void mainMenu(bool *gameStart)
 BulletNode *BulletHead = NULL;
 Texture2D bulletTexture;
 
+/* INITBULLETS: MENGINISIALISASI LINKED LIST PELURU ATAU ME-RESET STATUSNYA */
 void InitBullets()
 {
     if (BulletHead == NULL)
@@ -235,6 +244,7 @@ void InitBullets()
     }
 }
 
+/* SHOOTBULLET: MENEMBAKKAN PELURU JIKA MASIH DI BAWAH BATAS MAKSIMUM */
 void ShootBullet()
 {
     int maxBullets = InfoPlayer.DoubleAttack ? 10 : 5;
@@ -267,7 +277,7 @@ void ShootBullet()
 }
 
 
-
+/* UPDATEBULLETS: MEMPERBARUI POSISI PELURU DAN NONAKTIFKAN JIKA KELUAR LAYAR */
 void UpdateBullets()
 {
     BulletNode *current = BulletHead;
@@ -286,6 +296,7 @@ void UpdateBullets()
     }
 }
 
+/* DRAWBULLETS: MENGGAMBAR SEMUA PELURU YANG MASIH AKTIF DI LAYAR */
 void DrawBullets()
 {
     BulletNode *current = BulletHead;
@@ -299,6 +310,7 @@ void DrawBullets()
     }
 }
 
+/* FREEBULLETS: MENGHAPUS SEMUA NODE PELURU DAN MENGOSONGKAN MEMORY */
 void freeBullets()
 {
     BulletNode *current = BulletHead;
@@ -311,6 +323,7 @@ void freeBullets()
     BulletHead = NULL;
 }
 
+/* RESETPLAYERBULLET: MENONAKTIFKAN SEMUA PELURU DALAM LIST */
 void ResetPlayerBulet()
 {
     BulletNode *current = BulletHead;
@@ -324,6 +337,7 @@ void ResetPlayerBulet()
 ExplosionNode *ExplosionHead = NULL;
 Texture2D explosionsTexture;
 
+/* CREATEEXPLOSION: MEMBUAT EFEK LEDAKAN DI POSISI TERTENTU ATAU MENGAKTIFKAN YANG SUDAH ADA */
 void CreateExplosion(Vector2 position)
 {
     ExplosionNode *current = ExplosionHead;
@@ -362,6 +376,7 @@ void CreateExplosion(Vector2 position)
     }
 }
 
+/* UPDATEEXPLOSIONS: MEMPERBARUI ANIMASI LEDAKAN DAN NONAKTIFKAN JIKA SELESAI */
 void UpdateExplosions(float deltaTime)
 {
     ExplosionNode *current = ExplosionHead;
@@ -386,6 +401,7 @@ void UpdateExplosions(float deltaTime)
     }
 }
 
+/* DRAWEXPLOSIONS: MENGGAMBAR SEMUA LEDAKAN YANG MASIH AKTIF */
 void DrawExplosions(Texture2D explosionTexture)
 {
     ExplosionNode *current = ExplosionHead;
@@ -401,6 +417,7 @@ void DrawExplosions(Texture2D explosionTexture)
     }
 }
 
+/* FREEEXPLOSIONS: MENGHAPUS SEMUA NODE LEDAKAN DAN BEBASKAN MEMORY */
 void freeExplosions()
 {
     ExplosionNode *current = ExplosionHead;
@@ -413,6 +430,7 @@ void freeExplosions()
     ExplosionHead = NULL;
 }
 
+/* RESETEXPLOSIONS: MENONAKTIFKAN SEMUA EFEK LEDAKAN */
 void ResetExplosions()
 {
     ExplosionNode *current = ExplosionHead;

@@ -170,8 +170,9 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     if (!getPauseState())
     {
         game();
-        mainMenu(&gameStart);
-        
+        if (InfoPlayer.nyawa > 0) {
+            mainMenu(&gameStart);
+        }
     }
     else
     {

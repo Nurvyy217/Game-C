@@ -1121,6 +1121,7 @@ void bossLevel(float deltaTime)
 
 void game()
 {
+   
     if (!IsMusicStreamPlaying(gameplayMusic)&&!bosses.theEnd)
     {
         PlayMusicStream(gameplayMusic);
@@ -1142,7 +1143,7 @@ void game()
     }
 
     if (!isGameOver)
-    {
+    { 
         UpdateStar();
         // Tentukan level berdasarkan skor
         if (InfoPlayer.score < 25)
@@ -1204,6 +1205,7 @@ void game()
         }
         else
         {
+            
             switch (level)
             {
             case 1:

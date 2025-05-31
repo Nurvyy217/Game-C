@@ -65,7 +65,8 @@
 ## ▶️ Cara Menjalankan
 
 1. Pastikan Raylib sudah terinstal.
-2. Clone repository:
+2. Pastikan compiler sudah tersedia seperti gcc/msys/dll.
+3. Clone repository:
 
 ```bash
 git clone https://github.com/Nurvyy217/Game-C.git

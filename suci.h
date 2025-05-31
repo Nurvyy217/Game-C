@@ -24,7 +24,7 @@ typedef enum MenuOption
     MENU_PLAY,
     MENU_SETTINGS,
     MENU_EXIT,
-    MENU_TOTAL // Jumlah total opsi menu
+    MENU_TOTAL
 } MenuOption;
 
 // Struktur untuk menyimpan aset
@@ -36,7 +36,6 @@ typedef struct Assets
     Texture2D btnMenu;
     Texture2D btnExit;
     Music bgMusic;
-    Texture2D menuBackground;
     Texture2D settingsBackground;
     Texture2D btnOn;
     Texture2D btnOff;
@@ -50,17 +49,7 @@ typedef struct Node {
     struct Node *next;    // Pointer ke node berikutnya
 } Node;
 
-// // Struktur untuk menu pengaturan array
-// typedef struct {
-//     int selectedOption;
-//     float volume;
-//     int screenWidth;
-//     int screenHeight;
-//     const char *options[3];
-// } SettingsMenu;
-
-
-// Struktur  settings menu dengan linked list
+// Struktur  settings menu  linked list
 typedef struct {
     Node *head;           // Pointer ke node pertama dalam linked list
     int selectedOption;   // Pilihan menu yang dipilih
@@ -76,15 +65,12 @@ void UnloadAssetss(Assets *assets);
 void UpdateMenu(Assets *assets, GameScreen *currentScreen);
 void UpdatePlayScreen(GameScreen *currentScreen);
 void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets);
-
-
-
 void InitSettingsMenu(SettingsMenu *menu);
 void InitSettingsMenu(SettingsMenu *menu);
-void addOption(SettingsMenu *menu, const char *option);  // Fungsi untuk menambah opsi menu ke linked list
-void printMenuOptions(SettingsMenu *menu);  // Fungsi untuk menampilkan pilihan menu dari linked list
-void clearMenuOptions(SettingsMenu *menu);   // Fungsi untuk menghapus linked list
-void UpdateSettingsMenu(SettingsMenu *menu);
+void addOption(SettingsMenu *menu, const char *option);  // Fungsi menambah opsi menu ke linked list
+void printMenuOptions(SettingsMenu *menu);  // Fungsi menampilkan pilihan menu dari linked list
+void clearMenuOptions(SettingsMenu *menu);   // Fungsi menghapus linked list
+void UpdateSettingsMenu(SettingsMenu *menu, Assets *assets);
 void DrawSettingsMenu(SettingsMenu *menu);
 
 

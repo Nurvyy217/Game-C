@@ -10,15 +10,14 @@
 
 Texture2D logoDeveloper;
 Texture2D gameNamePhoto;
-
 Texture2D background;
 
-bool texturesLoaded = false; // Cek apakah gambar sudah di-load
+bool texturesLoaded = false; 
 
 void initLoadScreen()
 {
     if (!texturesLoaded)
-    { // Load hanya sekali
+    { 
         logoDeveloper = LoadTexture("assets/logoG6.png");
         gameNamePhoto = LoadTexture("assets/spaceInviders.png");
         texturesLoaded = true;
@@ -41,7 +40,6 @@ void InitAssets(Assets *assets)
     clickMenu = LoadSound("assets/clickMenu.wav");
     selectMenu = LoadSound("assets/selectMenu.wav");
 
-    assets->menuBackground = LoadTexture("assets/bgMenuScreen.png");
     assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png");
     assets->btnOn = LoadTexture("assets/btnOn.png");
     assets->btnOff = LoadTexture("assets/btnOff.png");
@@ -49,21 +47,14 @@ void InitAssets(Assets *assets)
     assets->bgMusic = LoadMusicStream("assets/background_music.mp3");
 
     PlayMusicStream(assets->bgMusic);
-    SetMusicVolume(assets->bgMusic, 0.5f);
     SetMusicVolume(assets->bgMusic, 1.0f);
     assets->isMusicOn = true;
 
-    assets->menuBackground = LoadTexture("aseets/bgMenuScreen.png");  
-    assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png"); 
-    assets->btnOn = LoadTexture("assets/btnOn.png");
-    assets->btnOff = LoadTexture("assets/btnOff.png");
-    assets->btnBack = LoadTexture("assets/btnBack.png");
 }
 
-void UnloadAssetss(Assets *assets)
-{
+void UnloadAssetss(Assets *assets) {
     UnloadTexture(assets->bg);
-    // UnloadTexture(assets->title); // Jika tidak lagi dipakai
+  
 
     UnloadTexture(assets->btnPlay);
     UnloadTexture(assets->btnMenu);
@@ -73,16 +64,7 @@ void UnloadAssetss(Assets *assets)
     UnloadTexture(assets->btnOff);
     UnloadTexture(assets->btnBack);
 
-    UnloadTexture(assets->menuBackground);
     UnloadTexture(assets->settingsBackground);
-
-    UnloadTexture(assets->btnOn);
-    UnloadTexture(assets->btnOff);
-    UnloadTexture(assets->btnBack);
-
-    UnloadTexture(assets->menuBackground);
-    UnloadTexture(assets->settingsBackground);
-
 
     UnloadMusicStream(assets->bgMusic);
     CloseAudioDevice();
@@ -129,10 +111,10 @@ void UpdateMenu(Assets *assets, GameScreen *currentScreen)
     float scaleBtn = 2.0f;
     int scaledWidth = (int)(assets->btnPlay.width * scaleBtn);
     int scaledHeight = (int)(assets->btnPlay.height * scaleBtn);
-    int spacing = 0; // spacing 0, tapi kita atur offset secara manual
+    int spacing = 0; 
 
     int buttonX = SCREEN_WIDTH / 2 - scaledWidth / 2;
-    int buttonY = 550; // Posisi awal tombol PLAY
+    int buttonY = 550; 
 
     if (assets->btnPlay.id > 0)
     {
@@ -201,7 +183,7 @@ void addOption(SettingsMenu *menu, const char *option) {
     newNode->next = NULL;                          // Node terakhir menunjuk ke NULL
 
     if (menu->head == NULL) {
-        menu->head = newNode;  // Jika linked list kosong, node ini menjadi head
+        menu->head = newNode;  // Jika linked list kosong, node ini jadi head
     } else {
         Node *current = menu->head;
         while (current->next != NULL) {
@@ -227,19 +209,18 @@ void clearMenuOptions(SettingsMenu *menu) {
         free(current);               // Hapus node saat ini
         current = next;              // Pindah ke node berikutnya
     }
-    menu->head = NULL;  // Set head ke NULL untuk menunjukkan linked list kosong
+    menu->head = NULL;  // Set head ke NULL
 }
 
 void DrawSettingsMenu(SettingsMenu *menu) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawText("Pengaturan", SCREEN_WIDTH / 2 - 50, 100, 20, RAYWHITE);
     
     // Tampilkan opsi menu dari linked list
     Node *current = menu->head;
     int yOffset = 200;
     while (current != NULL) {
-        Color color = (menu->selectedOption == 0) ? YELLOW : WHITE; // Pilihan yang dipilih diberi warna khusus
+        Color color = (menu->selectedOption == 0) ? YELLOW : WHITE;
         DrawText(current->option, SCREEN_WIDTH / 2 - 50, yOffset, 20, color);
         yOffset += 40;
         current = current->next;
@@ -248,7 +229,7 @@ void DrawSettingsMenu(SettingsMenu *menu) {
     EndDrawing();
 }
 
-void UpdateSettingsMenu(SettingsMenu *menu) {
+void UpdateSettingsMenu(SettingsMenu *menu, Assets *assets) {
     if (IsKeyPressed(KEY_DOWN)) {
         menu->selectedOption = (menu->selectedOption + 1) % 3;
     }
@@ -256,13 +237,8 @@ void UpdateSettingsMenu(SettingsMenu *menu) {
         menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
     }
 
-    if (menu->selectedOption == 0) {
-        if (IsKeyPressed(KEY_LEFT)) menu->volume = fmax(menu->volume - 0.1f, 0.0f);
-        if (IsKeyPressed(KEY_RIGHT)) menu->volume = fmin(menu->volume + 0.1f, 1.0f);
-    }
-
     if (menu->selectedOption == 2 && IsKeyPressed(KEY_ENTER)) {
-        // Implement action for "Back"
+    
     }
 }
 

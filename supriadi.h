@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "hasbi.h"
 
-#define NYAWA_AWAL 1
+#define NYAWA_AWAL 15
 #define MAX_POWERUPS 5
 
 // Struktur untuk menyimpan data pemain

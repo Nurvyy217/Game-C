@@ -30,6 +30,8 @@ void initBG()
 }
 
 Sound clickMenu, selectMenu;
+
+//inisialisasi aset-aset
 void InitAssets(Assets *assets)
 {
     assets->bg = LoadTexture("assets/bgDisplayUtama.png");
@@ -70,6 +72,7 @@ void UnloadAssetss(Assets *assets) {
     CloseAudioDevice();
 }
 
+//mengupdate tampilan menu utama, proses input, dan menggambar menu.
 void UpdateMenu(Assets *assets, GameScreen *currentScreen)
 {
     static MenuOption menuIndex = MENU_PLAY;
@@ -164,6 +167,7 @@ void UpdatePlayScreen(GameScreen *currentScreen)
     EndDrawing();
 }
 
+//menginisialisasi menu pengaturan, termasuk linked list opsi menu.
 void InitSettingsMenu(SettingsMenu *menu) {
     menu->head = NULL;  // Inisialisasi linked list kosong
     menu->selectedOption = 0;
@@ -177,6 +181,7 @@ void InitSettingsMenu(SettingsMenu *menu) {
     addOption(menu, "Back");
 }
 
+///Fungsi ini menambahkan opsi ke dalam linked list menu pengaturan.
 void addOption(SettingsMenu *menu, const char *option) {
     Node *newNode = (Node*)malloc(sizeof(Node));  // Alokasikan memori untuk node baru
     newNode->option = option;                      // Simpan pilihan dalam node
@@ -193,15 +198,16 @@ void addOption(SettingsMenu *menu, const char *option) {
     }
 }
 
-
+// Fungsi ini mengprint pilihan menu yang ada dalam linked list.
 void printMenuOptions(SettingsMenu *menu) {
     Node *current = menu->head;
     while (current != NULL) {
-        printf("%s\n", current->option);  // Cetak pilihan menu
+        printf("%s\n", current->option);  // print pilihan menu
         current = current->next;          // Pindah ke node berikutnya
     }
 }
 
+// Fungsi ini menghapus semua opsi yang ada dalam linked list menu pengaturan.
 void clearMenuOptions(SettingsMenu *menu) {
     Node *current = menu->head;
     while (current != NULL) {
@@ -285,7 +291,7 @@ void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets 
     Color backColor = (menu->selectedOption == 2) ? BLUE : WHITE;
     int centerX = (SCREEN_WIDTH / 2) - ((assets->btnOn.width * 1.5) / 2);
 
-    // Posisi tombol ON dan OFF sejajar
+    //  tombol ON dan OFF sejajar
     int btnSpacing = 20; // Jarak antara ON dan OFF
     int btnOnX = (SCREEN_WIDTH / 2) - (assets->btnOn.width * 1.5) - (btnSpacing / 2);
     int btnOffX = (SCREEN_WIDTH / 2) + (btnSpacing / 2);

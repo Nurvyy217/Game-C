@@ -122,13 +122,11 @@ bool getPauseState()
 /* GAMEPAUSED: MENAMPILKAN TAMPILAN SAAT GAME DIPAUSET */
 void gamePaused()
 {
-    float iconScale = 0.5f;
-    int textOffsetX = 80; // Jarak teks dari ikon
+   
+    Rectangle source = {0, 0, gamePauseTexture.width, gamePauseTexture.height}; 
+    Rectangle dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; 
 
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-
-    DrawTextureEx(gamePauseTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press P to start", 260, 530, 23, WHITE);
+    DrawTexturePro(gamePauseTexture, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 /* VARRESTART: MENGHANDLE TOMBOL R UNTUK ME-RESET GAME KE KONDISI AWAL */
@@ -196,8 +194,13 @@ void mainMenu(bool *gameStart)
         tampilNyawa();
         Tampil_Score();
         TampilInfoPowerup();    
+      if (getPauseState())  
+        {
+            gamePaused(); 
     }
 }
+}
+
 
 BulletNode *BulletHead = NULL;
 Texture2D bulletTexture;

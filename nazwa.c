@@ -3,6 +3,7 @@
 #include "supriadi.h"
 #include "fawwaz.h"
 #include "stdio.h"
+#include "suci.h"
 
 Texture2D heartTexture;
 Texture2D enemyBulletlv3;
@@ -117,13 +118,11 @@ bool getPauseState()
 
 void gamePaused()
 {
-    float iconScale = 0.5f;
-    int textOffsetX = 80; // Jarak teks dari ikon
+   
+    Rectangle source = {0, 0, gamePauseTexture.width, gamePauseTexture.height}; 
+    Rectangle dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; 
 
-    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-
-    DrawTextureEx(gamePauseTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press P to start", 260, 530, 23, WHITE);
+    DrawTexturePro(gamePauseTexture, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 void varRestart()
@@ -188,7 +187,12 @@ void mainMenu(bool *gameStart)
         tampilNyawa();
         Tampil_Score();
         TampilInfoPowerup();    
+
+        if (getPauseState())  
+        {
+            gamePaused(); 
     }
+}
 }
 
 BulletNode *BulletHead = NULL;

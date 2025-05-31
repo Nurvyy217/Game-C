@@ -35,6 +35,7 @@ typedef struct Assets
     Texture2D btnPlay;
     Texture2D btnMenu;
     Texture2D btnExit;
+
     Music bgMusic;
     Texture2D settingsBackground;
     Texture2D btnOn;

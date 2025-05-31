@@ -14,10 +14,12 @@ int main(void)
     InitBGM();
     InitStar();
     InitPlayer();
+    InitEnemy();
     InitBosses();
     InitEnemyBullets();
     InitBullets();
     
+    InitEnemyBullets();
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();
@@ -35,6 +37,9 @@ int main(void)
         }
     }
 
+    FreeStars();
+    FreeEnemyBullets();
+    FreeEnemy();
     CloseAudioDevice();
     UnloadAssets();
     FreeEnemyBullets();

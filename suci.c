@@ -39,6 +39,7 @@ void InitAssets(Assets *assets)
     assets->btnExit = LoadTexture("assets/btnExit.png");
     clickMenu = LoadSound("assets/clickMenu.wav");
     selectMenu = LoadSound("assets/selectMenu.wav");
+
     assets->settingsBackground = LoadTexture("assets/bgMenuScreen.png");
     assets->btnOn = LoadTexture("assets/btnOn.png");
     assets->btnOff = LoadTexture("assets/btnOff.png");
@@ -253,6 +254,7 @@ void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets 
         menu->selectedOption = (menu->selectedOption - 1 + 3) % 3;
     }
 
+    // Pilihan menu
     if (IsKeyPressed(KEY_ENTER))
     {
         PlaySound(clickMenu);
@@ -282,8 +284,8 @@ void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets 
     Color backColor = (menu->selectedOption == 2) ? BLUE : WHITE;
     int centerX = (SCREEN_WIDTH / 2) - ((assets->btnOn.width * 1.5) / 2);
 
-    // tombol ON dan OFF sejajar
-    int btnSpacing = 20; // Jarak  ON dan OFF
+    // Posisi tombol ON dan OFF sejajar
+    int btnSpacing = 20; // Jarak antara ON dan OFF
     int btnOnX = (SCREEN_WIDTH / 2) - (assets->btnOn.width * 1.5) - (btnSpacing / 2);
     int btnOffX = (SCREEN_WIDTH / 2) + (btnSpacing / 2);
 

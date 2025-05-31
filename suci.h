@@ -24,7 +24,7 @@ typedef enum MenuOption
     MENU_PLAY,
     MENU_SETTINGS,
     MENU_EXIT,
-    MENU_TOTAL // Jumlah total opsi menu
+    MENU_TOTAL
 } MenuOption;
 
 // Struktur untuk menyimpan aset
@@ -36,7 +36,6 @@ typedef struct Assets
     Texture2D btnMenu;
     Texture2D btnExit;
     Music bgMusic;
-    Texture2D menuBackground;
     Texture2D settingsBackground;
     Texture2D btnOn;
     Texture2D btnOff;
@@ -44,15 +43,20 @@ typedef struct Assets
     bool isMusicOn;
 } Assets;
 
-// Struktur untuk menu pengaturan
+
+typedef struct Node {
+    const char *option;   // Menyimpan pilihan menu
+    struct Node *next;    // Pointer ke node berikutnya
+} Node;
+
+// Struktur  settings menu  linked list
 typedef struct {
-    int selectedOption;
+    Node *head;           // Pointer ke node pertama dalam linked list
+    int selectedOption;   // Pilihan menu yang dipilih
     float volume;
     int screenWidth;
     int screenHeight;
-    const char *options[3];
 } SettingsMenu;
-
 
 // Deklarasi fungsi
 void menuSuci();
@@ -61,17 +65,13 @@ void UnloadAssetss(Assets *assets);
 void UpdateMenu(Assets *assets, GameScreen *currentScreen);
 void UpdatePlayScreen(GameScreen *currentScreen);
 void UpdateSettingsScreen(GameScreen *currentScreen, SettingsMenu *menu, Assets *assets);
-
-
 void InitSettingsMenu(SettingsMenu *menu);
-void UpdateSettingsMenu(SettingsMenu *menu);
+void InitSettingsMenu(SettingsMenu *menu);
+void addOption(SettingsMenu *menu, const char *option);  // Fungsi menambah opsi menu ke linked list
+void printMenuOptions(SettingsMenu *menu);  // Fungsi menampilkan pilihan menu dari linked list
+void clearMenuOptions(SettingsMenu *menu);   // Fungsi menghapus linked list
+void UpdateSettingsMenu(SettingsMenu *menu, Assets *assets);
 void DrawSettingsMenu(SettingsMenu *menu);
-// Deklarasi untuk gambar
-extern Texture2D gameoverImage;
-// Fungsi untuk memuat gambar
-void InitGameoverImage();
-// Fungsi untuk membersihkan gambar
-void UnloadGameoverImage();
 
 
 #endif

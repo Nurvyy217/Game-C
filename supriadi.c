@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include <stdio.h>
 #include "fawwaz.h"
-#include "suci.h"
+#include "nazwa.h"
 
 infoPlayer InfoPlayer;
 PowerUp powerup;
@@ -22,7 +22,7 @@ void infokanPlayer()
     InfoPlayer.shieldActive = false;
     InfoPlayer.nyawa = NYAWA_AWAL;
     InfoPlayer.score = 0;
-    InfoPlayer.nyawaIMG = LoadTexture("asset-menu/1.png");
+    InfoPlayer.nyawaIMG = LoadTexture("assets/heart.png");
 }
 
 void updateNyawa(GameState *S)
@@ -72,38 +72,42 @@ void Tampil_Score()
     DrawText(TextFormat("Score: %d", InfoPlayer.score), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 140, 25, RAYWHITE);
 }
 
-void InitGame() {
-    
-    InitWindow(800, 600, "Game Example");  
-    
-}
-void InitAssets(Assets *assets);
-void gameover(){
+void gameover(GameState *S)
+{
     ClearBackground(BLACK);
-    
-    DrawTexture(gameoverImage, 
-        (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - gameoverImage.width / 2, 
-        SCREEN_HEIGHT / 2 - gameoverImage.height / 2, 
-        WHITE);
-    DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 150, 600, 30, RAYWHITE);
-    DrawText("Press B to Back to Menu", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 180, 650, 30, RAYWHITE);
-    
-    if (IsKeyPressed(KEY_R)){
+    Rectangle source = {0, 0, gameOver.width, gameOver.height}; // Seluruh gambar
+    Rectangle dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};         // Area gameplay
+    Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
+
+    DrawTexturePro(gameOver, source, dest, origin, 0.0f, WHITE);
+    // DrawText("Game Over", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
+    // DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
+    if (IsKeyPressed(KEY_ENTER))
+    {
+        PlaySound(clickMenu);
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
 
         InitPlayer();
         InitBullets();
-
-        
-
+        ResetPlayerBulet();
+        ResetExplosions();
+        ResetEnemyBullets();
+        ResetEnemies();
+        ResetAsteroid(S);
+        bosses.aktif = false;
     }
 }
 
 
 
-void inipowerup(){
-    spawnPowerUp();
+void inipowerup()
+{
+    if (level != 3)
+    {
+
+        SpawnPowerUpTime();
+    }
     tampilPowerUp();
     checkPowerUpCollision();
     UpdateSpark();
@@ -162,6 +166,7 @@ void tampilPowerUp()
     {
         DrawTextureEx(powerup.powerupIMG, powerup.posisi, 0.0f, 0.15f, WHITE);
     }
+    GetTime();
 }
 
 void checkPowerUpCollision()
@@ -178,7 +183,6 @@ void checkPowerUpCollision()
 
         switch (powerup.type)
         {
-
         case POWERUP_LIFE:
             InfoPlayer.AddNyawa = true;
             updateNyawa(S);
@@ -261,7 +265,24 @@ void updatePowerupTime()
 void powerupAttack()
 {
     int bulletmuncul = 0;
+    int maxBullets = InfoPlayer.DoubleAttack ? 10 : 5;
+    int currentActiveBullets = 0;
+
     BulletNode* current = BulletHead;
+
+    // Hitung bullet yang aktif
+    while (current != NULL)
+    {
+        if (current->data.active)
+            currentActiveBullets++;
+        current = current->next;
+    }
+
+    // Jika sudah mencapai batas, keluar
+    if (currentActiveBullets >= maxBullets)
+        return;
+
+    current = BulletHead;
 
     while (current != NULL)
     {
@@ -269,25 +290,25 @@ void powerupAttack()
         {
             if (bulletmuncul == 0)
             {
-                current->data.position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x - 65) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
             }
             else if (bulletmuncul == 1)
             {
-                current->data.position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
+                current->data.position = (Vector2){(player.position.x + 20) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
             }
 
             current->data.active = true;
-            bulletmuncul++;
-
-            if (bulletmuncul >= 2)
-            {
-                break;
-            }
             PlaySound(shootSound);
+            bulletmuncul++;
+            currentActiveBullets++;
+
+            if (bulletmuncul >= 2 || currentActiveBullets >= maxBullets)
+                break;
         }
         current = current->next;
     }
 }
+
 
 void ShowPowerupShield()
 {

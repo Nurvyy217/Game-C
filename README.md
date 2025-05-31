@@ -38,15 +38,27 @@
 
 ---
 
-## 📑 Pembagian Tugas
+## 📑 Pembagian Tugas Semester 1
 
 | Nama   | Peran          | Kontribusi                                   |
 | ------ | -------------- | -------------------------------------------- |
-| Hasbi  | Lead Developer | Core logic, UI, Game Loop, Integration       |
+| Hasbi  | Developer | Enemy, Asteroid, Loading Animation, User Plane      |
 | Fawwaz | Developer      | Boss Level, Star Background          |
-| Supri  | Developer      | Score System, High Score Persistence, Assets |
-| Suci   | Developer      | Player Controls, Shooting Mechanics, Assets  |
-| Nazwa  | Developer      | Projectile Physics, Collision System, Assets |
+| Supri  | Developer      | Score System, PowerUp, User Health |
+| Suci   | Developer      | Menu in Games, Assets  |
+| Nazwa  | Developer      | Home Menu, Assets |
+
+---
+
+## 📑 Pembagian Tugas Semester 2
+
+| Nama   | Peran          | Kontribusi                                   |
+| ------ | -------------- | -------------------------------------------- |
+| Hasbi  | Developer      | Mengubah Asteroid, delayTimer menjadi Linked List      |
+| Fawwaz | Developer      | Mengubah EnemyBullet menjadi Linked List          |
+| Supri  | Developer      | Mengubah Enemy menjadi Linked List |
+| Suci   | Developer      | Mengubah Home Menu menjadi Linked List  |
+| Nazwa  | Developer      | Mengubah UserBullets, Explosions menjadi Linked List |
 
 ---
 

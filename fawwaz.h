@@ -4,7 +4,8 @@
 #define BOSS_SPEED 2
 #define BOSS_MAX_BULLETS 10
 #define BOSS_BULLET_SPEED 8
-#define MAX_STARS 100
+#define MAX_STARS 400
+#define MAX_ENEMY_BULLETS 20
 
 // Bosses
 typedef struct
@@ -30,6 +31,16 @@ typedef struct
     int size;
 } Star;
 
+typedef struct StarNode {
+    Star data;
+    struct StarNode* next;
+} StarNode;
+
+extern StarNode* starHead;
+
+typedef struct EnemyBulletNode* PNodeEB;
+
+
 typedef struct
 {
     Vector2 position;
@@ -46,6 +57,7 @@ extern Bosses bosses;
 extern BossLaser bossLaser;
 extern Sound laserSound;
 extern Music bossbgm;
+extern Sound nging, duar;
 
 void InitBosses();
 void DrawBosses(GameState *S);
@@ -64,3 +76,7 @@ void InitBGM();
 void UpdateBGM();
 void UnloadBGM();
 void InitialBoss();
+void FreeStars();
+
+void InitEnemyBullets();
+void FreeEnemyBullets();

@@ -2,6 +2,7 @@
 #include "hasbi.h"
 #include "supriadi.h"
 #include "fawwaz.h"
+#include "stdio.h"
 
 Texture2D heartTexture;
 Texture2D enemyBulletlv3;
@@ -11,9 +12,11 @@ Texture2D soundOffTexture;
 Texture2D restartTexture;
 Texture2D pauseTexture;
 Texture2D quitTexture;
-Texture2D gameOverTexture;
+Texture2D gamePauseTexture;
 Texture2D ufoTexture;
+
 bool soundOn = true;
+bool soundAssets = true;
 bool startGame = false;
 
 void varMenu(bool *soundAssets)
@@ -58,11 +61,11 @@ void varMenu(bool *soundAssets)
         DrawText("Popup Menu", popupX + 20, popupY + 20, 25, WHITE);
 
         // Posisi elemen dalam pop-up
-        int iconStartX = popupX + 20; 
-        int iconStartY = popupY + 60; 
-        int iconSpacing = 70; 
+        int iconStartX = popupX + 20;
+        int iconStartY = popupY + 60;
+        int iconSpacing = 70;
         float iconScale = 0.5f;
-        int textOffsetX = 80; 
+        int textOffsetX = 80;
 
         // *Cek apakah tombol F ditekan untuk mengubah soundAssets*
         if (IsKeyPressed(KEY_F))
@@ -81,7 +84,7 @@ void varMenu(bool *soundAssets)
 
         // Tombol Pause
         DrawTextureEx(pauseTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 2}, 0.0f, iconScale, WHITE);
-        DrawText("Press Enter to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
+        DrawText("Press P to Pause", iconStartX + textOffsetX, iconStartY + iconSpacing * 2 + 22, 23, WHITE);
 
         // Tombol Quit
         DrawTextureEx(quitTexture, (Vector2){iconStartX, iconStartY + iconSpacing * 3}, 0.0f, iconScale, WHITE);
@@ -101,7 +104,7 @@ bool isPaused = false;
 
 void togglePause()
 {
-    if (IsKeyPressed(KEY_ENTER))
+    if (IsKeyPressed(KEY_P))
     {
         isPaused = !isPaused;
     }
@@ -118,9 +121,9 @@ void gamePaused()
     int textOffsetX = 80; // Jarak teks dari ikon
 
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-    
-    DrawTextureEx(gameOverTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
-    DrawText("Press Enter to start", 235, 530, 23, WHITE);
+
+    DrawTextureEx(gamePauseTexture, (Vector2){210, 300}, 0.0f, iconScale, WHITE);
+    DrawText("Press P to start", 260, 530, 23, WHITE);
 }
 
 void varRestart()
@@ -129,6 +132,8 @@ void varRestart()
     {
         InfoPlayer.nyawa = NYAWA_AWAL;
         InfoPlayer.score = 0;
+        ResetEnemies();
+        ResetEnemyBullets();
         InitPlayer();
         InitBullets();
     }
@@ -182,24 +187,255 @@ void mainMenu(bool *gameStart)
         // varHeart(heartTexture);
         tampilNyawa();
         Tampil_Score();
-        TampilInfoPowerup();
+        TampilInfoPowerup();    
+    }
+}
 
-        if (IsKeyPressed(KEY_ENTER))
+BulletNode *BulletHead = NULL;
+Texture2D bulletTexture;
+
+void InitBullets()
+{
+    if (BulletHead == NULL)
+    {
+        BulletNode *current = NULL;
+
+        for (int i = 0; i < MAX_BULLETS; i++)
         {
-            *gameStart = true; // Set gameStart = true untuk keluar dari menu
+            BulletNode *newNode = (BulletNode *)malloc(sizeof(BulletNode));
+            if (newNode == NULL)
+            {
+                // Gagal alokasi memori, bisa beri pesan atau hentikan
+                printf("Gagal alokasi memori untuk BulletNode\n");
+                return;
+            }
+            newNode->data.active = false;
+            newNode->next = NULL;
+
+            if (BulletHead == NULL)
+            {
+                BulletHead = newNode;
+                current = BulletHead;
+            }
+            else
+            {
+                current->next = newNode;
+                current = newNode;
+            }
+        }
+    }
+    else
+    {
+        BulletNode *current = BulletHead;
+        while (current != NULL)
+        {
+            current->data.active = false;
+            current = current->next;
         }
     }
 }
+
+void ShootBullet()
+{
+    int maxBullets = InfoPlayer.DoubleAttack ? 10 : 5;
+    int currentActiveBullets = 0;
+    BulletNode *current = BulletHead;
+
+    while (current != NULL)
+    {
+        if (current->data.active)
+            currentActiveBullets++;
+        current = current->next;
+    }
+
+    if (currentActiveBullets >= maxBullets)
+        return;
+
+    current = BulletHead;
+
+    while (current != NULL)
+    {
+        if (!current->data.active)
+        {
+            current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6f / 2, (player.position.y + player.texture.width * 0.6f / 2) - 110};
+            PlaySound(shootSound);
+            current->data.active = true;
+            break;
+        }
+        current = current->next;
+    }
+}
+
+
+
+void UpdateBullets()
+{
+    BulletNode *current = BulletHead;
+
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
+            current->data.position.y -= BULLET_SPEED;
+            if (current->data.position.y < 0)
+            {
+                current->data.active = false;
+            }
+        }
+        current = current->next;
+    }
+}
+
+void DrawBullets()
+{
+    BulletNode *current = BulletHead;
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
+            DrawTexture(bulletTexture, current->data.position.x, current->data.position.y, WHITE);
+        }
+        current = current->next;
+    }
+}
+
+void freeBullets()
+{
+    BulletNode *current = BulletHead;
+    while (current != NULL)
+    {
+        BulletNode *temp = current;
+        current = current->next;
+        free(temp);
+    }
+    BulletHead = NULL;
+}
+
+void ResetPlayerBulet()
+{
+    BulletNode *current = BulletHead;
+    while (current != NULL)
+    {
+        current->data.active = false;
+        current = current->next;
+    }
+}
+
+ExplosionNode *ExplosionHead = NULL;
+Texture2D explosionsTexture;
+
+void CreateExplosion(Vector2 position)
+{
+    ExplosionNode *current = ExplosionHead;
+    ExplosionNode *last = NULL;
+
+    // Cari node yang tidak aktif
+    while (current != NULL)
+    {
+        if (!current->data.active)
+        {
+            current->data.position = position;
+            current->data.active = true;
+            current->data.frame = 0;
+            current->data.timer = 0;
+            return;
+        }
+        last = current;
+        current = current->next;
+    }
+
+    // Jika tidak ada node yang tidak aktif, buat node baru
+    ExplosionNode *newNode = (ExplosionNode *)malloc(sizeof(ExplosionNode));
+    newNode->data.position = position;
+    newNode->data.active = true;
+    newNode->data.frame = 0;
+    newNode->data.timer = 0;
+    newNode->next = NULL;
+
+    if (ExplosionHead == NULL)
+    {
+        ExplosionHead = newNode;
+    }
+    else
+    {
+        last->next = newNode;
+    }
+}
+
+void UpdateExplosions(float deltaTime)
+{
+    ExplosionNode *current = ExplosionHead;
+
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
+            current->data.timer += deltaTime;
+            if (current->data.timer > 0.1f)
+            {
+                current->data.frame++;
+                current->data.timer = 0;
+            }
+
+            if (current->data.frame >= 5)
+            {
+                current->data.active = false;
+            }
+        }
+        current = current->next;
+    }
+}
+
+void DrawExplosions(Texture2D explosionTexture)
+{
+    ExplosionNode *current = ExplosionHead;
+    while (current != NULL)
+    {
+        if (current->data.active)
+        {
+            Rectangle source = {current->data.frame * 64, 0, 64, 64};
+            Rectangle dest = {current->data.position.x, current->data.position.y, 128, 128};
+            DrawTexturePro(explosionsTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
+        }
+        current = current->next;
+    }
+}
+
+void freeExplosions()
+{
+    ExplosionNode *current = ExplosionHead;
+    while (current != NULL)
+    {
+        ExplosionNode *temp = current;
+        current = current->next;
+        free(temp);
+    }
+    ExplosionHead = NULL;
+}
+
+void ResetExplosions()
+{
+    ExplosionNode *current = ExplosionHead;
+    while (current != NULL)
+    {
+        current->data.active = false;
+        current = current->next;
+    }
+}
+
 Texture2D eneBul, ufoBroken;
 void loadAssetMenu()
 {
-    menuTexture = LoadTexture("asset-menu/6.png");
-    soundOnTexture = LoadTexture("asset-menu/7.png");
-    soundOffTexture = LoadTexture("asset-menu/5.png");
-    restartTexture = LoadTexture("asset-menu/8.png");
-    pauseTexture = LoadTexture("asset-menu/9.png");
-    quitTexture = LoadTexture("asset-menu/10.png");
-    gameOverTexture = LoadTexture("asset-menu/11.png");
+
+    menuTexture = LoadTexture("assets/menuTexture.png");
+    soundOnTexture = LoadTexture("assets/soundOn.png");
+    soundOffTexture = LoadTexture("assets/soundOff.png");
+    restartTexture = LoadTexture("assets/restart.png");
+    pauseTexture = LoadTexture("assets/pause.png");
+    quitTexture = LoadTexture("assets/quit.png");
+    gamePauseTexture = LoadTexture("assets/gamePause.png");
+    bulletTexture = LoadTexture("assets/bullet.png");
+    explosionsTexture = LoadTexture("assets/Explosions.png");
     ufoTexture = LoadTexture("assets/ufo.png");
     enemyBulletlv3 = LoadTexture("assets/laserUfo.png");
     eneBul = LoadTexture("assets/eneBull.png");
@@ -214,7 +450,7 @@ void unloadAssetMenu()
     UnloadTexture(restartTexture);
     UnloadTexture(pauseTexture);
     UnloadTexture(quitTexture);
-    UnloadTexture(gameOverTexture);
+    UnloadTexture(gamePauseTexture);
 }
 
 void DrawLvl2()
@@ -226,7 +462,6 @@ void DrawLvl2()
     DrawEnemies(ufoTexture, ufoBroken, 1.5f, 80, 110, &gamestate);
     DrawEnemyBullets(eneBul, 1.2f, &gamestate);
     tampilspark();
-    mainMenu(&gameStart);
 }
 
 void level2(float deltaTime)

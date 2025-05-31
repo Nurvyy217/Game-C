@@ -1,6 +1,5 @@
-# 🚀 Space Blaster
-
-**Space Blaster** adalah game 2D bertema luar angkasa di mana pemain mengendalikan pesawat untuk melawan gelombang musuh dan menghindari serangan. Game ini dibuat sebagai tugas akhir mata kuliah *Pemrograman Game*.
+# 🚀 Space Invaders 
+**Space Invaders** adalah game 2D bertema luar angkasa di mana pemain mengendalikan pesawat untuk melawan gelombang musuh dan menghindari serangan. Game ini dibuat sebagai tugas akhir mata kuliah *Projek 2: Pengembangan Aplikasi Berbasis Library*.
 
 ---
 
@@ -18,8 +17,8 @@
 ## 🛠️ Teknologi yang Digunakan
 
 - Bahasa: **C**
-- Framework: **Raylib**
-- Build tool: `gcc` (atau `clang`)
+- Library: **Raylib**
+- Build tool: `gcc` (atau `clang`) or MakeFile (optional)
 - Sistem operasi: Windows / Linux
 
 ---
@@ -39,3 +38,7 @@
 ```bash
 git clone https://github.com/username/space-blaster.git
 cd space-blaster
+./build.bat
+
+## Anggota
+

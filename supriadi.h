@@ -31,7 +31,6 @@ typedef enum
 {
     POWERUP_LIFE,
     POWERUP_FASTFIRE,
-    // POWERUP_SCORE,
     POWERUP_SPEED,
     POWERUP_SHIELD,
 } PowerUpType;

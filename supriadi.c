@@ -17,6 +17,7 @@ int playerInvincible = 0; // Timer kebal (dalam frame)
 int AddSpeed;
 float timer = 0;
 
+// initialisasi info player awal
 void infokanPlayer()
 {
     InfoPlayer.shieldActive = false;
@@ -25,6 +26,7 @@ void infokanPlayer()
     InfoPlayer.nyawaIMG = LoadTexture("assets/heart.png");
 }
 
+// modul untuk ubah nyawa player ketika terkena peluru atau mendapat poowerup
 void updateNyawa(GameState *S)
 {
     if (InfoPlayer.AddNyawa)
@@ -44,11 +46,13 @@ void updateNyawa(GameState *S)
     }
 }
 
+// untuk perubahan skor
 void updateScore(int berapa)
 {
     InfoPlayer.score += berapa;
 }
 
+// untuk menampilkan logo nyawa(hati) di layar
 void tampilNyawa()
 {
     ClearBackground(RAYWHITE);
@@ -67,11 +71,13 @@ void tampilNyawa()
     DrawText(TextFormat("Health: %d", InfoPlayer.nyawa), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 190, 30, WHITE);
 }
 
+// menampilkan skor
 void Tampil_Score()
 {
     DrawText(TextFormat("Score: %d", InfoPlayer.score), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 140, 25, RAYWHITE);
 }
 
+// menampilkan gameover ketika user kehabisan darah
 void gameover(GameState *S)
 {
     ClearBackground(BLACK);
@@ -80,8 +86,6 @@ void gameover(GameState *S)
     Vector2 origin = {0, 0};                                        // Titik acuan (pojok kiri atas)
 
     DrawTexturePro(gameOver, source, dest, origin, 0.0f, WHITE);
-    // DrawText("Game Over", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 140, SCREEN_HEIGHT / 2, 50, RAYWHITE);
-    // DrawText("Press R to Restart", (GAMEPLAY_WIDTH + MENU_WIDTH) / 2 - 160, 600, 30, RAYWHITE);
     if (IsKeyPressed(KEY_ENTER))
     {
         PlaySound(clickMenu);
@@ -99,8 +103,7 @@ void gameover(GameState *S)
     }
 }
 
-
-
+// modul untuk grouping / pemanggilan modul modul lain yg berkaitan dengan powerup
 void inipowerup()
 {
     if (level != 3)
@@ -117,6 +120,7 @@ void inipowerup()
     tampilspark();
 }
 
+// initilaisasi awal powerup
 void infoPowerUp()
 {
     powerup.powerupIMG = LoadTexture("assets/powerup.png");
@@ -129,6 +133,7 @@ void infoPowerUp()
     powerup.SpawnTime = 0;
 }
 
+// waktu spawn powerup
 void SpawnPowerUpTime()
 {
     powerup.SpawnTime += GetFrameTime();
@@ -138,6 +143,7 @@ void SpawnPowerUpTime()
     }
 }
 
+// modul untuk memuncul kan powerup
 void spawnPowerUp()
 {
     if (!powerup.active)
@@ -160,6 +166,7 @@ void spawnPowerUp()
     }
 }
 
+// modul untuk menampilkan powerup
 void tampilPowerUp()
 {
     if (powerup.active)
@@ -169,6 +176,7 @@ void tampilPowerUp()
     GetTime();
 }
 
+// modul untuk cek hitbox dari player dengan hitbox dari powerup
 void checkPowerUpCollision()
 {
     GameState *S = &gamestate;
@@ -205,6 +213,7 @@ void checkPowerUpCollision()
         }
     }
 }
+
 
 void updatePowerupTime()
 {
@@ -262,6 +271,7 @@ void updatePowerupTime()
     }
 }
 
+// power up untuk peluru user menjadi double
 void powerupAttack()
 {
     int bulletmuncul = 0;
@@ -309,7 +319,7 @@ void powerupAttack()
     }
 }
 
-
+// powerup shield
 void ShowPowerupShield()
 {
     Vector2 playerPosition = (Vector2){player.position.x + 153, player.position.y + 130};
@@ -319,6 +329,7 @@ void ShowPowerupShield()
     }
 }
 
+// untuk menampilkan sayap ketika user mendapat kan powerup attack
 void ShowWingDoubleAttack()
 {
     Vector2 playerPosition = (Vector2){player.position.x + 153, player.position.y + 130};
@@ -328,6 +339,7 @@ void ShowWingDoubleAttack()
     }
 }
 
+// untuk menampilkan tulisan mengenai info powerup apa yang di dapatkan
 void TampilInfoPowerup()
 {
     DrawText(TextFormat("Powerup: "), GAMEPLAY_WIDTH + MENU_WIDTH / 2 - 85, 350, 30, WHITE);
@@ -350,6 +362,7 @@ void TampilInfoPowerup()
     }
 }
 
+// tampilkan efek ketika user mendapatkan powerup
 void ShowSpark(Vector2 position)
 {
     Sparkles.aktif = true;
@@ -357,6 +370,7 @@ void ShowSpark(Vector2 position)
     Sparkles.PosisiSpark = position;
 }
 
+// efek ketika user mendapat powerup (waktu seberapa lama muncul nya)
 void UpdateSpark()
 {
     if (Sparkles.aktif)
@@ -369,6 +383,7 @@ void UpdateSpark()
     }
 }
 
+// untuk membuat texture dari spark
 void tampilspark()
 {
     if (Sparkles.aktif)
@@ -377,6 +392,7 @@ void tampilspark()
     }
 }
 
+// untuk menghapus tampilan ketika user mendapatkan power up nya
 void ResetSpark()
 {
     Sparkles.aktif = false;
@@ -392,14 +408,12 @@ void InitEnemy(){
         {
             new_enemy->isActive = false;
             new_enemy->next = NULL;
-            /* code */
 
         }
         if (EnemiesHead == NULL)
         {
             EnemiesHead = new_enemy;
             currentEnemy = EnemiesHead;
-            /* code */
         }
         else{
             currentEnemy->next = new_enemy;
@@ -408,6 +422,7 @@ void InitEnemy(){
     }
 }
 
+// untuk menampilkan enemy setiap node list nya
 void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -431,6 +446,7 @@ void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, in
     }
 }
 
+// modul untuk enemy dari tiap node nya bisa bergerak atau menembak
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 {
     address currentEnemy;
@@ -472,6 +488,7 @@ void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEne
     }
 }
 
+// modul untuk memunculkan enemy nya
 void SpawnEnemies(GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -493,6 +510,7 @@ void SpawnEnemies(GameState *S)
     }
 }
 
+// modul untuk mengecek enemy bertabrakan dengan user atau peluru user dan peluru musuh dengan pemain
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -573,6 +591,7 @@ void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBu
     }
 }
 
+// reset enemuy
 void ResetEnemies()
 {
     address currentEnemy = EnemiesHead;
@@ -583,6 +602,7 @@ void ResetEnemies()
     }
 }
 
+// free pointer
 void FreeEnemy()
 {
     address currentEnemy = EnemiesHead;
@@ -594,4 +614,3 @@ void FreeEnemy()
     }
     EnemiesHead = NULL;
 }
-

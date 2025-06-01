@@ -11,6 +11,7 @@
 /********************************************************* LOADING ANIMATION ******************************************************************/
 bool gameStart = false;
 bool isLoadingDone = false;
+Sound nging, duar;
 
 void DrawLayout()
 {
@@ -99,8 +100,8 @@ void unloadTextures()
 
 /********************************************************* USER PLANE ******************************************************************/
 Player player;
-BulletNode *BulletHead = NULL;
-Texture2D bulletTexture;
+// BulletNode *BulletHead = NULL;
+// Texture2D bulletTexture;
 Sound shootSound;
 static float shootCooldown = 0.0f;
 static const float SHOOT_INTERVAL = 0.2f;
@@ -135,45 +136,12 @@ void InitPlayer()
     player.texture = LoadTexture("assets/userPlane.png");
 }
 
-void InitBullets()
+
+void DrawPlayer()
 {
-    if (BulletHead == NULL)
-    {
-        BulletNode *current = NULL;
-
-        for (int i = 0; i < MAX_BULLETS; i++)
-        {
-            BulletNode *newNode = (BulletNode *)malloc(sizeof(BulletNode));
-            if (newNode == NULL)
-            {
-                // Gagal alokasi memori, bisa beri pesan atau hentikan
-                printf("Gagal alokasi memori untuk BulletNode\n");
-                return;
-            }
-            newNode->data.active = false;
-            newNode->next = NULL;
-
-            if (BulletHead == NULL)
-            {
-                BulletHead = newNode;
-                current = BulletHead;
-            }
-            else
-            {
-                current->next = newNode;
-                current = newNode;
-            }
-        }
-    }
-    else
-    {
-        BulletNode *current = BulletHead;
-        while (current != NULL)
-        {
-            current->data.active = false;
-            current = current->next;
-        }
-    }
+    float scale = 0.6f; // Skala 60% dari ukuran aslinya
+    Color playerColor = (playerInvincible > 0) ? (Color){255, 255, 255, 100} : WHITE;
+    DrawTextureEx(player.texture, player.position, 0.0f, scale, playerColor);
 }
 
 void UpdatePlayer()
@@ -186,73 +154,6 @@ void UpdatePlayer()
         player.position.y -= PLAYER_SPEED + AddSpeed;
     if ((IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) && player.position.y < SCREEN_HEIGHT - (((player.texture.height * 0.6) / 2) + 15))
         player.position.y += PLAYER_SPEED + AddSpeed;
-}
-
-void ShootBullet()
-{
-    BulletNode *current = BulletHead;
-
-    while (current != NULL)
-    {
-        if (!current->data.active)
-        {
-            current->data.position = (Vector2){(player.position.x - 25) + player.texture.width * 0.6 / 2, (player.position.y + player.texture.width * 0.6 / 2) - 110};
-            PlaySound(shootSound);
-            current->data.active = true;
-            break;
-        }
-        current = current->next;
-    }
-}
-
-void UpdateBullets()
-{
-    BulletNode *current = BulletHead;
-
-    while (current != NULL)
-    {
-        if (current->data.active)
-        {
-            current->data.position.y -= BULLET_SPEED; // <- Perbaikan di sini
-            if (current->data.position.y < 0)
-            {
-                current->data.active = false;
-            }
-        }
-        current = current->next;
-    }
-}
-
-void DrawPlayer()
-{
-    float scale = 0.6f; // Skala 60% dari ukuran aslinya
-    Color playerColor = (playerInvincible > 0) ? (Color){255, 255, 255, 100} : WHITE;
-    DrawTextureEx(player.texture, player.position, 0.0f, scale, playerColor);
-}
-
-void DrawBullets()
-{
-    BulletNode *current = BulletHead;
-    while (current != NULL)
-    {
-        if (current->data.active)
-        {
-            DrawTexture(bulletTexture, current->data.position.x, current->data.position.y, WHITE);
-        }
-        current = current->next;
-    }
-}
-
-void freeBullets()
-{
-    BulletNode *current = BulletHead;
-    while (current != NULL)
-    {
-        BulletNode *temp = current;
-        current = current->next;
-        free(temp);
-    }
-    BulletHead = NULL;
 }
 
 /********************************************************* SETTER GETTER ******************************************************************/
@@ -326,99 +227,8 @@ int getEnemyDamage(GameState *S)
 
 /********************************************************* EXPLOSIONS ******************************************************************/
 // Explosion explosions[MAX_EXPLOSIONS];
-ExplosionNode* ExplosionHead = NULL;
-Texture2D explosionsTexture;
+
 Sound asteroidDestroyed, userPlaneExplosions;
-
-void CreateExplosion(Vector2 position)
-{
-    ExplosionNode* current = ExplosionHead;
-    ExplosionNode* last = NULL;
-
-    // Cari node yang tidak aktif
-    while (current != NULL)
-    {
-        if (!current->data.active)
-        {
-            current->data.position = position;
-            current->data.active = true;
-            current->data.frame = 0;
-            current->data.timer = 0;
-            return;
-        }
-        last = current;
-        current = current->next;
-    }
-
-    // Jika tidak ada node yang tidak aktif, buat node baru
-    ExplosionNode* newNode = (ExplosionNode*)malloc(sizeof(ExplosionNode));
-    newNode->data.position = position;
-    newNode->data.active = true;
-    newNode->data.frame = 0;
-    newNode->data.timer = 0;
-    newNode->next = NULL;
-
-    if (ExplosionHead == NULL)
-    {
-        ExplosionHead = newNode;
-    }
-    else
-    {
-        last->next = newNode;
-    }
-}
-
-
-void UpdateExplosions(float deltaTime)
-{
-    ExplosionNode* current = ExplosionHead;
-
-    while (current != NULL)
-    {
-        if (current->data.active)
-        {
-            current->data.timer += deltaTime;
-            if (current->data.timer > 0.1f)
-            { // Ubah frame setiap 0.1 detik
-                current->data.frame++;
-                current->data.timer = 0;
-            }
-
-            if (current->data.frame >= 5)
-            { // Misal animasi punya 5 frame
-                current->data.active = false;
-            }
-        }
-        current = current->next;
-    }
-}
-
-void DrawExplosions(Texture2D explosionTexture)
-{
-    ExplosionNode* current = ExplosionHead;
-    while (current != NULL)
-    {
-        if (current->data.active)
-        {
-            Rectangle source = {current->data.frame * 64, 0, 64, 64}; // Misal sprite 64x64
-            Rectangle dest = {current->data.position.x, current->data.position.y, 128, 128};
-            DrawTexturePro(explosionsTexture, source, dest, (Vector2){18, 0}, 0, WHITE);
-        }
-        current = current->next;
-    }
-}
-
-void freeExplosions()
-{
-    ExplosionNode* current = ExplosionHead;
-    while (current != NULL)
-    {
-        ExplosionNode* temp = current;
-        current = current->next;
-        free(temp);
-    }
-    ExplosionHead = NULL;
-}
 
 /********************************************************* ASTEROIDS ******************************************************************/
 
@@ -560,7 +370,7 @@ void DrawAsteroids(GameState *S)
 // Enemy enemies[MAX_ENEMIES];
 address EnemiesHead = NULL;
 PNodeEB ebHead = NULL;
-Sound nging, duar;
+
 
 void InitEnemy(){
     address currentEnemy;
@@ -742,32 +552,6 @@ void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, in
     }
 }
 
-void InitEnemyBullets()
-{
-    for (int i = 0; i < MAX_ENEMY_BULLETS; i++)
-    {
-        PNodeEB newBullet = (PNodeEB)malloc(sizeof(EnemyBulletNode));
-        newBullet->Eb.isActive = false;
-        newBullet->Eb.hasPlayedSound = false;
-        newBullet->Eb.shooterIndex = -1; // Inisialisasi index penembak
-        newBullet->next = NULL;
-
-        if (ebHead == NULL)
-        {
-            ebHead = newBullet;
-        }
-        else
-        {
-            PNodeEB current = ebHead;
-            while (current->next != NULL)
-            {
-                current = current->next;
-            }
-            current->next = newBullet;
-        }
-    }
-}
-
 void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S)
 {
     address currentEnemy = EnemiesHead;
@@ -804,7 +588,7 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
             }
         }
         else if (getEnemyTypeShoot(S) == 1)
-        {
+        {   
             int bulletsSpawned = 0;
             current = ebHead;
             for (int j = 0; j < getMaxEnemyBullet(S) && bulletsSpawned < 4; j++)
@@ -850,117 +634,6 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
         }
         currentEnemy = currentEnemy->next;
     }
-}
-
-void UpdateEnemyBullets(Texture2D enemyBulletTexture, GameState *S)
-{
-    address currentEnemy;
-    currentEnemy = EnemiesHead;
-    int n = getMaxEnemyBullet(S);
-    PNodeEB current = ebHead;
-
-    for (int i = 0; i < getMaxEnemyBullet(S); i++)
-    {
-        if (current->Eb.isActive == true)
-        {
-            if (getEnemyTypeShoot(S) == 3)
-            {
-                int shooterIdx = current->Eb.shooterIndex; // Ambil index musuh yang menembak
-
-                if (shooterIdx >= 0 && shooterIdx < getMaxEnemy(S))
-                {
-                    // Vector2 shooterPos = enemies[shooterIdx].position; // Posisi musuh
-                    Vector2 shooterPos;
-                    int shooterLinklistIdx = shooterIdx; 
-                    while (shooterLinklistIdx > 0)
-                    {
-                        currentEnemy = currentEnemy->next;
-                        shooterLinklistIdx--;
-                    }
-                    shooterPos = currentEnemy->position;
-                    currentEnemy = EnemiesHead;
-                    
-                    if (current->Eb.delayTimer < 2.0f)
-                    {
-                        // Selama 2 detik pertama, peluru mengikuti musuh
-                        current->Eb.position.x = shooterPos.x + (enemyBulletTexture.width / 2) + 71;
-                        current->Eb.position.y = shooterPos.y + enemyBulletTexture.height + 185;
-
-                        current->Eb.delayTimer += GetFrameTime();
-
-                        if (current->Eb.delayTimer < 2.0f && current->Eb.hasPlayedSound == false)
-                        {
-                            SetSoundVolume(nging, 3.0f);
-                            PlaySound(nging);                  // Suara "nging"
-                            current->Eb.hasPlayedSound = true; // Tandai agar tidak diulang
-                        }
-                    }
-
-                    // Setelah 2 detik, mulai tembakan cepat dan mainkan suara "duar"
-                    if (current->Eb.delayTimer >= 2.0f)
-                    {
-                        if (!current->Eb.hasPlayedDuar) // Pastikan "duar" hanya dimainkan sekali
-                        {
-                            PlaySound(duar);
-                            current->Eb.hasPlayedDuar = true; // Tandai sudah dimainkan
-                        }
-                        current->Eb.speed.y = SPEED_ENEMY_BULLETS * 10.0f;
-                        current->Eb.position.y += current->Eb.speed.y;
-
-                        if (current->Eb.position.y > 960)
-                        {
-                            current->Eb.delayTimer = 0;
-                            current->Eb.hasPlayedSound = false; // Reset untuk peluru berikutnya
-                        }
-                    }
-                }
-            }
-            else
-            {
-                current->Eb.position.x += current->Eb.speed.x;
-                current->Eb.position.y += current->Eb.speed.y;
-            }
-            if (current->Eb.position.x <= -15 || current->Eb.position.x >= GAMEPLAY_WIDTH - (enemyBulletTexture.width * 0.8f) + 15)
-            {
-                current->Eb.speed.x *= -1;
-            }
-
-            if (current->Eb.position.y > 960)
-            {
-                current->Eb.isActive = false;
-                current->Eb.hasPlayedSound = false;
-                current->Eb.hasPlayedDuar = false;
-                current->Eb.delayTimer = 0;
-                current->Eb.shooterIndex = -1;
-            }
-        }
-        current = current->next;
-    }
-}
-
-void DrawEnemyBullets(Texture2D enemyBulletTexture, float scale, GameState *S)
-{
-    PNodeEB current = ebHead;
-    for (int i = 0; i < getMaxEnemyBullet(S); i++)
-    {
-        if (current->Eb.isActive)
-        {
-            DrawTextureEx(enemyBulletTexture, current->Eb.position, 0.0f, scale, WHITE);
-        }
-        current = current->next; // Pindah ke peluru musuh berikutnya
-    }
-}
-
-void FreeEnemyBullets()
-{
-    PNodeEB current = ebHead;
-    while (current != NULL)
-    {
-        PNodeEB temp = current;
-        current = current->next;
-        free(temp);
-    }
-    ebHead = NULL;
 }
 
 void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
@@ -1076,39 +749,6 @@ void ResetAsteroid(GameState *S)
     }
 }
 
-void ResetEnemyBullets()
-{
-    PNodeEB current = ebHead;
-    while (current != NULL)
-    {
-        current->Eb.isActive = false;
-        current->Eb.hasPlayedSound = false;
-        current->Eb.hasPlayedDuar = false;
-        current->Eb.shooterIndex = -1;
-        current = current->next;
-    }
-}
-
-void ResetExplosions()
-{
-    ExplosionNode* current = ExplosionHead;
-    while (current != NULL)
-    {
-        current->data.active = false;
-        current = current->next;
-    }
-}
-
-void ResetPlayerBulet()
-{
-    BulletNode *current = BulletHead;
-    while (current != NULL)
-    {
-        current->data.active = false;
-        current = current->next;
-    }
-}
-
 /********************************************************* LOAD AND UNLOAD ******************************************************************/
 Texture2D enemyLvl5, enemyLvl6, enemyBulletLv3, enePurpleDamaged, enemyLvl5Broken, enemylvl1, enemyBulletlv1, gameOver;
 Sound typing;
@@ -1123,8 +763,6 @@ void LoadAssets()
     duar = LoadSound("assets/duar.wav");
     asteroidDestroyed = LoadSound("assets/asteroidDestroyed.wav");
     userPlaneExplosions = LoadSound("assets/userPlaneExplosion.wav");
-    bulletTexture = LoadTexture("assets/bullet.png");
-    explosionsTexture = LoadTexture("assets/Explosions.png");
     hitEffect1 = LoadTexture("assets/efekTembakan1.png");
     hitEffect2 = LoadTexture("assets/efekTembakan2.png");
     enemylvl1 = LoadTexture("assets/musuh.png");

@@ -21,6 +21,7 @@ int main(void)
     InitEnemyBullets();
     InitBullets();
     
+    InitEnemyBullets();
     LoadAssets();
     loadAssetMenu();
     infokanPlayer();
@@ -40,6 +41,7 @@ int main(void)
 
     UnloadImage(IconNa);
     FreeStars();
+    FreeEnemyBullets();
     FreeEnemy();
     CloseAudioDevice();
     UnloadAssets();

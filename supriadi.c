@@ -408,6 +408,29 @@ void InitEnemy(){
     }
 }
 
+void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S)
+{
+    address currentEnemy = EnemiesHead;
+    for (int i = 0; i < getMaxEnemy(S); i++)
+    {
+        if (currentEnemy->isActive)
+        {
+            Texture2D currentTexture = (currentEnemy->health <= getHealthBroke(S)) ? EnemyDamaged : EnemyTexture;
+            DrawTextureEx(currentTexture, currentEnemy->position, 0.0f, scale, WHITE);
+            if (currentEnemy->hitEffectTimer > 0)
+            {
+                Texture2D effect = (currentEnemy->hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
+
+                Vector2 effectPosition;
+                effectPosition.x = currentEnemy->position.x - (effect.width / 2) + xEffect;
+                effectPosition.y = currentEnemy->position.y - (effect.height / 2) + yEffect;
+                DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
+            }
+        }
+        currentEnemy = currentEnemy->next;
+    }
+}
+
 void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 {
     address currentEnemy;
@@ -571,3 +594,4 @@ void FreeEnemy()
     }
     EnemiesHead = NULL;
 }
+

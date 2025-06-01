@@ -17,7 +17,6 @@ StarNode* starHead = NULL;
 
 void InitBosses()
 {
-
     // Load texture dari boss
     bosses.texture = LoadTexture("assets/bossesTest.png");
     BD1 = LoadTexture("assets/bossesBroken1.png");

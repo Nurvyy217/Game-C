@@ -134,6 +134,7 @@ void varRestart()
         ResetEnemyBullets();
         InitPlayer();
         InitBullets();
+        bosses.theEnd = false;
     }
 }
 

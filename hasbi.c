@@ -396,149 +396,92 @@ Sound nging, duar, enemyDestroyed;
 Texture2D  hitEffect1, hitEffect2;
 
 /* INIT ENEMY: ALOKASI UNTUK 1 NODE */
-void InitEnemy(){
-    address currentEnemy;
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        address new_enemy = (address)malloc(sizeof(Enemy));
-        if (new_enemy != NULL)
-        {
-            new_enemy->isActive = false;
-            new_enemy->next = NULL;
-            /* code */
+// void InitEnemy(){
+//     address currentEnemy;
+//     for (int i = 0; i < MAX_ENEMIES; i++)
+//     {
+//         address new_enemy = (address)malloc(sizeof(Enemy));
+//         if (new_enemy != NULL)
+//         {
+//             new_enemy->isActive = false;
+//             new_enemy->next = NULL;
+//             /* code */
 
-        }
-        if (EnemiesHead == NULL)
-        {
-            EnemiesHead = new_enemy;
-            currentEnemy = EnemiesHead;
-            /* code */
-        }
-        else{
-            currentEnemy->next = new_enemy;
-            currentEnemy = new_enemy;
-        }
-    }
-}
+//         }
+//         if (EnemiesHead == NULL)
+//         {
+//             EnemiesHead = new_enemy;
+//             currentEnemy = EnemiesHead;
+//             /* code */
+//         }
+//         else{
+//             currentEnemy->next = new_enemy;
+//             currentEnemy = new_enemy;
+//         }
+//     }
+// }
 
 // void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 // {
+//     address currentEnemy;
+//     currentEnemy = EnemiesHead;
 //     float deltaTime = GetFrameTime();
 //     for (int i = 0; i < getMaxEnemy(S); i++)
 //     {
-//         if (enemies[i].isActive)
+//         if (currentEnemy->isActive)
 //         {
-//             if (enemies[i].hitEffectTimer > 0)
+//             if (currentEnemy->hitEffectTimer > 0)
 //             {
-//                 enemies[i].hitEffectTimer -= deltaTime;
-//                 if (enemies[i].hitEffectTimer <= 0)
+//                 currentEnemy->hitEffectTimer -= deltaTime;
+//                 if (currentEnemy->hitEffectTimer <= 0)
 //                 {
-//                     enemies[i].hitEffectTimer = 0;
+//                     currentEnemy->hitEffectTimer = 0;
 //                 }
 //             }
-//             enemies[i].position.y += enemies[i].speed.y;
-//             enemies[i].position.x += enemies[i].speed.x;
+//             currentEnemy->position.y += currentEnemy->speed.y;
+//             currentEnemy->position.x += currentEnemy->speed.x;
 
-//             if (enemies[i].position.x <= xBounceEnemyRight || enemies[i].position.x >= GAMEPLAY_WIDTH - (EnemyTexture.width * 2.0f) + xBounceEnemyLeft)
+//             if (currentEnemy->position.x <= xBounceEnemyRight || currentEnemy->position.x >= GAMEPLAY_WIDTH - (EnemyTexture.width * 2.0f) + xBounceEnemyLeft)
 //             {
-//                 enemies[i].speed.x *= -1; // Pantulan jika mencapai batas
+//                 currentEnemy->speed.x *= -1; // Pantulan jika mencapai batas
 //             }
 
-//             if (enemies[i].position.y > SCREEN_HEIGHT)
+//             if (currentEnemy->position.y > SCREEN_HEIGHT)
 //             {
-//                 enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
-//                 enemies[i].hasShot = false; // Reset tembakan jika musuh respawn dari atas
+//                 currentEnemy->position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
+//                 currentEnemy->hasShot = false; // Reset tembakan jika musuh respawn dari atas
 //             }
 
 //             // Jika musuh boleh menembak dan belum menembak sebelumnya, maka tembak
-//             if (enemies[i].canShoot && !enemies[i].hasShot && GetRandomValue(0, 100) < 2)
+//             if (currentEnemy->canShoot && !currentEnemy->hasShot && GetRandomValue(0, 100) < 2)
 //             {
 //                 EnemyShoot(EnemyTexture, yPositionBullet, xPositionBullet, S);
 //             }
 //         }
+//         currentEnemy = currentEnemy->next;
 //     }
 // }
-
-void UpdateEnemies(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
-{
-    address currentEnemy;
-    currentEnemy = EnemiesHead;
-    float deltaTime = GetFrameTime();
-    for (int i = 0; i < getMaxEnemy(S); i++)
-    {
-        if (currentEnemy->isActive)
-        {
-            if (currentEnemy->hitEffectTimer > 0)
-            {
-                currentEnemy->hitEffectTimer -= deltaTime;
-                if (currentEnemy->hitEffectTimer <= 0)
-                {
-                    currentEnemy->hitEffectTimer = 0;
-                }
-            }
-            currentEnemy->position.y += currentEnemy->speed.y;
-            currentEnemy->position.x += currentEnemy->speed.x;
-
-            if (currentEnemy->position.x <= xBounceEnemyRight || currentEnemy->position.x >= GAMEPLAY_WIDTH - (EnemyTexture.width * 2.0f) + xBounceEnemyLeft)
-            {
-                currentEnemy->speed.x *= -1; // Pantulan jika mencapai batas
-            }
-
-            if (currentEnemy->position.y > SCREEN_HEIGHT)
-            {
-                currentEnemy->position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
-                currentEnemy->hasShot = false; // Reset tembakan jika musuh respawn dari atas
-            }
-
-            // Jika musuh boleh menembak dan belum menembak sebelumnya, maka tembak
-            if (currentEnemy->canShoot && !currentEnemy->hasShot && GetRandomValue(0, 100) < 2)
-            {
-                EnemyShoot(EnemyTexture, yPositionBullet, xPositionBullet, S);
-            }
-        }
-        currentEnemy = currentEnemy->next;
-    }
-}
 
 // void SpawnEnemies(GameState *S)
 // {
+//     address currentEnemy = EnemiesHead;
 //     for (int i = 0; i < getMaxEnemy(S); i++)
 //     {
-//         if (!enemies[i].isActive)
+//         if (!currentEnemy->isActive)
 //         {
-//             enemies[i].speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, getEnemySpeed(S)) * 0.8};
-//             enemies[i].position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
-//             enemies[i].canShoot = (GetRandomValue(0, 1) == 1);
-//             enemies[i].health = getEnemyHealth(S);
-//             enemies[i].isActive = true;
-//             enemies[i].hasShot = false;
-//             enemies[i].hitEffectTimer = 0;
-//             enemies[i].hitEffectFrame = 0;
+//             currentEnemy->speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, getEnemySpeed(S)) * 0.8};
+//             currentEnemy->position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
+//             currentEnemy->canShoot = (GetRandomValue(0, 1) == 1);
+//             currentEnemy->health = getEnemyHealth(S);
+//             currentEnemy->isActive = true;
+//             currentEnemy->hasShot = false;
+//             currentEnemy->hitEffectTimer = 0;
+//             currentEnemy->hitEffectFrame = 0;
 //             break;
 //         }
+//         currentEnemy = currentEnemy->next;
 //     }
 // }
-
-void SpawnEnemies(GameState *S)
-{
-    address currentEnemy = EnemiesHead;
-    for (int i = 0; i < getMaxEnemy(S); i++)
-    {
-        if (!currentEnemy->isActive)
-        {
-            currentEnemy->speed = (Vector2){GetRandomValue(-2, 2) * 0.5, GetRandomValue(1, getEnemySpeed(S)) * 0.8};
-            currentEnemy->position = (Vector2){GetRandomValue(50, GAMEPLAY_WIDTH - 170), GetRandomValue(-200, -150)};
-            currentEnemy->canShoot = (GetRandomValue(0, 1) == 1);
-            currentEnemy->health = getEnemyHealth(S);
-            currentEnemy->isActive = true;
-            currentEnemy->hasShot = false;
-            currentEnemy->hitEffectTimer = 0;
-            currentEnemy->hitEffectFrame = 0;
-            break;
-        }
-        currentEnemy = currentEnemy->next;
-    }
-}
 
 void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemyLeft, int yPositionBullet, int xPositionBullet, GameState *S)
 {
@@ -553,28 +496,28 @@ void EnemiesLoop(Texture2D EnemyTexture, int xBounceEnemyRight, int xBounceEnemy
     UpdateEnemies(EnemyTexture, xBounceEnemyRight, xBounceEnemyLeft, yPositionBullet, xPositionBullet, S);
 }
 
-void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S)
-{
-    address currentEnemy = EnemiesHead;
-    for (int i = 0; i < getMaxEnemy(S); i++)
-    {
-        if (currentEnemy->isActive)
-        {
-            Texture2D currentTexture = (currentEnemy->health <= getHealthBroke(S)) ? EnemyDamaged : EnemyTexture;
-            DrawTextureEx(currentTexture, currentEnemy->position, 0.0f, scale, WHITE);
-            if (currentEnemy->hitEffectTimer > 0)
-            {
-                Texture2D effect = (currentEnemy->hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
+// void DrawEnemies(Texture2D EnemyTexture, Texture2D EnemyDamaged, float scale, int xEffect, int yEffect, GameState *S)
+// {
+//     address currentEnemy = EnemiesHead;
+//     for (int i = 0; i < getMaxEnemy(S); i++)
+//     {
+//         if (currentEnemy->isActive)
+//         {
+//             Texture2D currentTexture = (currentEnemy->health <= getHealthBroke(S)) ? EnemyDamaged : EnemyTexture;
+//             DrawTextureEx(currentTexture, currentEnemy->position, 0.0f, scale, WHITE);
+//             if (currentEnemy->hitEffectTimer > 0)
+//             {
+//                 Texture2D effect = (currentEnemy->hitEffectFrame == 0) ? hitEffect1 : hitEffect2;
 
-                Vector2 effectPosition;
-                effectPosition.x = currentEnemy->position.x - (effect.width / 2) + xEffect;
-                effectPosition.y = currentEnemy->position.y - (effect.height / 2) + yEffect;
-                DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
-            }
-        }
-        currentEnemy = currentEnemy->next;
-    }
-}
+//                 Vector2 effectPosition;
+//                 effectPosition.x = currentEnemy->position.x - (effect.width / 2) + xEffect;
+//                 effectPosition.y = currentEnemy->position.y - (effect.height / 2) + yEffect;
+//                 DrawTexture(effect, effectPosition.x, effectPosition.y, WHITE);
+//             }
+//         }
+//         currentEnemy = currentEnemy->next;
+//     }
+// }
 
 void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet, GameState *S)
 {
@@ -660,108 +603,108 @@ void EnemyShoot(Texture2D EnemyTexture, int yPositionBullet, int xPositionBullet
     }
 }
 
-void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
-{
-    address currentEnemy = EnemiesHead;
-    Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
+// void CheckEnemyCollisions(int xEnemy, int yEnemy, int radiusPlayer, int radiusBulletEnemy, GameState *S)
+// {
+//     address currentEnemy = EnemiesHead;
+//     Vector2 playerPosition = (Vector2){player.position.x + 185, player.position.y + 150};
 
-    PNodeEB current = ebHead;
+//     PNodeEB current = ebHead;
 
-    for (int i = 0; i < getMaxEnemy(S); i++)
-    {
-        if (!currentEnemy->isActive)
-            continue; // Lewati musuh yang sudah mati
+//     for (int i = 0; i < getMaxEnemy(S); i++)
+//     {
+//         if (!currentEnemy->isActive)
+//             continue; // Lewati musuh yang sudah mati
 
-        Vector2 enemiesPosition = (Vector2){currentEnemy->position.x + xEnemy, currentEnemy->position.y + yEnemy};
+//         Vector2 enemiesPosition = (Vector2){currentEnemy->position.x + xEnemy, currentEnemy->position.y + yEnemy};
 
-        // Cek tabrakan dengan peluru pemain (Musuh tertembak)
-        BulletNode *currentB = BulletHead;
-        while (currentB != NULL)
-        {
-            if (currentB->data.active && CheckCollisionCircles(enemiesPosition, radiusPlayer, currentB->data.position, radiusBulletEnemy))
-            {
-                currentEnemy->health--;
-                currentEnemy->hitEffectTimer = 0.15f; // Waktu efek aktif
-                currentEnemy->hitEffectFrame = (currentEnemy->health % 2);
-                currentB->data.active = false;
-                if (currentEnemy->health <= 0)
-                {
-                    currentEnemy->isActive = false;
-                    currentEnemy->hitEffectTimer = 0;
-                    currentEnemy->hitEffectFrame = 0;
-                    updateScore(2); // Matikan musuh
-                    PlaySound(enemyDestroyed);
-                    CreateExplosion(enemiesPosition);
-                    break; // Hindari multiple hits dalam satu frame
-                }
-            }
+//         // Cek tabrakan dengan peluru pemain (Musuh tertembak)
+//         BulletNode *currentB = BulletHead;
+//         while (currentB != NULL)
+//         {
+//             if (currentB->data.active && CheckCollisionCircles(enemiesPosition, radiusPlayer, currentB->data.position, radiusBulletEnemy))
+//             {
+//                 currentEnemy->health--;
+//                 currentEnemy->hitEffectTimer = 0.15f; // Waktu efek aktif
+//                 currentEnemy->hitEffectFrame = (currentEnemy->health % 2);
+//                 currentB->data.active = false;
+//                 if (currentEnemy->health <= 0)
+//                 {
+//                     currentEnemy->isActive = false;
+//                     currentEnemy->hitEffectTimer = 0;
+//                     currentEnemy->hitEffectFrame = 0;
+//                     updateScore(2); // Matikan musuh
+//                     PlaySound(enemyDestroyed);
+//                     CreateExplosion(enemiesPosition);
+//                     break; // Hindari multiple hits dalam satu frame
+//                 }
+//             }
 
-            currentB = currentB->next;
-        }
-        // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
-        if (playerInvincible <= 0)
-        {
-            if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
-            {
-                updateScore(1);
-                updateNyawa(S);
-                PlaySound(userPlaneExplosions);
-                if (!InfoPlayer.shieldActive)
-                {
-                    CreateExplosion(playerPosition);
-                }
-                currentEnemy->isActive = false; // Hancurkan musuh
-                break;
-            }
-        }
+//             currentB = currentB->next;
+//         }
+//         // Cek tabrakan antara musuh dan pemain (Player menabrak musuh)
+//         if (playerInvincible <= 0)
+//         {
+//             if (CheckCollisionCircles(playerPosition, 45, enemiesPosition, 35))
+//             {
+//                 updateScore(1);
+//                 updateNyawa(S);
+//                 PlaySound(userPlaneExplosions);
+//                 if (!InfoPlayer.shieldActive)
+//                 {
+//                     CreateExplosion(playerPosition);
+//                 }
+//                 currentEnemy->isActive = false; // Hancurkan musuh
+//                 break;
+//             }
+//         }
 
-        // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
-        current = ebHead;
-        while (current != NULL)
-        {
-            if (playerInvincible <= 0)
-            {
-                if (current->Eb.isActive && CheckCollisionCircles(current->Eb.position, 5, playerPosition, 45))
-                {
-                    current->Eb.isActive = false;
-                    PlaySound(enemyDestroyed);
-                    if (!InfoPlayer.shieldActive)
-                    {
-                        CreateExplosion(playerPosition);
-                    }
+//         // Cek tabrakan antara peluru musuh dan pemain (Player tertembak)
+//         current = ebHead;
+//         while (current != NULL)
+//         {
+//             if (playerInvincible <= 0)
+//             {
+//                 if (current->Eb.isActive && CheckCollisionCircles(current->Eb.position, 5, playerPosition, 45))
+//                 {
+//                     current->Eb.isActive = false;
+//                     PlaySound(enemyDestroyed);
+//                     if (!InfoPlayer.shieldActive)
+//                     {
+//                         CreateExplosion(playerPosition);
+//                     }
 
-                    updateNyawa(S);
-                    break;
-                }
-            }
-            current = current->next; // Pindah ke peluru musuh berikutnya
-        }
-        currentEnemy = currentEnemy->next;
-    }
-}
+//                     updateNyawa(S);
+//                     break;
+//                 }
+//             }
+//             current = current->next; // Pindah ke peluru musuh berikutnya
+//         }
+//         currentEnemy = currentEnemy->next;
+//     }
+// }
 
-void FreeEnemy()
-{
-    address currentEnemy = EnemiesHead;
-    while (currentEnemy != NULL)
-    {
-        address temp = currentEnemy;
-        currentEnemy = currentEnemy->next;
-        free(temp);
-    }
-    EnemiesHead = NULL;
-}
+// void FreeEnemy()
+// {
+//     address currentEnemy = EnemiesHead;
+//     while (currentEnemy != NULL)
+//     {
+//         address temp = currentEnemy;
+//         currentEnemy = currentEnemy->next;
+//         free(temp);
+//     }
+//     EnemiesHead = NULL;
+// }
 
 /********************************************************* RESET ******************************************************************/
-void ResetEnemies()
-{
-    address currentEnemy = EnemiesHead;
-    for (int i = 0; i < MAX_ENEMIES; i++)
-    {
-        currentEnemy->isActive = false;
-        currentEnemy = currentEnemy->next;
-    }
-}
+// void ResetEnemies()
+// {
+//     address currentEnemy = EnemiesHead;
+//     for (int i = 0; i < MAX_ENEMIES; i++)
+//     {
+//         currentEnemy->isActive = false;
+//         currentEnemy = currentEnemy->next;
+//     }
+// }
 
 void ResetAsteroid(GameState *S)
 {
@@ -1146,27 +1089,27 @@ void game()
     { 
         UpdateStar();
         // Tentukan level berdasarkan skor
-        if (InfoPlayer.score < 25)
+        if (InfoPlayer.score < 130)
         {
             level = 1;
         }
-        else if (InfoPlayer.score >= 25 && InfoPlayer.score < 50)
+        else if (InfoPlayer.score >= 130 && InfoPlayer.score < 200)
         {
             level = 2;
         }
-        else if (InfoPlayer.score >= 50 && InfoPlayer.score < 75)
+        else if (InfoPlayer.score >= 200 && InfoPlayer.score < 270)
         {
             level = 3;
         }
-        else if (InfoPlayer.score >= 75 && InfoPlayer.score < 100)
+        else if (InfoPlayer.score >= 270 && InfoPlayer.score < 340)
         {
             level = 4;
         }
-        else if (InfoPlayer.score >= 100 && InfoPlayer.score < 125)
+        else if (InfoPlayer.score >= 340 && InfoPlayer.score < 410)
         {
             level = 5;
         }
-        else if (InfoPlayer.score >= 125)
+        else if (InfoPlayer.score >= 410)
         {
             level = 6;
         }
@@ -1205,7 +1148,6 @@ void game()
         }
         else
         {
-            
             switch (level)
             {
             case 1:
@@ -1221,7 +1163,7 @@ void game()
                 // Jika sudah mencapai 20 detik, naik ke level 3
                 if (levelTimer >= 20.0f)
                 {
-                    InfoPlayer.score = 75;
+                    InfoPlayer.score = 270;
                 }
                 break;
             case 4:

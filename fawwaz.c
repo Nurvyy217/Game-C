@@ -2,6 +2,7 @@
 #include "fawwaz.h"
 #include "hasbi.h"
 #include "supriadi.h"
+#include "nazwa.h"
 
 Bosses bosses;
 BossLaser bossLaser;
@@ -483,7 +484,7 @@ void BossExplosions()
                 };
 
                 CreateExplosion(posisi);         // Pakai linked list ledakan
-                PlaySound(asteroidDestroyed);   // Suara ledakan
+                PlaySound(enemyDestroyed);   // Suara ledakan
             }
             timerExp = 0;
         }

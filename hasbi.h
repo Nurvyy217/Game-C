@@ -12,13 +12,11 @@
 #define MENU_WIDTH (SCREEN_WIDTH * 2 / 7)
 // USER PLANE AND BULLET
 #define PLAYER_SPEED 4
-#define BULLET_SPEED 7
-#define MAX_BULLETS 10
+
 // ASTEROIDS
 #define MAX_ASTEROIDS 10
-// EXPLOSION
-#define MAX_EXPLOSIONS 50
-extern Sound asteroidDestroyed;
+
+extern Sound enemyDestroyed;
 // ENEMY
 #define SPEED_ENEMY_BULLETS 4
 #define MAX_ENEMIES 10
@@ -50,20 +48,7 @@ typedef struct
     Texture2D texture;
 } Player;
 
-// USER BULLET
-typedef struct
-{
-    Vector2 position;
-    bool active;
-} Bullet;
 
-typedef struct BulletNode
-{
-    Bullet data;
-    struct BulletNode *next;
-} BulletNode;
-
-extern BulletNode *BulletHead;
 
 // ASTEROID
 typedef struct
@@ -84,20 +69,7 @@ typedef struct AsteroidNode
 } AsteroidNode;
 
 // EXPLOSIONS EFFECT
-typedef struct Explosion
-{
-    Vector2 position;
-    bool active;
-    int frame;   // Frame animasi ledakan
-    float timer; // Untuk mengatur kecepatan animasi
-} Explosion;
 
-typedef struct ExplosionNode {
-    Explosion data;
-    struct ExplosionNode* next;
-} ExplosionNode;
-
-extern ExplosionNode* ExplosionHead;
 
 // ENEMY
 typedef struct Enemy *address;
@@ -175,29 +147,20 @@ void DrawLayout();
 
 // USER PLANE
 void DrawPlayer();
-void DrawBullets();
-void UpdateShooting(float deltaTime);
 void InitPlayer();
-void InitBullets();
 void UpdatePlayer();
-void ShootBullet();
-void UpdateBullets();
-void freeBullets();
+
 
 // ASTEROID
 void DrawAsteroids(GameState *S);
 void AsteroidLoop(GameState *S);
 void SpawnAsteroid(GameState *S);
-void CheckCollisions(GameState *S);
+void CheckCollisionAsteroid(GameState *S);
 void UpdateAsteroids(GameState *S);
 int CountActiveAsteroids(GameState *S);
 void RemoveInactiveAsteroids(GameState *S);
 
-// EXPLOSIONS
-void DrawExplosions(Texture2D explosionsTexture);
-void UpdateExplosions(float deltaTime);
-void CreateExplosion(Vector2 position);
-void freeExplosions();
+
 
 // ENEMY
 void InitEnemyBullets();
@@ -249,8 +212,6 @@ int getHealthBroke(GameState *S);
 int getEnemyDamage(GameState *S);
 
 // RESET
-void ResetPlayerBulet();
-void ResetExplosions();
 void ResetEnemyBullets();
 void ResetEnemies();
 void ResetAsteroid(GameState *S);
